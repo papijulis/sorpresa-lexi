@@ -116,6 +116,19 @@ function main() {
     }
   }
 
+  // Archivos "fantasma": existen pero están vacíos o son placeholders (así estuvieron
+  // los mp3 de las canciones: 2 bytes). Cualquier asset binario < 1 KB es sospechoso.
+  for (const relPath of checked) {
+    const absPath = path.join(ROOT, relPath);
+    if (!fs.existsSync(absPath)) continue;
+    if (!/\.(mp3|jpe?g|webp|png|woff2)$/i.test(relPath)) continue;
+    const size = fs.statSync(absPath).size;
+    if (size < 1024) {
+      hasErrors = true;
+      console.error(`✗ ./${relPath}  pesa solo ${size} bytes: parece un placeholder vacío`);
+    }
+  }
+
   const missingWebp = checkWebpSiblings(referencesByPath);
   for (const { relPath, webpPath, usedIn } of missingWebp) {
     hasErrors = true;

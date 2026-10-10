@@ -15,6 +15,7 @@ window.JuegoConstelacion = (function () {
   let connected = 0;
   let finished = false;
   let raf = null;
+  let cw = 0, ch = 0;
   let listeners = [];
 
   function loadState() {
@@ -54,6 +55,7 @@ window.JuegoConstelacion = (function () {
     canvas.height = Math.max(1, Math.round(rect.height * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+    cw = rect.width; ch = rect.height;
     const cx = rect.width / 2;
     const cy = rect.height / 2 - rect.height * 0.04;
     const scale = Math.min(rect.width, rect.height) / 36;
@@ -70,8 +72,7 @@ window.JuegoConstelacion = (function () {
   }
 
   function draw(t) {
-    const rect = canvas.getBoundingClientRect();
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    ctx.clearRect(0, 0, cw, ch);
 
     bgStars.forEach((s) => {
       ctx.save();

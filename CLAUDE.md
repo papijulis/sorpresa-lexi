@@ -16,7 +16,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 1. **No truncar código ni usar placeholders.** Todo lo entregado debe funcionar de inmediato.
 2. **Rendimiento 60 fps**, mobile-first. Canvas con `devicePixelRatio` limitado a 2, pausar animaciones cuando la pestaña esté oculta o la sección no sea visible (`visibilitychange` / `IntersectionObserver`), respetar `prefers-reduced-motion`.
 3. **Sin Tailwind CDN.** El estilo utilitario vive en `assets/css/utilities.css`, escrito a mano con SOLO las clases usadas. Cada vez que se use una clase utilitaria nueva en HTML o JS, agregarla a ese archivo.
-4. **Rutas de assets sensibles a mayúsculas/minúsculas** (GitHub Pages corre en Linux). Antes de cada commit correr `node tools/check-assets.js` (también revisa que cada foto `.jpeg` de galería tenga su hermano `.webp`). Nombres reales actuales:
+4. **Rutas de assets sensibles a mayúsculas/minúsculas** (GitHub Pages corre en Linux). Antes de cada commit correr `node tools/check-assets.js` (también revisa que cada foto `.jpeg` de galería tenga su hermano `.webp` y que ningún mp3/imagen/fuente pese menos de 1 KB: así se detectan placeholders vacíos). Nombres reales actuales:
    - Audio (`assets/audio/`): `Honeybee.mp3`, `Lover.mp3`, `So-High-School.mp3`, `nota-voz.mp3`
    - Imágenes (`assets/img/`, todas `.jpeg` + `.webp` desde Fase 5, ~760px de lado largo): `fondo-chat`, `viendo-edgerunners`, `flores-panchito`, `lirios-jarron`, `lirios-rosas`, `frutos-rojos`, `lirios-rosas-2`, `girasoles-ella`, `girasoles`, `ramo-feito-ella`. Los originales sin tocar viven en `assets/img/originales/` (mismos nombres, nunca se sirven ni se cachean) — para volver a optimizar corre `python3 tools/optimize-images.py`.
    - `assets/img/og.jpg` (metatags para compartir) es la única imagen de `assets/img/` que **no** necesita `.webp` — solo la leen crawlers de redes sociales, nunca pasa por `pictureHTML()`.
@@ -123,7 +123,7 @@ por cada día 28.
 
 ## Rincón de Juegos (Fase 3)
 
-Juegos: cupones para raspar (15, 5 filas de 3), memorama, lluvia de lirios,
+Juegos: cupones para raspar (15: 3 filas de 5 en pantallas ≥1024px, 3 columnas en tablet, 2 en móvil con el último centrado), memorama, lluvia de lirios,
 cacería de corazones, Constelación, Wrapped y Cúrame. La Trivia se eliminó
 por decisión de Julio (no volver a agregarla).
 
@@ -220,6 +220,7 @@ del bloque de "te amo".
 - La sección "Lo que nos falta vivir" se eliminó por decisión de Julio (no volver a agregarla).
 - Inicio: `#hero-panel` es un cuadro semitransparente que aparece ~4.5 s después de abrir el sitio (clase `.shown`) para que "Para ti" y el texto se lean sobre los lirios; sin la fecha "21 de septiembre" arriba. En modo ligero (`body.light-mode`) no usa blur.
 - Cursor: cursor nativo siempre visible; el rastro de pétalos dorados tiene su propio rAF (`cursorFrame`), independiente del loop principal (que se pausa con overlays) para que nunca quede congelado en pantalla.
+- Rendimiento del canvas: los lirios ya florecidos se dibujan desde un sprite cacheado (`buildLilySprite`) en vez de rehacer 6 gradientes por flor por cuadro; `scrollYCache` evita leer `window.scrollY` (layout forzado) en cada cuadro; ningún loop debe llamar a `getBoundingClientRect()` por cuadro, guarda el tamaño en el resize.
 - Ritual 11:11 en vivo: `check1111()` abre un aviso si está en el sitio a las
   11:11 o 23:11 (hora de México), una vez por cada 11:11 de cada día.
 

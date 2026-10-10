@@ -135,7 +135,7 @@ window.JuegoCupones = (function () {
     const reveal = document.createElement('div');
     reveal.className = 'cupon-reveal';
     reveal.innerHTML = `
-      <span style="font-size:2rem;">${cupon.emoji}</span>
+      <span class="cupon-emoji">${cupon.emoji}</span>
       <p class="font-display text-sm" style="color:#FDFBF7;">${cupon.titulo}</p>
       <p class="font-ui text-[11px]" style="color:rgba(253,251,247,.6);">${cupon.descripcion}</p>
     `;
