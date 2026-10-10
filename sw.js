@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -35,7 +35,6 @@ const SHELL_URLS = [
   './js/juegos/lluvia-lirios.js',
   './js/juegos/caceria.js',
   './js/juegos/constelacion.js',
-  './js/juegos/wrapped.js',
   './js/juegos/curame.js',
 ];
 
@@ -48,7 +47,6 @@ const CONTENIDO_URLS = [
   './contenido/cartas.js',
   './contenido/frases.js',
   './contenido/cupones.js',
-  './contenido/wrapped.js',
 ];
 
 self.addEventListener('install', (event) => {

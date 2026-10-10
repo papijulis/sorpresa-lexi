@@ -50,7 +50,6 @@ Entradas nuevas: 29 de mayo, 18 de junio (Chapultepec), 1 de julio
 ## Juegos
 
 - **Cupones (`cupones.js`):** 15 cupones del banco, descripciones cortas y sin referencias. Ya no contactan a nadie: el botón es "Acepto" y muestra una nota (`NOTA_CUPON`).
-- **Wrapped (`wrapped.js`):** cifras aproximadas del banco, en tu voz.
 - **Cúrame (`js/juegos/curame.js`):** 40 segundos, sin game over duro; "como si fueras Luna en Rivals".
 
 ## Otros textos (`contenido/config.js`, `canciones.js`)

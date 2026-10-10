@@ -44,7 +44,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 ├─ manifest.webmanifest       # PWA — nombre, íconos, theme_color
 ├─ sw.js                      # Service worker: HTML/JS/CSS network-first (los arreglos llegan de inmediato), contenido/*.js
 │                              # también network-first (con SWR se veía HTML nuevo + contenido viejo), fuentes/fotos cache-first, audio NO se intercepta (Range). Sube CACHE_VERSION
-│                              # (hoy v5) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
+│                              # (hoy v6) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
 ├─ CLAUDE.md                  # este archivo
 ├─ REVISAR.md                 # lista de textos borrador para que Julio revise/edite
 ├─ contenido/                 # TODO lo que Julio edita, vía <script src> (globals, no ES modules ni fetch — debe funcionar en file:// y GitHub Pages)
@@ -56,7 +56,6 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 │  ├─ cupones.js              # cupones raspables (CUPONES)
 │  ├─ frases.js               # banco de frases (FRASES) — 20 seed en Fase 2, Fase 4 lo amplía a 120
 │  ├─ canciones.js            # soundtrack (SONGS)
-│  └─ wrapped.js              # cifras para el Wrapped (WRAPPED)
 ├─ js/juegos/                 # un archivo por juego del Rincón de Juegos (Fase 3), cada uno expone
 │                              # window.Juego<Nombre> = { id, titulo, emoji, descripcion, start(mount), stop() }.
 │                              # Nunca llaman a globales del script principal (openModal, jardinStorage, SONGS…)
@@ -124,8 +123,8 @@ por cada día 28.
 ## Rincón de Juegos (Fase 3)
 
 Juegos: cupones para raspar (15: 3 filas de 5 en pantallas ≥1024px, 3 columnas en tablet, 2 en móvil con el último centrado), memorama, lluvia de lirios,
-cacería de corazones, Constelación, Wrapped y Cúrame. La Trivia se eliminó
-por decisión de Julio (no volver a agregarla).
+cacería de corazones, Constelación y Cúrame: 6 tarjetas en el Rincón, 2 columnas
+de 3. La Trivia y el Wrapped se eliminaron por decisión de Julio (no volver a agregarlos).
 
 - **Constelación** (`js/juegos/constelacion.js` → `window.JuegoConstelacion`):
   12 estrellas sobre la curva paramétrica clásica del corazón
@@ -144,7 +143,6 @@ por decisión de Julio (no volver a agregarla).
   decoración SVG permanente en el cielo nocturno del Jardín una vez que
   Lexi la complete, sin reimplementar la curva del corazón una segunda vez.
 
-- **Wrapped** (`contenido/wrapped.js`, `js/juegos/wrapped.js`): slides con cifras del chat (solo conteos); toca/Siguiente/flechas; los números suben con animación (instantáneo con reduced-motion).
 - **Cúrame** (`js/juegos/curame.js`): 40 s curando a Julio tocando corazones, sin game over duro; guarda `jardin.curame.v1` y abre la carta `desbloqueaCon: "curame"`.
 
 Las cartas secretas de juegos no se abren por fecha: tienen

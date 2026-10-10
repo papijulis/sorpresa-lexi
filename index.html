@@ -354,14 +354,15 @@
   .letter-detail-text { white-space: pre-line; }
 
   /* ---- Rincón de Juegos ---- */
-  .juegos-grid { display: grid; grid-template-columns: repeat(1, minmax(0,1fr)); gap: 1.25rem; }
+  .juegos-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .9rem; }
   .juegos-grid.hidden { display: none; }
-  @media (min-width: 640px) { .juegos-grid { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.5rem; } }
+  @media (min-width: 640px) { .juegos-grid { gap: 1.5rem; } }
   .juego-card {
     text-align: left; cursor: pointer; padding: 1.5rem;
     transition: transform .2s ease;
   }
   .juego-card:hover { transform: translateY(-3px); }
+  @media (max-width: 639px) { .juego-card { padding: 1rem; } .juego-card .font-display { font-size: 1rem; line-height: 1.25; } }
   .juego-card-emoji { font-size: 2rem; margin-bottom: .5rem; display: block; }
   .juego-card-progress { font-size: .72rem; color: rgba(255,215,0,.8); margin-top: .5rem; font-family: 'Inter', sans-serif; }
 
@@ -458,36 +459,6 @@
   @keyframes constellationTwinkle { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
   .night-constellation circle { animation: constellationTwinkle 3.6s ease-in-out infinite; }
 
-
-  /* ---- wrapped ---- */
-  .wrapped-wrap { max-width: 420px; margin: 0 auto; }
-  .wrapped-progress { display: flex; gap: 4px; margin-bottom: .9rem; }
-  .wrapped-progress span { flex: 1; height: 3px; border-radius: 3px; background: rgba(255,255,255,.18); transition: background .3s ease; }
-  .wrapped-progress span.done { background: #FFD700; }
-  .wrapped-card {
-    min-height: 340px; padding: 1.75rem 1.5rem; border-radius: 1.25rem; cursor: pointer; user-select: none;
-    background: radial-gradient(circle at 50% 0%, #270D42, #090112); border: 1px solid rgba(255,255,255,.12);
-    display: flex; flex-direction: column; justify-content: center; text-align: center; gap: .7rem;
-  }
-  .wrapped-eyebrow { font-family: 'Inter', sans-serif; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(255,215,0,.8); margin: 0; }
-  .wrapped-big { font-family: 'Playfair Display', serif; font-weight: 700; font-size: clamp(2.6rem, 14vw, 3.8rem); color: #FFD700; line-height: 1.05; margin: .2rem 0 0; }
-  .wrapped-closing { font-size: clamp(1.7rem, 8vw, 2.3rem); }
-  .wrapped-unit { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: #FDFBF7; margin: 0; }
-  .wrapped-title { font-size: 1.6rem; margin-bottom: .6rem; }
-  .wrapped-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: rgba(253,251,247,.8); line-height: 1.5; margin: .6rem 0 0; }
-  .wrapped-note { font-family: 'Inter', sans-serif; font-size: .7rem; color: rgba(253,251,247,.45); margin: .8rem 0 0; }
-  .wrapped-bar-row { display: grid; grid-template-columns: 6.2rem 1fr auto; align-items: center; gap: .6rem; text-align: left; }
-  .wrapped-bar-name { font-family: 'Inter', sans-serif; font-size: .75rem; color: rgba(253,251,247,.75); }
-  .wrapped-bar-track { height: 12px; border-radius: 12px; background: rgba(255,255,255,.1); overflow: hidden; }
-  .wrapped-bar-fill { height: 100%; width: 0; border-radius: 12px; transition: width .9s cubic-bezier(.2,.8,.2,1); }
-  .wrapped-bar-val { font-family: 'Inter', sans-serif; font-size: .75rem; color: #FDFBF7; min-width: 4.5rem; text-align: right; }
-  .wrapped-nav { display: flex; justify-content: space-between; gap: .75rem; margin-top: .9rem; }
-  .wrapped-nav-btn {
-    flex: 1; padding: .6rem 1rem; border-radius: 999px; border: 1px solid rgba(255,255,255,.18);
-    background: rgba(255,255,255,.07); color: #FDFBF7; font-family: 'Inter', sans-serif; font-size: .8rem; cursor: pointer;
-  }
-  .wrapped-nav-btn:disabled { opacity: .4; cursor: default; }
-  .wrapped-nav-btn:focus-visible { outline: 2px solid #FFD700; outline-offset: 2px; }
 
   /* ---- cúrame ---- */
   .curame-wrap { max-width: 420px; margin: 0 auto; }
@@ -951,14 +922,12 @@
 <script src="./contenido/cartas.js"></script>
 <script src="./contenido/frases.js"></script>
 <script src="./contenido/cupones.js"></script>
-<script src="./contenido/wrapped.js"></script>
 
 <script src="./js/juegos/cupones.js"></script>
 <script src="./js/juegos/memorama.js"></script>
 <script src="./js/juegos/lluvia-lirios.js"></script>
 <script src="./js/juegos/caceria.js"></script>
 <script src="./js/juegos/constelacion.js"></script>
-<script src="./js/juegos/wrapped.js"></script>
 <script src="./js/juegos/curame.js"></script>
 
 <script>
@@ -2620,7 +2589,7 @@ function celebrateMesiversarioIfNeeded() {
    siempre activa en el Jardín (JuegoCaceria.init()), aquí solo se
    muestra su progreso.
 ====================================================================== */
-const JUEGOS_JUGABLES = [window.JuegoCupones, window.JuegoMemorama, window.JuegoLluviaLirios, window.JuegoConstelacion, window.JuegoWrapped, window.JuegoCurame].filter(Boolean);
+const JUEGOS_JUGABLES = [window.JuegoCupones, window.JuegoMemorama, window.JuegoLluviaLirios, window.JuegoConstelacion, window.JuegoCurame].filter(Boolean);
 
 const viewJuegos = document.getElementById('view-juegos');
 const juegosToggleBtn = document.getElementById('juegos-toggle');
