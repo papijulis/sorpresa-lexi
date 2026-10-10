@@ -219,7 +219,7 @@ del bloque de "te amo".
   la primera carta. `CARTA_FINAL` también es un sobre abierto del Buzón.
 - La sección "Lo que nos falta vivir" se eliminó por decisión de Julio (no volver a agregarla).
 - Inicio: `#hero-panel` es un cuadro semitransparente que aparece ~4.5 s después de abrir el sitio (clase `.shown`) para que "Para ti" y el texto se lean sobre los lirios; sin la fecha "21 de septiembre" arriba. En modo ligero (`body.light-mode`) no usa blur.
-- Cursor: cursor nativo siempre visible; el rastro de pétalos dorados tiene su propio rAF (`cursorFrame`), independiente del loop principal (que se pausa con overlays) para que nunca quede congelado en pantalla.
+- Cursor: cursor nativo siempre visible (nunca `cursor:none`) y la manita (`cursor:pointer`) en todo lo clicable vía regla global `button, [role="button"], a[href]…` (venía del preflight de Tailwind y se había perdido). La capa superior `#cursor-canvas` (z 200) tiene su propio rAF (`topFrame`), independiente del loop principal, y dibuja el rastro de pétalos (por `pointermove` de mouse/lápiz, nunca touch) y los destellos de premio (`spawnSparkleBurst` los manda ahí cuando el canvas principal está pausado, así se ven al ganar un juego). Todo lo que decae lo hace por tiempo (dt), no por cuadro.
 - Rendimiento del canvas: los lirios ya florecidos se dibujan desde un sprite cacheado (`buildLilySprite`) en vez de rehacer 6 gradientes por flor por cuadro; `scrollYCache` evita leer `window.scrollY` (layout forzado) en cada cuadro; ningún loop debe llamar a `getBoundingClientRect()` por cuadro, guarda el tamaño en el resize.
 - Ritual 11:11 en vivo: `check1111()` abre un aviso si está en el sitio a las
   11:11 o 23:11 (hora de México), una vez por cada 11:11 de cada día.

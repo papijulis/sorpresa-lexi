@@ -64,6 +64,9 @@
   }
   body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
   button, a { -webkit-tap-highlight-color: transparent; }
+  /* la regla button{cursor:pointer} venía del preflight de Tailwind; al quitar el CDN se perdió */
+  button, [role="button"], [role="checkbox"], a[href], summary, select, label[for] { cursor: pointer; }
+  button:disabled, [aria-disabled="true"] { cursor: default; }
   button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid #FFD700; outline-offset: 3px; }
 
   #bg-layer-day, #bg-layer-sunset {
@@ -1027,6 +1030,7 @@ const cursorCtx = cursorCanvas.getContext('2d', { alpha: true });
 let vw = 0, vh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 function resizeCanvas() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
   vw = window.innerWidth;
   vh = window.innerHeight;
   canvas.width = vw * dpr;
@@ -1078,6 +1082,7 @@ function applyLightMode() {
 
 let particles = [];
 let sparkles = [];
+let topSparkles = [];
 let bokehs = [];
 let blooms = [];
 let butterflies = [];
@@ -1241,11 +1246,15 @@ function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1 }) {
 }
 
 /* ---- sparkles + bokeh ---- */
+/* Cuando el canvas principal está pausado (cartas, juegos, vistas abiertas)
+   los destellos de premio se dibujan en la capa superior (#cursor-canvas,
+   encima de todo) para que se vean al ganar un juego. */
 function spawnSparkleBurst(x, y, count, rising = false) {
+  const target = (rafId === null && !document.hidden) ? topSparkles : sparkles;
   for (let i = 0; i < count; i++) {
     const angle = rising ? rand(-Math.PI * 0.75, -Math.PI * 0.25) : rand(0, Math.PI * 2);
     const speed = rising ? rand(0.3, 0.9) : rand(0.6, 3.2);
-    sparkles.push({
+    target.push({
       x, y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - (rising ? rand(0.2, 0.5) : rand(0.5, 1.5)),
@@ -1254,6 +1263,7 @@ function spawnSparkleBurst(x, y, count, rising = false) {
       size: rand(1.5, 3.5),
     });
   }
+  if (target === topSparkles) startTopLayer();
 }
 function spawnBokeh(x, y, count) {
   for (let i = 0; i < count; i++) {
@@ -1395,50 +1405,81 @@ function drawBird(b) {
   ctx.restore();
 }
 
-/* ---- rastro de pétalos del cursor (escritorio) ----
-   Tiene su propio requestAnimationFrame, independiente del loop principal:
-   ese se pausa con cartas, juegos y vistas abiertas, y el rastro se quedaba
-   congelado sobre la pantalla. Solo corre mientras haya puntos. El cursor
-   nativo nunca se oculta. */
+/* ---- capa superior (#cursor-canvas, z-index 200): rastro de pétalos del
+   cursor + destellos de premio cuando el canvas principal está pausado ----
+   Tiene su propio requestAnimationFrame, independiente del loop principal
+   (que se pausa con cartas, juegos y vistas abiertas), y solo corre mientras
+   haya algo que dibujar. El cursor nativo nunca se oculta. El rastro usa
+   pointermove (mouse o lápiz), así funciona también en laptops con pantalla
+   táctil, donde (pointer: fine) puede dar falso. */
 let cursorTrail = [];
-let cursorRaf = null;
+let topRaf = null;
+let topLast = 0;
 const isDesktopPointer = window.matchMedia('(pointer: fine)').matches;
-function drawCursorTrail() {
-  cursorCtx.fillStyle = isSunset ? '#FB7185' : '#FFD700';
-  cursorTrail.forEach((c) => {
-    cursorCtx.globalAlpha = Math.max(0, c.life) * 0.6;
-    cursorCtx.beginPath();
-    cursorCtx.ellipse(c.x, c.y, 4.2 * c.life + 1, 2 * c.life + 0.6, c.rot, 0, Math.PI * 2);
-    cursorCtx.fill();
-  });
+const TRAIL_LIFE_MS = 480;
+function drawTopLayer() {
+  if (cursorTrail.length) {
+    cursorCtx.fillStyle = isSunset ? '#FB7185' : '#FFD700';
+    cursorTrail.forEach((c) => {
+      cursorCtx.globalAlpha = Math.max(0, c.life) * 0.6;
+      cursorCtx.beginPath();
+      cursorCtx.ellipse(c.x, c.y, 4.2 * c.life + 1, 2 * c.life + 0.6, c.rot, 0, Math.PI * 2);
+      cursorCtx.fill();
+    });
+  }
+  if (topSparkles.length) {
+    cursorCtx.fillStyle = '#FFD700';
+    topSparkles.forEach((sp) => {
+      const a = Math.max(0, sp.life);
+      cursorCtx.globalAlpha = a * 0.35;
+      cursorCtx.beginPath(); cursorCtx.arc(sp.x, sp.y, sp.size * 2.2, 0, Math.PI * 2); cursorCtx.fill();
+      cursorCtx.globalAlpha = a;
+      cursorCtx.beginPath(); cursorCtx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2); cursorCtx.fill();
+    });
+  }
   cursorCtx.globalAlpha = 1;
 }
-function cursorFrame() {
-  cursorRaf = null;
+function topFrame(t) {
+  topRaf = null;
+  const dt = topLast ? Math.min(t - topLast, 64) : 16;
+  topLast = t;
   for (let i = cursorTrail.length - 1; i >= 0; i--) {
-    cursorTrail[i].life -= 0.035;
+    cursorTrail[i].life -= dt / TRAIL_LIFE_MS;
     if (cursorTrail[i].life <= 0) cursorTrail.splice(i, 1);
   }
+  for (let i = topSparkles.length - 1; i >= 0; i--) {
+    const sp = topSparkles[i];
+    const k = dt / 16.67;
+    sp.x += sp.vx * k; sp.y += sp.vy * k; sp.vy += 0.01 * k; sp.life -= sp.decay * k;
+    if (sp.life <= 0) topSparkles.splice(i, 1);
+  }
   cursorCtx.clearRect(0, 0, vw, vh);
-  if (cursorTrail.length) {
-    drawCursorTrail();
-    cursorRaf = requestAnimationFrame(cursorFrame);
+  if (cursorTrail.length || topSparkles.length) {
+    drawTopLayer();
+    topRaf = requestAnimationFrame(topFrame);
+  } else {
+    topLast = 0;
   }
 }
-if (isDesktopPointer) {
-  window.addEventListener('mousemove', (e) => {
-    if (cursorTrail.length > 40) cursorTrail.shift();
-    cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI) });
-    if (!cursorRaf && !document.hidden) cursorRaf = requestAnimationFrame(cursorFrame);
-  });
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      cursorTrail = [];
-      if (cursorRaf) { cancelAnimationFrame(cursorRaf); cursorRaf = null; }
-      cursorCtx.clearRect(0, 0, vw, vh);
-    }
-  });
+function startTopLayer() {
+  if (!topRaf && !document.hidden) topRaf = requestAnimationFrame(topFrame);
 }
+window.addEventListener('pointermove', (e) => {
+  if (e.pointerType === 'touch') return;
+  if (cursorTrail.length > 40) cursorTrail.shift();
+  cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI) });
+  startTopLayer();
+}, { passive: true });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    cursorTrail = []; topSparkles = [];
+    if (topRaf) { cancelAnimationFrame(topRaf); topRaf = null; }
+    topLast = 0;
+    cursorCtx.clearRect(0, 0, vw, vh);
+  }
+});
+/* si el cursor sale de la ventana, el rastro se desvanece solo (no se queda pegado) */
+document.documentElement.addEventListener('pointerleave', () => { cursorTrail.length = 0; });
 
 /* ---- main render loop ---- */
 let lastFrame = performance.now();
@@ -1500,7 +1541,10 @@ let rafId = requestAnimationFrame(loop);
 const canvasPauseReasons = new Set();
 function updateCanvasPauseState() {
   if (canvasPauseReasons.size > 0) {
-    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    if (rafId) {
+      cancelAnimationFrame(rafId); rafId = null;
+      sparkles.length = 0; // los destellos del fondo no deben quedar congelados ni reaparecer después
+    }
   } else if (!rafId) {
     lastFrame = performance.now(); // evita un dt gigante por el tiempo en pausa
     rafId = requestAnimationFrame(loop);
