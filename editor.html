@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Editor — Nuestro Jardín</title>
+<style>
+  :root {
+    --plum: #18062B; --plum-dark: #090112; --plum-deep: #270D42;
+    --amethyst: #A855F7; --amethyst-orchid: #7E22CE; --amethyst-lavender: #E9D5FF;
+    --gold: #FFD700; --gold-amber: #F59E0B; --gold-soft: #FACC15;
+    --rose: #FB7185; --rose-deep: #E11D48;
+    --parchment: #FDFBF7; --parchment-warm: #F5EBE1; --parchment-ink: #3B2A1A;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100vh;
+    background: radial-gradient(circle at 50% 0%, var(--plum-deep) 0%, var(--plum-dark) 60%, #05000a 100%);
+    color: var(--parchment);
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  header {
+    padding: 2rem 1.5rem 1rem;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0 0 .35rem;
+    font-size: 1.8rem;
+    color: var(--gold);
+    font-weight: 600;
+  }
+  header p {
+    margin: 0;
+    font-size: .85rem;
+    color: rgba(253,251,247,.6);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
+  }
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    justify-content: center;
+    margin-bottom: 1.75rem;
+  }
+  .tab-btn {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .85rem;
+    padding: .55rem 1.1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(255,255,255,.05);
+    color: var(--parchment);
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .tab-btn:hover { background: rgba(255,255,255,.1); }
+  .tab-btn.active {
+    background: linear-gradient(to right, var(--gold), var(--gold-soft));
+    color: var(--plum-dark);
+    border-color: transparent;
+    font-weight: 700;
+  }
+  .panel { display: none; }
+  .panel.active { display: block; animation: fadeIn .25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .card {
+    background: rgba(255,255,255,.055);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    padding: 1.5rem;
+    margin-bottom: 1.25rem;
+  }
+  .card h2 {
+    margin: 0 0 1rem;
+    font-size: 1.15rem;
+    color: var(--gold-soft);
+  }
+  label {
+    display: block;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: rgba(253,251,247,.55);
+    margin: 1rem 0 .35rem;
+  }
+  label:first-of-type { margin-top: 0; }
+  input, textarea, select {
+    width: 100%;
+    font-family: Georgia, serif;
+    font-size: .95rem;
+    padding: .6rem .75rem;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(5,0,10,.35);
+    color: var(--parchment);
+    resize: vertical;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+  }
+  select { cursor: pointer; }
+  .row { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .row > div { flex: 1; min-width: 160px; }
+  .checkbox-row {
+    display: flex; align-items: center; gap: .5rem;
+    margin-top: 1rem;
+    font-family: Arial, Helvetica, sans-serif; font-size: .85rem;
+    color: rgba(253,251,247,.75);
+  }
+  .checkbox-row input { width: auto; }
+
+  .actions { display: flex; gap: .75rem; margin-top: 1.25rem; flex-wrap: wrap; }
+  button.primary {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 700; font-size: .9rem;
+    padding: .7rem 1.4rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(to right, var(--gold), var(--gold-soft), var(--gold-amber));
+    color: var(--plum-dark);
+  }
+  button.primary:hover { filter: brightness(1.05); }
+  button.ghost {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .85rem;
+    padding: .65rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.2);
+    background: transparent;
+    color: var(--parchment);
+    cursor: pointer;
+  }
+  button.ghost:hover { background: rgba(255,255,255,.08); }
+
+  .output-wrap { margin-top: 1.5rem; }
+  .output-wrap h3 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .8rem; text-transform: uppercase; letter-spacing: .04em;
+    color: rgba(253,251,247,.55);
+    margin: 0 0 .5rem;
+  }
+  pre {
+    background: #05000a;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 12px;
+    padding: 1rem;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .82rem;
+    line-height: 1.5;
+    color: #FDE68A;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .hint {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .78rem;
+    color: rgba(253,251,247,.45);
+    margin-top: .4rem;
+  }
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(to right, var(--gold), var(--gold-soft));
+    color: var(--plum-dark);
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 700; font-size: .85rem;
+    padding: .65rem 1.3rem;
+    border-radius: 999px;
+    opacity: 0; pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, -8px); }
+
+  .mini-count {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: .78rem;
+    color: rgba(253,251,247,.5);
+    margin-top: -.5rem;
+    margin-bottom: .75rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Editor — Nuestro Jardín</h1>
+  <p>Solo para Julio. Genera los bloques listos para pegar en <code>contenido/*.js</code>. Funciona 100% offline.</p>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="carta">Carta</button>
+    <button class="tab-btn" data-tab="razon">Razón</button>
+    <button class="tab-btn" data-tab="recuerdo">Recuerdo</button>
+    <button class="tab-btn" data-tab="foto">Foto</button>
+    <button class="tab-btn" data-tab="cupon">Cupón</button>
+  </div>
+
+  <!-- ===================== CARTA ===================== -->
+  <section class="panel active" id="panel-carta">
+    <div class="card">
+      <h2>Nueva carta (contenido/cartas.js)</h2>
+      <div class="row">
+        <div>
+          <label for="carta-id">ID (único, sin espacios)</label>
+          <input id="carta-id" type="text" placeholder="mes-6">
+        </div>
+        <div>
+          <label for="carta-tipo">Tipo</label>
+          <select id="carta-tipo">
+            <option value="mesiversario">mesiversario</option>
+            <option value="abre-cuando">abre-cuando</option>
+            <option value="capsula">capsula</option>
+            <option value="sorpresa">sorpresa</option>
+          </select>
+        </div>
+      </div>
+      <label for="carta-titulo">Título</label>
+      <input id="carta-titulo" type="text" placeholder="Seis meses">
+      <div class="row">
+        <div>
+          <label for="carta-apertura">Fecha de apertura (America/Mexico_City)</label>
+          <input id="carta-apertura" type="date">
+        </div>
+        <div>
+          <label for="carta-sello">Sello de cera</label>
+          <select id="carta-sello">
+            <option value="lirio">lirio</option>
+            <option value="corazon">corazon</option>
+            <option value="estrella">estrella</option>
+          </select>
+        </div>
+      </div>
+      <label for="carta-texto">Texto de la carta</label>
+      <textarea id="carta-texto" rows="6" placeholder="Escribe aquí la carta..."></textarea>
+      <div class="row">
+        <div>
+          <label for="carta-foto">Foto (opcional, ruta exacta)</label>
+          <input id="carta-foto" type="text" placeholder="./assets/img/girasoles.jpeg">
+        </div>
+        <div>
+          <label for="carta-audio">Audio (opcional, ruta exacta)</label>
+          <input id="carta-audio" type="text" placeholder="./assets/audio/Lover.mp3">
+        </div>
+      </div>
+      <label for="carta-cancion">Canción dedicada (opcional, título exacto de canciones.js)</label>
+      <input id="carta-cancion" type="text" placeholder="Lover">
+      <div class="checkbox-row">
+        <input id="carta-borrador" type="checkbox" checked>
+        <label for="carta-borrador" style="margin:0; text-transform:none; font-size:.85rem;">Marcar como borrador (recomendado si Julio no ha revisado el texto final)</label>
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="buildCarta()">Generar bloque</button>
+        <button class="ghost" onclick="copyOutput('out-carta')">Copiar</button>
+      </div>
+      <div class="output-wrap">
+        <h3>Pega esto dentro del array CARTAS en contenido/cartas.js</h3>
+        <pre id="out-carta">// completa el formulario y pulsa "Generar bloque"</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RAZÓN ===================== -->
+  <section class="panel" id="panel-razon">
+    <div class="card">
+      <h2>Nueva razón (contenido/razones.js)</h2>
+      <label for="razon-texto">Texto (empieza con "Amo que…" o "Amo cómo…")</label>
+      <textarea id="razon-texto" rows="3" placeholder="Amo que..."></textarea>
+      <div class="checkbox-row">
+        <input id="razon-borrador" type="checkbox" checked>
+        <label for="razon-borrador" style="margin:0; text-transform:none; font-size:.85rem;">Marcar como borrador</label>
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="buildRazon()">Generar bloque</button>
+        <button class="ghost" onclick="copyOutput('out-razon')">Copiar</button>
+      </div>
+      <div class="output-wrap">
+        <h3>Pega esto dentro del array REASONS en contenido/razones.js</h3>
+        <pre id="out-razon">// completa el formulario y pulsa "Generar bloque"</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== RECUERDO ===================== -->
+  <section class="panel" id="panel-recuerdo">
+    <div class="card">
+      <h2>Nuevo recuerdo (contenido/recuerdos.js)</h2>
+      <div class="row">
+        <div>
+          <label for="recuerdo-fecha">Fecha</label>
+          <input id="recuerdo-fecha" type="date">
+        </div>
+        <div>
+          <label for="recuerdo-display">Texto de la fecha a mostrar</label>
+          <input id="recuerdo-display" type="text" placeholder="Domingo 28 de junio">
+        </div>
+      </div>
+      <label for="recuerdo-texto">Descripción del recuerdo</label>
+      <textarea id="recuerdo-texto" rows="4" placeholder="El día que..."></textarea>
+      <div class="checkbox-row">
+        <input id="recuerdo-special" type="checkbox">
+        <label for="recuerdo-special" style="margin:0; text-transform:none; font-size:.85rem;">Marcar como día especial (corazón dorado en el calendario)</label>
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="buildRecuerdo()">Generar bloque</button>
+        <button class="ghost" onclick="copyOutput('out-recuerdo')">Copiar</button>
+      </div>
+      <div class="output-wrap">
+        <h3>Pega esto dentro del array MEMORIES en contenido/recuerdos.js</h3>
+        <pre id="out-recuerdo">// completa el formulario y pulsa "Generar bloque"</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOTO ===================== -->
+  <section class="panel" id="panel-foto">
+    <div class="card">
+      <h2>Nueva foto (contenido/fotos.js)</h2>
+      <p class="hint" style="margin-top:-.25rem;">Coloca primero el archivo en <code>assets/img/</code> (nombre exacto, minúsculas y guiones) antes de pegar el bloque.</p>
+      <div class="row">
+        <div>
+          <label for="foto-album">Álbum</label>
+          <input id="foto-album" type="text" placeholder="Flores">
+        </div>
+        <div>
+          <label for="foto-fecha">Fecha (opcional)</label>
+          <input id="foto-fecha" type="date">
+        </div>
+      </div>
+      <label for="foto-src">Ruta exacta del archivo</label>
+      <input id="foto-src" type="text" placeholder="./assets/img/ramo-feito-ella.jpeg">
+      <label for="foto-pie">Pie de foto</label>
+      <input id="foto-pie" type="text" placeholder="Un domingo cualquiera 💛">
+      <div class="actions">
+        <button class="primary" onclick="buildFoto()">Generar bloque</button>
+        <button class="ghost" onclick="copyOutput('out-foto')">Copiar</button>
+      </div>
+      <div class="output-wrap">
+        <h3>Pega esto dentro del array de fotos en contenido/fotos.js</h3>
+        <pre id="out-foto">// completa el formulario y pulsa "Generar bloque"</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CUPÓN ===================== -->
+  <section class="panel" id="panel-cupon">
+    <div class="card">
+      <h2>Nuevo cupón (contenido/cupones.js)</h2>
+      <div class="row">
+        <div>
+          <label for="cupon-id">ID (único, sin espacios)</label>
+          <input id="cupon-id" type="text" placeholder="cita-sorpresa">
+        </div>
+        <div>
+          <label for="cupon-emoji">Emoji</label>
+          <input id="cupon-emoji" type="text" placeholder="🎁" maxlength="4">
+        </div>
+      </div>
+      <label for="cupon-titulo">Título</label>
+      <input id="cupon-titulo" type="text" placeholder="Una cita sorpresa">
+      <label for="cupon-descripcion">Descripción</label>
+      <textarea id="cupon-descripcion" rows="3" placeholder="Canjéalo cuando quieras..."></textarea>
+      <div class="checkbox-row">
+        <input id="cupon-canjeable" type="checkbox" checked>
+        <label for="cupon-canjeable" style="margin:0; text-transform:none; font-size:.85rem;">Canjeable (muestra botón "Canjear")</label>
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="buildCupon()">Generar bloque</button>
+        <button class="ghost" onclick="copyOutput('out-cupon')">Copiar</button>
+      </div>
+      <div class="output-wrap">
+        <h3>Pega esto dentro del array CUPONES en contenido/cupones.js</h3>
+        <pre id="out-cupon">// completa el formulario y pulsa "Generar bloque"</pre>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast">Copiado ✓</div>
+
+<script>
+function escapeStr(s) {
+  return String(s || '').replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+}
+function jsStringLiteral(s) {
+  // Prefer a template literal so accented characters and quotes paste cleanly.
+  return '`' + escapeStr(s) + '`';
+}
+
+document.querySelectorAll('.tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || 'Copiado ✓';
+  t.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  if (!text || text.startsWith('//')) { showToast('Primero genera el bloque'); return; }
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showToast('Copiado ✓'); }
+    catch (e) { showToast('No se pudo copiar, selecciona el texto a mano'); }
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => showToast('Copiado ✓')).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+function buildCarta() {
+  const id = document.getElementById('carta-id').value.trim();
+  const tipo = document.getElementById('carta-tipo').value;
+  const titulo = document.getElementById('carta-titulo').value.trim();
+  const apertura = document.getElementById('carta-apertura').value;
+  const sello = document.getElementById('carta-sello').value;
+  const texto = document.getElementById('carta-texto').value.trim();
+  const foto = document.getElementById('carta-foto').value.trim();
+  const audio = document.getElementById('carta-audio').value.trim();
+  const cancion = document.getElementById('carta-cancion').value.trim();
+  const borrador = document.getElementById('carta-borrador').checked;
+
+  let block = '{\n';
+  block += `  id: ${JSON.stringify(id)},\n`;
+  block += `  titulo: ${JSON.stringify(titulo)},\n`;
+  block += `  tipo: ${JSON.stringify(tipo)},\n`;
+  block += `  apertura: ${JSON.stringify(apertura)},\n`;
+  block += `  sello: ${JSON.stringify(sello)},\n`;
+  block += `  texto: ${jsStringLiteral(texto)},\n`;
+  if (foto) block += `  foto: ${JSON.stringify(foto)},\n`;
+  if (audio) block += `  audio: ${JSON.stringify(audio)},\n`;
+  if (cancion) block += `  cancion: ${JSON.stringify(cancion)},\n`;
+  block += `  borrador: ${borrador}\n`;
+  block += '},';
+  document.getElementById('out-carta').textContent = block;
+}
+
+function buildRazon() {
+  const texto = document.getElementById('razon-texto').value.trim();
+  const borrador = document.getElementById('razon-borrador').checked;
+  const block = `{ texto: ${JSON.stringify(texto)}, borrador: ${borrador} },`;
+  document.getElementById('out-razon').textContent = block;
+}
+
+function buildRecuerdo() {
+  const fecha = document.getElementById('recuerdo-fecha').value;
+  const display = document.getElementById('recuerdo-display').value.trim();
+  const texto = document.getElementById('recuerdo-texto').value.trim();
+  const special = document.getElementById('recuerdo-special').checked;
+  let block = `{ date: ${JSON.stringify(fecha)}, display: ${JSON.stringify(display)}`;
+  if (special) block += `, special: true`;
+  block += `, text: ${jsStringLiteral(texto)} },`;
+  document.getElementById('out-recuerdo').textContent = block;
+}
+
+function buildFoto() {
+  const album = document.getElementById('foto-album').value.trim();
+  const src = document.getElementById('foto-src').value.trim();
+  const pie = document.getElementById('foto-pie').value.trim();
+  const fecha = document.getElementById('foto-fecha').value;
+  let block = '{\n';
+  block += `  album: ${JSON.stringify(album)},\n`;
+  block += `  src: ${JSON.stringify(src)},\n`;
+  block += `  pie: ${JSON.stringify(pie)}`;
+  if (fecha) block += `,\n  fecha: ${JSON.stringify(fecha)}`;
+  block += '\n},';
+  document.getElementById('out-foto').textContent = block;
+}
+
+function buildCupon() {
+  const id = document.getElementById('cupon-id').value.trim();
+  const titulo = document.getElementById('cupon-titulo').value.trim();
+  const descripcion = document.getElementById('cupon-descripcion').value.trim();
+  const emoji = document.getElementById('cupon-emoji').value.trim();
+  const canjeable = document.getElementById('cupon-canjeable').checked;
+  let block = '{\n';
+  block += `  id: ${JSON.stringify(id)},\n`;
+  block += `  titulo: ${JSON.stringify(titulo)},\n`;
+  block += `  descripcion: ${jsStringLiteral(descripcion)},\n`;
+  block += `  emoji: ${JSON.stringify(emoji)},\n`;
+  block += `  canjeable: ${canjeable}\n`;
+  block += '},';
+  document.getElementById('out-cupon').textContent = block;
+}
+</script>
+
+</body>
+</html>
