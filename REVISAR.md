@@ -74,3 +74,11 @@ Cacería de corazones con los lugares del chat, playlist ampliada
 (Call It What You Want, Cowboy Like Me, Gold Rush, Patient Zero), galería
 de "ojitos", carta de los 6 meses (28 de noviembre) y "Adivina los 5
 versos".
+
+## Mejoras futuras sugeridas (no implementadas)
+
+**Móvil:** agrupar la línea del tiempo por mes (hoy mide ~6,800px en el teléfono); gestos de deslizar entre cartas del Buzón; vibración suave (`navigator.vibrate`) al acertar en juegos; modo "instalar en inicio" con aviso amable (PWA); menú inferior fijo en vez de botones flotantes; juegos jugables también en horizontal.
+
+**Escritorio:** atajos de teclado (B Buzón, J Juegos); galería con navegación de flechas en el lightbox; fondo que reacciona al ritmo de la canción; carta del mes con cuenta regresiva en vivo; cacería con los lugares del chat; playlist ampliada; carta de los 6 meses.
+
+**Ambos:** Lighthouse real (rendimiento ≥90) en un teléfono de gama baja; imágenes AVIF; modo oscuro/claro automático según la hora del dispositivo.

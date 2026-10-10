@@ -111,6 +111,8 @@ window.JuegoCurame = (function () {
 
     function loop(t) {
       if (!running) return;
+      // arena oculta (p. ej. teléfono en horizontal): el tiempo no corre, para que no se "gane" sin jugar
+      if (arenaEl.offsetParent === null) { lastT = 0; raf = requestAnimationFrame(loop); return; }
       const dt = lastT ? Math.min(t - lastT, 100) : 16;
       lastT = t;
       if (!ended) {

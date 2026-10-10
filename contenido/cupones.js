@@ -15,7 +15,7 @@ window.CUPONES = [
   { id: "cena-julio", titulo: "Una cena cocinada por Julio", descripcion: "Yo cocino, tú solo disfrutas.", emoji: "🍳", canjeable: true, borrador: true },
   { id: "mvp", titulo: "Un MVP dedicado, con captura", descripcion: "Con evidencia, para que no digas que no.", emoji: "⭐", canjeable: true, borrador: true },
   { id: "colomos-manta", titulo: "Una tarde en Colomos con manta", descripcion: "Sin prisa, solo nosotros.", emoji: "🌼", canjeable: true, borrador: true },
-  { id: "paseo-sin-rumbo", titulo: "Un paseo sin rumbo con Carl's Jr de drive-thru", descripcion: "Manejamos hasta donde se acabe la canción.", emoji: "🌙", canjeable: true, borrador: true },
+  { id: "paseo-sin-rumbo", titulo: "Un paseo sin rumbo con Carl's Jr", descripcion: "Drive-thru y hasta donde se acabe la canción.", emoji: "🌙", canjeable: true, borrador: true },
   { id: "bg3-pareja", titulo: "Una noche de Baldur's Gate 3 en pareja", descripcion: "Una noche de aventura, solo tú y yo.", emoji: "🎮", canjeable: true, borrador: true },
   { id: "cabana", titulo: "Un Airbnb o una cabaña", descripcion: "Se acepta cuando haya presupuesto.", emoji: "💛", canjeable: true, borrador: true },
   { id: "tres-besos", titulo: "3 besos de precio especial", descripcion: "Oferta única, sin fecha de vencimiento.", emoji: "💌", canjeable: true, borrador: true },

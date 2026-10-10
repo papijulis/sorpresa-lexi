@@ -561,6 +561,90 @@
   .heart-lang-canvas { width: 100%; max-width: 480px; aspect-ratio: 10/9; touch-action: none; }
   .heart-lang-hint { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; color: rgba(253,251,247,.65); margin-top: .5rem; text-align: center; }
 
+
+  /* ======================================================================
+     MÓVIL — zonas seguras, toques de 44px, texto legible, sin hover pegado
+  ====================================================================== */
+  /* lo fijo respeta el notch y la barra de inicio del teléfono (viewport-fit=cover) */
+  #sunset-toggle { top: calc(1.25rem + env(safe-area-inset-top, 0px)); right: calc(1.25rem + env(safe-area-inset-right, 0px)); }
+  #buzon-toggle  { top: calc(1.25rem + env(safe-area-inset-top, 0px)); left: calc(1.25rem + env(safe-area-inset-left, 0px)); }
+  #juegos-toggle { top: calc(6rem + env(safe-area-inset-top, 0px)); left: calc(1.25rem + env(safe-area-inset-left, 0px)); }
+  #mini-player   { bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px)); left: calc(1.25rem + env(safe-area-inset-left, 0px)); }
+  #toast         { bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); }
+  #sunset-toggle, #buzon-toggle, #juegos-toggle { transition: opacity .3s ease, transform .2s ease; }
+  .fab-away { opacity: 0 !important; pointer-events: none !important; }
+  .app-view, .modal-panel { overscroll-behavior: contain; }
+
+  .clock-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .clock-grid > :nth-child(-n+3) { grid-column: span 2; }
+  .clock-grid > :nth-child(n+4) { grid-column: span 3; }
+  @media (min-width: 640px) {
+    .clock-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .clock-grid > * { grid-column: span 1 !important; }
+  }
+
+  @media (max-width: 639px) {
+    #sunset-toggle, #buzon-toggle, #juegos-toggle { width: 3rem; height: 3rem; }
+    #juegos-toggle { top: calc(5rem + env(safe-area-inset-top, 0px)); }
+    .clock-grid > div { padding-top: 1rem; padding-bottom: 1rem; }
+    /* calendario: casillas de ~43px para tocar cómodo */
+    .cal-section { padding-left: .75rem; padding-right: .75rem; }
+    .cal-card { padding: .75rem; }
+    .cal-card .grid { gap: .25rem; }
+    #cal-prev, #cal-next, #mini-player-toggle, #mini-player-next, .banda-play { width: 2.75rem; height: 2.75rem; }
+    .app-view-close { width: 2.75rem; height: 2.75rem; }
+    #modal-close { top: .35rem; right: .5rem; width: 2.75rem; height: 2.75rem; font-size: 1.75rem; display: flex; align-items: center; justify-content: center; }
+    #letter-switch, #random-memory-btn, .juego-exit-btn { min-height: 2.75rem; }
+    .cupon-redeem-btn { min-height: 2.5rem; padding-left: 1.1rem; padding-right: 1.1rem; }
+    .cupon-card { aspect-ratio: 3 / 4; }
+    .cupon-reveal { padding: .5rem; gap: .2rem; }
+    .cupon-emoji { font-size: 1.6rem; }
+    .cupon-reveal .font-display { font-size: .85rem; line-height: 1.2; }
+    .heart-hotspot { width: 44px; height: 44px; }
+    .text-\[10px\], .text-\[11px\] { font-size: 12px; }
+    .timeline-date { font-size: .75rem; }
+    /* selección de canción: tarjetas compactas para que las 3 quepan sin scroll */
+    #screen-songs { align-items: center; overflow-y: auto; }
+    #screen-songs h2 { font-size: 1.6rem; }
+    #screen-songs p.mb-10 { margin-bottom: 1.25rem; }
+    #song-select-cards { gap: .75rem; }
+    .song-select-card {
+      display: grid !important; grid-template-columns: 64px 1fr auto; grid-template-rows: auto auto;
+      column-gap: .9rem; align-items: center; text-align: left !important; padding: .75rem !important;
+    }
+    .song-select-card .vinyl-mini { grid-row: 1 / span 2; width: 64px !important; margin: 0 !important; font-size: 1.6rem; }
+    .song-select-card p { margin: 0 !important; }
+    .song-select-card .eq-wrap { grid-row: 1 / span 2; grid-column: 3; }
+    .glass { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .hero-panel.shown { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+    .modal-panel { max-height: 85vh; max-height: 85dvh; }
+  }
+  /* teléfonos muy angostos (<360px): cupones a una columna para que no se recorten */
+  @media (max-width: 359px) {
+    .cupon-grid { grid-template-columns: 1fr; }
+    .cupon-card, .cupon-grid .cupon-card:last-child:nth-child(odd) { aspect-ratio: 3 / 2; width: 100%; grid-column: auto; }
+    .cupon-emoji { font-size: 1.4rem; }
+  }
+  /* teléfono en horizontal: poco alto disponible */
+  @media (max-height: 520px) and (orientation: landscape) {
+    .hero-section { padding-top: 1rem; padding-bottom: 1rem; }
+    .modal-panel { max-height: 90vh; max-height: 90dvh; }
+    .lightbox img { max-height: 90dvh; }
+    .app-view { padding-top: calc(1rem + env(safe-area-inset-top, 0px)); }
+    .app-view-header { margin-bottom: 0; }
+    /* los juegos de lienzo necesitan pantalla vertical: aviso para girar el teléfono */
+    #juego-stage[data-portrait="1"] #juego-mount { display: none; }
+    #juego-stage[data-portrait="1"]::before {
+      content: 'Para jugar, gira tu teléfono en vertical.';
+      display: block; text-align: center; padding: 2rem 1rem;
+      font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: rgba(253,251,247,.8);
+    }
+  }
+  /* en pantallas táctiles el :hover se queda pegado tras el toque: se anula */
+  @media (hover: none) {
+    .buzon-envelope:hover, .juego-card:hover, .hover\:scale-110:hover, .hover\:scale-105:hover, .hover\:-translate-y-1:hover { transform: none; }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html, body { scroll-behavior: auto; }
     * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -649,12 +733,12 @@
   <section class="reveal py-24 px-6 flex flex-col items-center text-center">
     <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2">Desde el 28 de mayo de 2026</h2>
     <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar</p>
-    <div class="grid grid-cols-3 sm:grid-cols-5 gap-4 sm:gap-6 max-w-3xl w-full">
+    <div class="clock-grid grid gap-3 sm:gap-6 max-w-3xl w-full">
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-months" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Meses</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-days" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Días</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-hours" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Horas</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-minutes" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Minutos</p></div>
-      <div class="glass rounded-2xl py-5 px-2 col-span-3 sm:col-span-1"><p id="clock-seconds" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Segundos</p></div>
+      <div class="glass rounded-2xl py-5 px-2"><p id="clock-seconds" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Segundos</p></div>
     </div>
     <button id="badge-1111" class="mt-14 glass glow-gold rounded-full px-6 py-3 flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform">
       <span class="text-2xl">✨</span>
@@ -672,12 +756,12 @@
   </section>
 
   <!-- CALENDAR -->
-  <section class="reveal py-24 px-6">
+  <section class="cal-section reveal py-24 px-6">
     <div class="max-w-3xl mx-auto text-center mb-10">
       <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-3">Nuestros Días más Especiales</h2>
       <p class="font-ui text-parchment/60 text-sm sm:text-base max-w-xl mx-auto">Cada día a tu lado guarda un espacio especial en mi corazón, pero estos son "Nuestros Días más Especiales" (aunque todos lo son).</p>
     </div>
-    <div class="max-w-lg mx-auto glass rounded-3xl p-5 sm:p-7">
+    <div class="cal-card max-w-lg mx-auto glass rounded-3xl p-5 sm:p-7">
       <div class="flex items-center justify-between mb-5">
         <button id="cal-prev" aria-label="Mes anterior" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-parchment">‹</button>
         <h3 id="cal-title" class="font-display text-xl text-gold"></h3>
@@ -858,7 +942,7 @@
     <button id="buzon-close" aria-label="Cerrar el Buzón" class="app-view-close">×</button>
   </div>
   <p class="font-ui text-xs sm:text-sm text-parchment/60 text-center max-w-md mx-auto mb-8 px-6">Cartas para cuando haga falta, mesiversarios, cápsulas del tiempo y alguna sorpresa escondida.</p>
-  <div id="buzon-grid" class="app-view-body"></div>
+  <div id="buzon-grid" class="app-view-body buzon-grid"></div>
 </div>
 
 <!-- ===================== RINCÓN DE JUEGOS ===================== -->
@@ -999,7 +1083,7 @@ const cursorCtx = cursorCanvas.getContext('2d', { alpha: true });
 let vw = 0, vh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 function resizeCanvas() {
-  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.5 : 2);
   vw = window.innerWidth;
   vh = window.innerHeight;
   canvas.width = vw * dpr;
@@ -1018,7 +1102,18 @@ function resizeCanvas() {
 /* scrollY cacheado: leerlo en cada cuadro (updateLily) forzaba un recálculo
    de layout por flor. Se actualiza solo al hacer scroll. */
 let scrollYCache = window.scrollY || 0;
-window.addEventListener('scroll', () => { scrollYCache = window.scrollY || 0; }, { passive: true });
+let fabLastY = 0;
+const fabEls = ['sunset-toggle', 'buzon-toggle', 'juegos-toggle'].map((id) => document.getElementById(id));
+window.addEventListener('scroll', () => {
+  scrollYCache = window.scrollY || 0;
+  /* en el teléfono, los botones flotantes se esconden al bajar y vuelven al subir */
+  if (window.innerWidth < 640) {
+    const y = scrollYCache;
+    if (y > 160 && y > fabLastY + 8) fabEls.forEach((el) => el && el.classList.add('fab-away'));
+    else if (y < fabLastY - 8 || y <= 160) fabEls.forEach((el) => el && el.classList.remove('fab-away'));
+    fabLastY = y;
+  }
+}, { passive: true });
 let resizeQueued = false;
 window.addEventListener('resize', () => {
   if (resizeQueued) return;
@@ -1294,6 +1389,8 @@ function spawnButterfly() {
   });
 }
 let BUTTERFLY_CAP = LIGHT_MODE ? 2 : 4; // sube en primavera (Fase 4 — temporadas), ver final del script
+/* teléfonos: menos partículas (pantalla chica, batería) */
+if (window.innerWidth < 640 && !LIGHT_MODE) { PARTICLE_CAP = 32; FIREFLY_CAP = 10; BUTTERFLY_CAP = 3; }
 setInterval(() => { if (butterflies.length < BUTTERFLY_CAP && Math.random() < 0.7) spawnButterfly(); }, 3200);
 
 function updateButterflies(dt) {
@@ -2637,6 +2734,7 @@ function renderJuegosGrid() {
 
 function launchJuego(juego) {
   activeJuego = juego;
+  juegoStage.dataset.portrait = ['lluvia-lirios', 'constelacion', 'curame'].includes(juego.id) ? '1' : '0';
   juegosGridEl.classList.add('hidden');
   juegosHeaderTitle.textContent = juego.titulo;
   juegosIntro.classList.add('hidden');
@@ -3185,7 +3283,7 @@ function renderBandaSonora() {
     const row = document.createElement('div');
     row.className = 'glass rounded-2xl p-5 flex items-center gap-4';
     row.innerHTML = `
-      <button class="w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm" aria-label="Reproducir ${song.title}">▶</button>
+      <button class="banda-play w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm" aria-label="Reproducir ${song.title}">▶</button>
       <div class="min-w-0 text-left">
         <p class="font-display text-base text-parchment">${song.title}</p>
         <p class="font-ui text-xs text-parchment/50 mb-1">${song.artist}</p>
