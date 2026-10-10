@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Para Lexi — 21 de septiembre</title>
+<title>Para Lexi</title>
 <meta name="description" content="Un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.">
 <meta name="theme-color" content="#18062B">
 
@@ -172,6 +172,12 @@
   }
   @keyframes charIn { to { opacity: 1; transform: translateY(0); } }
   .char-in { display: inline-block; opacity: 0; transform: translateY(16px); animation: charIn .6s ease forwards; }
+  /* las letras inline-block no heredan el background-clip:text del padre y quedaban invisibles ("Lexi"); cada letra lleva su propio degradado */
+  .shimmer-gold .char-in {
+    background: linear-gradient(90deg, #FFD700, #FFF8DC 50%, #FFD700); background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: charIn .6s ease forwards, shimmerText 3.5s linear infinite;
+  }
 
   /* ---- jar ---- */
   .jar-glass { fill: url(#jarGlassGradient); stroke: rgba(255,215,0,0.4); }
@@ -364,6 +370,7 @@
   /* ---- cupones para raspar ---- */
   .cupon-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
   @media (min-width: 640px) { .cupon-grid { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 1.25rem; } }
+  @media (max-width: 639px) { .cupon-grid .cupon-card:last-child:nth-child(odd) { grid-column: 1 / -1; width: calc(50% - .5rem); justify-self: center; } }
   .cupon-card { position: relative; aspect-ratio: 1/1; border-radius: 1.25rem; overflow: hidden; }
   .cupon-reveal {
     position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -404,31 +411,19 @@
   .lirios-canvas { width: 100%; aspect-ratio: 3/4; border-radius: 1.25rem; background: linear-gradient(180deg, #18062B, #090112); touch-action: none; }
   .lirios-hud { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: .75rem; font-family: 'Inter', sans-serif; font-size: .85rem; color: #FFD700; }
 
-  /* ---- trivia: ¿qué tanto nos conocemos? ---- */
-  .trivia-progress { text-align: center; font-family: 'Inter', sans-serif; font-size: .75rem; letter-spacing: .04em; text-transform: uppercase; color: rgba(255,215,0,.75); margin-bottom: .75rem; }
-  .trivia-question { text-align: center; font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #FDFBF7; max-width: 32rem; margin: 0 auto 1.5rem; }
-  .trivia-options { display: grid; grid-template-columns: repeat(1, minmax(0,1fr)); gap: .75rem; max-width: 32rem; margin: 0 auto; }
-  @media (min-width: 560px) { .trivia-options { grid-template-columns: repeat(2, minmax(0,1fr)); } }
-  .trivia-option {
-    font-family: 'Inter', sans-serif; font-size: .9rem; text-align: left;
-    padding: .9rem 1.1rem; border-radius: 1rem; cursor: pointer;
-    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: #FDFBF7;
-    transition: background .2s ease, border-color .2s ease;
+  /* ---- panel semitransparente del inicio + legibilidad general ---- */
+  .hero-panel {
+    padding: 2.25rem 1.75rem; border-radius: 1.75rem; max-width: 34rem;
+    background: rgba(9,1,18,0); border: 1px solid rgba(255,255,255,0);
+    transition: background .9s ease, border-color .9s ease, box-shadow .9s ease, backdrop-filter .9s ease, -webkit-backdrop-filter .9s ease;
   }
-  .trivia-option:hover:not(:disabled) { background: rgba(255,255,255,.12); }
-  .trivia-option:disabled { cursor: default; }
-  .trivia-option.correct { background: rgba(52,211,153,.22); border-color: rgba(52,211,153,.7); }
-  .trivia-option.wrong { background: rgba(251,113,133,.18); border-color: rgba(251,113,133,.6); opacity: .8; }
-  .trivia-diploma {
-    max-width: 30rem; margin: 0 auto; text-align: center; padding: 2.5rem 2rem;
-    border: 2px solid rgba(255,215,0,.5); border-radius: 1.25rem;
-    background: radial-gradient(circle at 50% 0%, rgba(255,215,0,.08), transparent 70%);
+  .hero-panel.shown {
+    background: rgba(9,1,18,.58); border-color: rgba(255,255,255,.1);
+    box-shadow: 0 18px 50px rgba(0,0,0,.35);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
   }
-  .trivia-diploma-eyebrow { font-family: 'Inter', sans-serif; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,215,0,.7); margin: 0; }
-  .trivia-diploma-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #FFD700; margin: .35rem 0 1rem; }
-  .trivia-diploma-score { font-family: 'Playfair Display', serif; font-size: 2.6rem; color: #FDFBF7; margin: 0 0 1rem; }
-  .trivia-diploma-msg { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: rgba(253,251,247,.85); line-height: 1.5; margin: 0 0 1.25rem; }
-  .trivia-diploma-signature { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; color: rgba(255,215,0,.8); margin: 0; }
+  body.light-mode .hero-panel.shown { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(9,1,18,.72); }
+  #main-content h2, #main-content section > p, #main-content .font-hand { text-shadow: 0 2px 14px rgba(5,0,10,.85); }
 
   /* ---- constelación ---- */
   .constelacion-wrap { max-width: 420px; margin: 0 auto; text-align: center; }
@@ -544,30 +539,6 @@
   .timeline-text { font-family: 'Playfair Display', serif; font-size: .92rem; color: rgba(253,251,247,.85); line-height: 1.55; }
   .timeline-photo { width: 100%; max-width: 160px; border-radius: .6rem; margin-top: .6rem; box-shadow: 0 8px 18px rgba(0,0,0,.4); display: block; }
 
-  /* ---- lo que nos falta vivir ---- */
-  .pendientes-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .6rem; }
-  .pendiente-item {
-    display: flex; align-items: center; gap: .85rem; width: 100%; text-align: left;
-    padding: .8rem 1rem; border-radius: 1rem; border: 1px solid rgba(255,255,255,.12);
-    background: rgba(255,255,255,.05); color: rgba(253,251,247,.9);
-    font-family: 'Playfair Display', serif; font-size: .98rem; line-height: 1.4;
-    cursor: pointer; transition: background .25s ease, border-color .25s ease;
-  }
-  .pendiente-item:focus-visible { outline: 2px solid #FFD700; outline-offset: 3px; }
-  .pendiente-item[disabled] { cursor: default; }
-  .pendiente-box {
-    flex: 0 0 22px; width: 22px; height: 22px; border-radius: 7px; border: 2px solid rgba(255,215,0,.55);
-    display: flex; align-items: center; justify-content: center; transition: background .25s ease, border-color .25s ease;
-  }
-  .pendiente-box::after {
-    content: ''; width: 6px; height: 11px; margin-top: -2px; border: solid #18062B; border-width: 0 2px 2px 0;
-    transform: rotate(45deg) scale(0); transition: transform .25s ease;
-  }
-  .pendiente-item[aria-checked="true"] { border-color: rgba(255,215,0,.35); background: rgba(255,215,0,.07); }
-  .pendiente-item[aria-checked="true"] .pendiente-box { background: #FFD700; border-color: #FFD700; }
-  .pendiente-item[aria-checked="true"] .pendiente-box::after { transform: rotate(45deg) scale(1); }
-  .pendiente-item[aria-checked="true"] .pendiente-text { color: rgba(253,251,247,.6); }
-
   /* ---- easter egg: Panchito ---- */
   @keyframes panchitoWiggle { 0%, 100% { transform: rotate(0deg) scale(1); } 25% { transform: rotate(-4deg) scale(1.04); } 75% { transform: rotate(4deg) scale(1.04); } }
   .panchito-wiggle { animation: panchitoWiggle .6s ease; }
@@ -673,11 +644,12 @@
 
   <!-- HERO -->
   <section class="min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
-    <p class="font-hand text-gold text-3xl sm:text-4xl mb-3">21 de septiembre</p>
-    <h1 class="font-display text-5xl sm:text-7xl text-parchment leading-tight mb-4">Para ti,<br><span id="hero-lexi" class="shimmer-gold"></span></h1>
-    <p class="font-ui text-amethyst-lavender/80 max-w-md text-sm sm:text-base">Un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.</p>
-    <p id="saludo-dinamico" class="font-ui text-gold text-sm sm:text-base mt-6"></p>
-    <p id="frase-del-dia" class="font-hand text-lg sm:text-xl text-parchment max-w-md mt-4 frase-del-dia"></p>
+    <div id="hero-panel" class="hero-panel flex flex-col items-center">
+      <h1 class="font-display text-5xl sm:text-7xl text-parchment leading-tight mb-4">Para ti,<br><span id="hero-lexi" class="shimmer-gold"></span></h1>
+      <p class="font-ui text-amethyst-lavender max-w-md text-sm sm:text-base">Un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.</p>
+      <p id="saludo-dinamico" class="font-ui text-gold text-sm sm:text-base mt-6"></p>
+      <p id="frase-del-dia" class="font-hand text-lg sm:text-xl text-parchment max-w-md mt-4 frase-del-dia"></p>
+    </div>
     <div class="mt-14 flex flex-col items-center gap-2 text-parchment/50 font-ui text-xs tracking-wide">
       <span>Desliza para descubrirlo</span>
       <span class="text-xl">↓</span>
@@ -859,20 +831,6 @@
     <div id="banda-sonora-list" class="max-w-xl mx-auto flex flex-col gap-4"></div>
   </section>
 
-  <!-- LO QUE NOS FALTA VIVIR -->
-  <section class="reveal py-24 px-6">
-    <div class="max-w-3xl mx-auto text-center mb-10">
-      <h2 class="font-display text-3xl sm:text-4xl text-parchment">Lo que nos falta vivir</h2>
-      <p class="font-ui text-sm text-parchment/60 mt-3">Lo que ya hicimos, y lo que sigue. Marca cada pendiente cuando lo vivamos.</p>
-    </div>
-    <div class="max-w-xl mx-auto">
-      <h3 class="font-ui text-xs uppercase tracking-wide text-gold/80 mb-3">Ya lo vivimos</h3>
-      <ul id="pendientes-hechos" class="pendientes-list mb-10"></ul>
-      <h3 class="font-ui text-xs uppercase tracking-wide text-gold/80 mb-3">Todavía por vivir</h3>
-      <ul id="pendientes-lista" class="pendientes-list"></ul>
-    </div>
-  </section>
-
   <!-- LOVE LETTER -->
   <section class="reveal py-24 px-6">
     <div id="letter-container" class="max-w-2xl mx-auto letter-scroll rounded-2xl shadow-2xl p-8 sm:p-14 relative">
@@ -975,15 +933,12 @@
 <script src="./contenido/cartas.js"></script>
 <script src="./contenido/frases.js"></script>
 <script src="./contenido/cupones.js"></script>
-<script src="./contenido/trivia.js"></script>
 <script src="./contenido/wrapped.js"></script>
-<script src="./contenido/pendientes.js"></script>
 
 <script src="./js/juegos/cupones.js"></script>
 <script src="./js/juegos/memorama.js"></script>
 <script src="./js/juegos/lluvia-lirios.js"></script>
 <script src="./js/juegos/caceria.js"></script>
-<script src="./js/juegos/trivia.js"></script>
 <script src="./js/juegos/constelacion.js"></script>
 <script src="./js/juegos/wrapped.js"></script>
 <script src="./js/juegos/curame.js"></script>
@@ -1083,9 +1038,11 @@ let SEASON_PALETTE = null; // set from the current month (Fase 4 — temporadas)
 let LIGHT_MODE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let PARTICLE_CAP = LIGHT_MODE ? 25 : 55;
 let FIREFLY_CAP = LIGHT_MODE ? 8 : 18;
+if (LIGHT_MODE) document.body.classList.add('light-mode');
 function applyLightMode() {
   if (LIGHT_MODE) return;
   LIGHT_MODE = true;
+  document.body.classList.add('light-mode');
   PARTICLE_CAP = 25;
   FIREFLY_CAP = 8;
   BUTTERFLY_CAP = Math.min(BUTTERFLY_CAP, 2);
@@ -1389,25 +1346,15 @@ function drawBird(b) {
   ctx.restore();
 }
 
-/* ---- romantic cursor (desktop) ---- */
+/* ---- rastro de pétalos del cursor (escritorio) ----
+   Tiene su propio requestAnimationFrame, independiente del loop principal:
+   ese se pausa con cartas, juegos y vistas abiertas, y el rastro se quedaba
+   congelado sobre la pantalla. Solo corre mientras haya puntos. El cursor
+   nativo nunca se oculta. */
 let cursorTrail = [];
-let cursorDirty = false;
+let cursorRaf = null;
 const isDesktopPointer = window.matchMedia('(pointer: fine)').matches;
-if (isDesktopPointer) {
-  window.addEventListener('mousemove', (e) => {
-    if (cursorTrail.length > 40) cursorTrail.shift();
-    cursorDirty = true;
-    cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI) });
-  });
-}
-function updateCursorTrail() {
-  for (let i = cursorTrail.length - 1; i >= 0; i--) {
-    cursorTrail[i].life -= 0.035;
-    if (cursorTrail[i].life <= 0) cursorTrail.splice(i, 1);
-  }
-}
 function drawCursorTrail() {
-  if (!cursorTrail.length) return;
   cursorCtx.fillStyle = isSunset ? '#FB7185' : '#FFD700';
   cursorTrail.forEach((c) => {
     cursorCtx.globalAlpha = Math.max(0, c.life) * 0.6;
@@ -1416,6 +1363,32 @@ function drawCursorTrail() {
     cursorCtx.fill();
   });
   cursorCtx.globalAlpha = 1;
+}
+function cursorFrame() {
+  cursorRaf = null;
+  for (let i = cursorTrail.length - 1; i >= 0; i--) {
+    cursorTrail[i].life -= 0.035;
+    if (cursorTrail[i].life <= 0) cursorTrail.splice(i, 1);
+  }
+  cursorCtx.clearRect(0, 0, vw, vh);
+  if (cursorTrail.length) {
+    drawCursorTrail();
+    cursorRaf = requestAnimationFrame(cursorFrame);
+  }
+}
+if (isDesktopPointer) {
+  window.addEventListener('mousemove', (e) => {
+    if (cursorTrail.length > 40) cursorTrail.shift();
+    cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI) });
+    if (!cursorRaf && !document.hidden) cursorRaf = requestAnimationFrame(cursorFrame);
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      cursorTrail = [];
+      if (cursorRaf) { cancelAnimationFrame(cursorRaf); cursorRaf = null; }
+      cursorCtx.clearRect(0, 0, vw, vh);
+    }
+  });
 }
 
 /* ---- main render loop ---- */
@@ -1440,7 +1413,6 @@ function loop(t) {
   lastFrame = t;
   sampleFpsAndMaybeGoLight(t);
   ctx.clearRect(0, 0, vw, vh);
-  if (cursorDirty || cursorTrail.length) { cursorCtx.clearRect(0, 0, vw, vh); cursorDirty = cursorTrail.length > 0; }
 
   updateParticles(t);
   particles.forEach(drawPetal);
@@ -1465,7 +1437,6 @@ function loop(t) {
   updateHeartRain(dt);
   heartRain.forEach(drawHeartRainItem);
 
-  if (isDesktopPointer) { updateCursorTrail(); drawCursorTrail(); }
 
   updateAudioBars();
 
@@ -1804,6 +1775,7 @@ function chooseSong(idx) {
     mainContent.classList.remove('hidden-content');
     updateScrollProgress();
     revealHeroTitle();
+    setTimeout(() => document.getElementById('hero-panel').classList.add('shown'), 4500);
     celebrateMesiversarioIfNeeded();
   }, 500);
 }
@@ -2554,7 +2526,7 @@ function celebrateMesiversarioIfNeeded() {
    siempre activa en el Jardín (JuegoCaceria.init()), aquí solo se
    muestra su progreso.
 ====================================================================== */
-const JUEGOS_JUGABLES = [window.JuegoCupones, window.JuegoMemorama, window.JuegoLluviaLirios, window.JuegoTrivia, window.JuegoConstelacion, window.JuegoWrapped, window.JuegoCurame].filter(Boolean);
+const JUEGOS_JUGABLES = [window.JuegoCupones, window.JuegoMemorama, window.JuegoLluviaLirios, window.JuegoConstelacion, window.JuegoWrapped, window.JuegoCurame].filter(Boolean);
 
 const viewJuegos = document.getElementById('view-juegos');
 const juegosToggleBtn = document.getElementById('juegos-toggle');
@@ -3140,51 +3112,6 @@ function renderTimeline() {
   measureTimeline();
 }
 renderTimeline();
-
-/* ---- Lo que nos falta vivir: casillas (las pendientes se pueden marcar) ---- */
-const PENDIENTES_KEY = 'jardin.pendientes.v1';
-function renderPendientes() {
-  const hechosEl = document.getElementById('pendientes-hechos');
-  const listaEl = document.getElementById('pendientes-lista');
-  if (!hechosEl || !listaEl) return;
-  let marcados = [];
-  try {
-    const raw = jardinStorage.get(PENDIENTES_KEY);
-    const parsed = raw ? JSON.parse(raw) : {};
-    marcados = Array.isArray(parsed.marcados) ? parsed.marcados : [];
-  } catch (e) { marcados = []; }
-
-  function makeItem(texto, checked, interactive) {
-    const li = document.createElement('li');
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'pendiente-item';
-    btn.setAttribute('role', 'checkbox');
-    btn.setAttribute('aria-checked', checked ? 'true' : 'false');
-    btn.innerHTML = `<span class="pendiente-box" aria-hidden="true"></span><span class="pendiente-text"></span>`;
-    btn.querySelector('.pendiente-text').textContent = texto;
-    if (!interactive) btn.disabled = true;
-    li.appendChild(btn);
-    return { li, btn };
-  }
-  (window.PENDIENTES_HECHOS || []).forEach((t) => hechosEl.appendChild(makeItem(t, true, false).li));
-  (window.PENDIENTES || []).forEach((t) => {
-    const { li, btn } = makeItem(t, marcados.includes(t), true);
-    btn.addEventListener('click', () => {
-      const now = btn.getAttribute('aria-checked') !== 'true';
-      btn.setAttribute('aria-checked', now ? 'true' : 'false');
-      marcados = now ? marcados.concat(t) : marcados.filter((x) => x !== t);
-      jardinStorage.set(PENDIENTES_KEY, JSON.stringify({ marcados }));
-      if (now) {
-        const r = btn.getBoundingClientRect();
-        spawnSparkleBurst(r.left + 22, r.top + r.height / 2, 24, true);
-        if (window.NOTA_PENDIENTE) showToast(window.NOTA_PENDIENTE);
-      }
-    });
-    listaEl.appendChild(li);
-  });
-}
-renderPendientes();
 
 /* ---- Nuestra banda sonora: lista con dedicatoria + reproducir ---- */
 function renderBandaSonora() {

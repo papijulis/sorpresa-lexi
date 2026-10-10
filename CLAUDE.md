@@ -44,7 +44,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 ├─ manifest.webmanifest       # PWA — nombre, íconos, theme_color
 ├─ sw.js                      # Service worker: HTML/JS/CSS network-first (los arreglos llegan de inmediato), contenido/*.js
 │                              # también network-first (con SWR se veía HTML nuevo + contenido viejo), fuentes/fotos cache-first, audio NO se intercepta (Range). Sube CACHE_VERSION
-│                              # (hoy v4) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
+│                              # (hoy v5) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
 ├─ CLAUDE.md                  # este archivo
 ├─ REVISAR.md                 # lista de textos borrador para que Julio revise/edite
 ├─ contenido/                 # TODO lo que Julio edita, vía <script src> (globals, no ES modules ni fetch — debe funcionar en file:// y GitHub Pages)
@@ -56,9 +56,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 │  ├─ cupones.js              # cupones raspables (CUPONES)
 │  ├─ frases.js               # banco de frases (FRASES) — 20 seed en Fase 2, Fase 4 lo amplía a 120
 │  ├─ canciones.js            # soundtrack (SONGS)
-│  ├─ trivia.js               # pool de preguntas (TRIVIA); cada partida toma 10 al azar
-│  ├─ wrapped.js              # cifras del chat para el Wrapped (WRAPPED)
-│  └─ pendientes.js           # "Lo que nos falta vivir" (PENDIENTES_HECHOS / PENDIENTES)
+│  └─ wrapped.js              # cifras para el Wrapped (WRAPPED)
 ├─ js/juegos/                 # un archivo por juego del Rincón de Juegos (Fase 3), cada uno expone
 │                              # window.Juego<Nombre> = { id, titulo, emoji, descripcion, start(mount), stop() }.
 │                              # Nunca llaman a globales del script principal (openModal, jardinStorage, SONGS…)
@@ -125,16 +123,10 @@ por cada día 28.
 
 ## Rincón de Juegos (Fase 3)
 
-Los 6 juegos del plan original ya están: cupones para raspar, memorama,
-lluvia de lirios, cacería de corazones (Fase 3, priorizados primero
-porque el propio `PROMPT-claude-code.md` decía "si el tiempo es limitado,
-prioriza: 1, 2, 3, 5"), y Trivia + Constelación (agregados después, a
-petición de Julio).
+Juegos: cupones para raspar (15, 5 filas de 3), memorama, lluvia de lirios,
+cacería de corazones, Constelación, Wrapped y Cúrame. La Trivia se eliminó
+por decisión de Julio (no volver a agregarla).
 
-- **Trivia** (`contenido/trivia.js` → `window.TRIVIA`, `js/juegos/trivia.js`):
-  10 preguntas de opción múltiple basadas solo en hechos ya presentes en
-  el código. Termina en un "diploma" (nunca un puntaje frío). Se ajusta
-  solo al `length` del array si agregas o quitas preguntas.
 - **Constelación** (`js/juegos/constelacion.js` → `window.JuegoConstelacion`):
   12 estrellas sobre la curva paramétrica clásica del corazón
   (`x = 16·sin³t`, `y = 13·cos t − 5·cos 2t − 2·cos 3t − cos 4t`), que hay
@@ -217,7 +209,7 @@ del bloque de "te amo".
   quitado al cerrarlo (mismo patrón de limpieza por arreglo de funciones
   que usan los módulos de `js/juegos/`).
 
-## Pergamino con dos cartas, pendientes y ritual 11:11
+## Pergamino con dos cartas, panel del inicio y ritual 11:11
 
 - El pergamino final alterna entre `LETTER` (config.js) y `CARTA_FINAL`
   (cartas.js, "Para seguir escribiendo") con el botón "Leer una carta más" /
@@ -225,8 +217,9 @@ del bloque de "te amo".
   vuelve a revelar párrafo por párrafo, `aria-live="polite"`, instantáneo con
   `prefers-reduced-motion`. La vela del deseo (`#letter-wish-block`) es solo de
   la primera carta. `CARTA_FINAL` también es un sobre abierto del Buzón.
-- "Lo que nos falta vivir": casillas; las pendientes las marca Lexi
-  (`jardin.pendientes.v1`).
+- La sección "Lo que nos falta vivir" se eliminó por decisión de Julio (no volver a agregarla).
+- Inicio: `#hero-panel` es un cuadro semitransparente que aparece ~4.5 s después de abrir el sitio (clase `.shown`) para que "Para ti" y el texto se lean sobre los lirios; sin la fecha "21 de septiembre" arriba. En modo ligero (`body.light-mode`) no usa blur.
+- Cursor: cursor nativo siempre visible; el rastro de pétalos dorados tiene su propio rAF (`cursorFrame`), independiente del loop principal (que se pausa con overlays) para que nunca quede congelado en pantalla.
 - Ritual 11:11 en vivo: `check1111()` abre un aviso si está en el sitio a las
   11:11 o 23:11 (hora de México), una vez por cada 11:11 de cada día.
 

@@ -49,18 +49,13 @@ Entradas nuevas: 29 de mayo, 18 de junio (Chapultepec), 1 de julio
 
 ## Juegos
 
-- **Cupones (`cupones.js`):** 17 cupones del banco. Ya no contactan a
-  nadie: el botón es "Acepto" y muestra una nota (`NOTA_CUPON`).
-- **Trivia (`trivia.js`):** 31 preguntas verificadas; cada partida toma 10
-  al azar. Las opciones incorrectas las redacté yo; revisa que ninguna sea
-  accidentalmente cierta.
+- **Cupones (`cupones.js`):** 15 cupones del banco, descripciones cortas y sin referencias. Ya no contactan a nadie: el botón es "Acepto" y muestra una nota (`NOTA_CUPON`).
 - **Wrapped (`wrapped.js`):** cifras aproximadas del banco, en tu voz.
-- **Cúrame (`js/juegos/curame.js`):** 40 segundos, sin game over duro.
+- **Cúrame (`js/juegos/curame.js`):** 40 segundos, sin game over duro; "como si fueras Luna en Rivals".
 
-## Otros textos (`contenido/config.js`, `pendientes.js`, `canciones.js`)
+## Otros textos (`contenido/config.js`, `canciones.js`)
 
-- `NOTA_CARTA`, `NOTA_CUPON`, `RITUAL_1111_TEXT` y `NOTA_PENDIENTE`.
-- Lista "Lo que nos falta vivir" (del apartado 6 del banco).
+- `NOTA_CARTA`, `NOTA_CUPON` y `RITUAL_1111_TEXT`.
 - Dedicatorias de las canciones: Honeybee (Olivia Rodrigo) y So High
   School (con la frase de Lexi).
 

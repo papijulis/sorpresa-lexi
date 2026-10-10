@@ -146,7 +146,7 @@ window.CARTAS = [
     desbloqueaCon: "curame",
     pista: "cúrame, cúrame, cúrame",
     sello: "estrella",
-    texto: "Si estás leyendo esto es porque me curaste. Otra vez. En Rivals y en todo lo demás, siempre eres mi healer.\n\nTe dedico mi MVP: cada victoria es tuya, aunque yo juegue fatal. Y ya sabes: usa a Elsa.\n\nGracias por curarme, Lexi. Hoy, mañana y siempre.",
+    texto: "Si estás leyendo esto es porque me curaste. Otra vez. En Rivals y en todo lo demás, siempre eres mi healer.\n\nTe dedico mi MVP: cada victoria es tuya, aunque yo juegue fatal. Y ya sabes: cúrame como si fueras Luna en Rivals.\n\nGracias por curarme, Lexi. Hoy, mañana y siempre.",
     borrador: true,
   },
   {

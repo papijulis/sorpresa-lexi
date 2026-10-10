@@ -1,5 +1,5 @@
 /* Cúrame — mini-juego de Rivals: la barra de vida de Julio baja sola y
-   Lexi la cura tocando los corazones que aparecen ("usa a Elsa").
+   Lexi la cura tocando los corazones que aparecen (como si fuera Luna en Rivals).
    Sin game over duro: si la barra llega a cero, Julio pide un "¡cúrame!"
    y se recupera un poco, el tiempo sigue. Al aguantar DURACION_MS se
    guarda { completada: true } en jardin.curame.v1 y se desbloquea la
@@ -39,7 +39,7 @@ window.JuegoCurame = (function () {
         </div>
         <div class="curame-time"><div class="curame-time-fill" id="curame-time"></div></div>
         <div class="curame-arena" id="curame-arena"></div>
-        <p class="font-ui text-[11px] mt-3" style="color:rgba(253,251,247,.5);text-align:center;">Toca los corazones para curarme. Aguanta hasta que se llene la barra de abajo. Usa a Elsa.</p>
+        <p class="font-ui text-[11px] mt-3" style="color:rgba(253,251,247,.5);text-align:center;">Toca los corazones para curarme. Aguanta hasta que se llene la barra de abajo, como si fueras Luna en Rivals.</p>
         ${already ? '<p class="font-ui text-[11px] mt-1" style="color:rgba(255,215,0,.7);text-align:center;">Ya me curaste una vez y la carta está en el Buzón. Puedes volver a jugar cuando quieras.</p>' : ''}
         <div style="text-align:center;"><button type="button" id="curame-replay" class="cupon-redeem-btn" style="margin-top:.9rem;display:none;">Jugar de nuevo</button></div>
       </div>

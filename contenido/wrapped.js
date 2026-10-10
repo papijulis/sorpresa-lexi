@@ -1,4 +1,4 @@
-/* Nuestro Wrapped — cifras del chat (28 de mayo al 27 de septiembre de
+/* Nuestro Wrapped — cifras de nuestra conversación (28 de mayo al 27 de septiembre de
    2026), solo conteos; ningún mensaje del chat vive en el sitio. Las
    cifras son aproximadas (conteo por coincidencia de texto). Cada slide:
      tipo "numero": un número grande que sube (valor, unidad)

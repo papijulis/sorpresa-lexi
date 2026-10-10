@@ -118,7 +118,7 @@ window.JuegoWrapped = (function () {
     id: 'wrapped',
     titulo: 'Nuestro Wrapped',
     emoji: '🌙',
-    descripcion: 'Nuestras cifras del chat, en slides.',
+    descripcion: 'Nuestros números, en slides.',
     start,
     stop,
   };
