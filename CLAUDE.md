@@ -43,8 +43,8 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 ├─ editor.html                # SOLO para Julio, noindex, no enlazado desde el sitio
 ├─ manifest.webmanifest       # PWA — nombre, íconos, theme_color
 ├─ sw.js                      # Service worker: HTML/JS/CSS network-first (los arreglos llegan de inmediato), contenido/*.js
-│                              # stale-while-revalidate, fuentes/fotos cache-first, audio NO se intercepta (Range). Sube CACHE_VERSION
-│                              # (hoy v2) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
+│                              # también network-first (con SWR se veía HTML nuevo + contenido viejo), fuentes/fotos cache-first, audio NO se intercepta (Range). Sube CACHE_VERSION
+│                              # (hoy v4) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
 ├─ CLAUDE.md                  # este archivo
 ├─ REVISAR.md                 # lista de textos borrador para que Julio revise/edite
 ├─ contenido/                 # TODO lo que Julio edita, vía <script src> (globals, no ES modules ni fetch — debe funcionar en file:// y GitHub Pages)

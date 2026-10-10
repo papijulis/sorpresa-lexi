@@ -6,17 +6,17 @@
      cambian) sí son cache-first.
    - El audio no se intercepta: el navegador pide rangos (Range) y manejar
      eso a mano en el SW rompe el seek; lo cachea el navegador solo.
-   - contenido/*.js: stale-while-revalidate — se sirve lo que haya en
-     caché al instante, y se actualiza en segundo plano, para que Julio
-     vea sus cambios (nuevas cartas, razones, etc.) pronto sin que ella
-     se quede atascada en una versión vieja si no hay internet.
+   - contenido/*.js: network-first (igual que el shell). Antes era
+     stale-while-revalidate, y en la primera visita tras una actualización
+     se veía el index.html nuevo con contenido viejo; ahora siempre llega
+     lo más reciente y, sin red, se sirve la copia guardada.
    - Fotos/audio/juegos: cache-first bajo demanda (se guardan la primera
      vez que se piden, no se precargan todas de entrada — mantiene la
      primera visita ligera). assets/img/originales/ NUNCA se cachea.
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -136,7 +136,7 @@ self.addEventListener('fetch', (event) => {
   if (req.headers.has('range') || url.pathname.endsWith('.mp3')) return; // audio: lo maneja el navegador
 
   if (isContenidoRequest(url)) {
-    event.respondWith(staleWhileRevalidate(req, CONTENIDO_CACHE));
+    event.respondWith(networkFirst(req, CONTENIDO_CACHE));
     return;
   }
   if (SHELL_URLS.some((p) => url.pathname.endsWith(p.replace('./', '/')))) {
