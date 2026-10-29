@@ -33,6 +33,7 @@
 <link rel="stylesheet" href="./assets/css/vistas.css">
 <link rel="stylesheet" href="./assets/css/jardin.css">
 <link rel="stylesheet" href="./assets/css/ornamentos.css">
+<link rel="stylesheet" href="./assets/css/navegacion.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
 <body class="locked">
@@ -83,23 +84,6 @@
 <!-- ===================== SCREEN 3: MAIN JOURNEY ===================== -->
 <main id="main-content" class="hidden-content">
 
-  <button id="sunset-toggle" aria-label="Nuestro atardecer" class="fixed top-5 right-5 z-40 w-14 h-14 rounded-full glass glow-gold flex items-center justify-center hover:scale-110 active:scale-95 transition-transform float-soft">
-    <span class="icon-morph-wrap">
-      <span class="icon-sun text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-sol"/></svg></span>
-      <span class="icon-sunset text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-atardecer"/></svg></span>
-    </span>
-  </button>
-
-  <button id="buzon-toggle" aria-label="El Buzón" class="fixed top-5 left-5 z-40 w-14 h-14 rounded-full glass glow-gold flex items-center justify-center hover:scale-110 active:scale-95 transition-transform float-soft relative">
-    <span class="text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-sobre"/></svg></span>
-    <span id="buzon-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full" style="background:var(--rosa-400);box-shadow:0 0 6px rgba(var(--rosa-rgb),.8);"></span>
-  </button>
-
-  <button id="juegos-toggle" aria-label="Rincón de Juegos" class="fixed top-24 left-5 z-40 w-14 h-14 rounded-full glass glow-gold flex items-center justify-center hover:scale-110 active:scale-95 transition-transform float-soft relative">
-    <span class="text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-mando"/></svg></span>
-    <span id="juegos-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full" style="background:var(--dorado-500);box-shadow:0 0 6px rgba(var(--dorado-rgb),.8);"></span>
-  </button>
-
   <!-- HERO -->
   <section class="hero-section min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
     <div id="hero-panel" class="hero-panel flex flex-col items-center">
@@ -112,6 +96,84 @@
     <div class="mt-14 flex flex-col items-center gap-2 text-parchment/50 font-ui text-xs tracking-wide">
       <span>Desliza para descubrirlo</span>
       <span class="text-xl">↓</span>
+    </div>
+  </section>
+
+  <!-- CAMINOS DEL JARDÍN (punto 9): cuatro escenas que llevan a cada rincón -->
+  <section id="caminos" class="reveal py-24 px-6 text-center">
+    <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2 titulo-seccion">Caminos del jardín</h2>
+    <p class="font-ui text-parchment/60 text-sm mb-10">Por aquí se llega a cada rincón.</p>
+    <div class="caminos-grid">
+
+      <button type="button" id="camino-buzon" class="camino tarjeta-flor mov-revelar" aria-label="Abrir el Buzón">
+        <svg class="camino-escena escena-buzon" id="escena-buzon" viewBox="0 0 160 120" aria-hidden="true" focusable="false">
+          <path class="e-suelo" d="M24 108H136"/>
+          <path class="e-trazo" d="M80 108V70"/>
+          <path class="e-trazo e-relleno" d="M44 70V54a18 18 0 0 1 18-18h36a18 18 0 0 1 18 18v16z"/>
+          <path class="e-trazo e-fino" d="M44 62h72"/>
+          <use href="#lirio-linea" x="67" y="40" width="26" height="26" style="color:var(--dorado-500)"/>
+          <g class="bandera"><path class="e-trazo" d="M117 62V34"/><path class="e-bandera" d="M117 34h15v10h-15z"/></g>
+        </svg>
+        <h3>El Buzón</h3>
+        <p class="camino-sub">Cartas que se abren con el tiempo</p>
+        <span class="camino-chip" id="camino-buzon-chip">Abrir</span>
+      </button>
+
+      <button type="button" id="camino-juegos" class="camino tarjeta-flor mov-revelar" aria-label="Abrir el Rincón de Juegos">
+        <svg class="camino-escena escena-invernadero" viewBox="0 0 160 120" aria-hidden="true" focusable="false">
+          <circle class="e-luz" cx="80" cy="82" r="30"/>
+          <path class="e-suelo" d="M18 108H142"/>
+          <path class="e-trazo e-relleno" d="M34 108V58L80 28l46 30v50z"/>
+          <path class="e-trazo e-fino" d="M80 28v80M34 58h92M57 43v65M103 43v65"/>
+          <use href="#lirio-linea" x="60" y="62" width="40" height="40" style="color:var(--dorado-500)"/>
+        </svg>
+        <h3>Rincón de Juegos</h3>
+        <p class="camino-sub">Cupones, memorama y más sorpresas</p>
+        <span class="camino-chip">Abrir</span>
+      </button>
+
+      <div class="camino tarjeta-flor mov-revelar" role="group" aria-label="Música">
+        <svg class="camino-escena escena-tocadiscos" id="escena-tocadiscos" viewBox="0 0 160 120" aria-hidden="true" focusable="false">
+          <path class="e-trazo e-relleno" d="M28 56a6 6 0 0 1 6-6h92a6 6 0 0 1 6 6v50H28z"/>
+          <g class="disco">
+            <circle class="e-trazo" cx="66" cy="80" r="24"/>
+            <circle class="e-trazo e-fino" cx="66" cy="80" r="16"/>
+            <circle cx="66" cy="80" r="5" fill="currentColor"/>
+            <circle cx="77" cy="69" r="2.200" fill="currentColor"/>
+          </g>
+          <g class="brazo"><path class="e-trazo" d="M120 66 82 86"/><circle cx="120" cy="66" r="4.500" fill="currentColor"/></g>
+          <use class="nota-flota" href="#i-nota" x="100" y="16" width="16" height="16"/>
+          <use class="nota-flota n2" href="#i-nota" x="124" y="26" width="14" height="14"/>
+        </svg>
+        <h3>Tocadiscos</h3>
+        <p class="camino-sub" id="camino-musica-sub">Nuestro soundtrack</p>
+        <div class="camino-controles">
+          <button type="button" id="camino-musica-play" class="camino-boton" aria-label="Reproducir o pausar" aria-pressed="false"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></button>
+          <button type="button" id="camino-musica-next" class="camino-boton" aria-label="Cambiar canción"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
+        </div>
+      </div>
+
+      <div class="camino tarjeta-flor mov-revelar" role="group" aria-label="Cielo del jardín">
+        <svg class="camino-escena escena-cielo" id="escena-cielo" data-cielo="dia" viewBox="0 0 160 120" aria-hidden="true" focusable="false">
+          <path class="e-trazo e-relleno" d="M30 108V56a50 50 0 0 1 100 0v52z"/>
+          <path class="e-suelo" d="M18 108H142"/>
+          <g class="estrellas" style="color:var(--dorado-500)">
+            <use href="#brillo" x="54" y="38" width="7" height="7"/><use href="#brillo" x="104" y="30" width="9" height="9"/><use href="#brillo" x="112" y="62" width="6" height="6"/><use href="#brillo" x="64" y="68" width="5" height="5"/>
+          </g>
+          <g class="astro">
+            <use class="sol" href="#i-sol" x="-16" y="-16" width="32" height="32"/>
+            <use class="luna" href="#i-luna" x="-16" y="-16" width="32" height="32"/>
+          </g>
+        </svg>
+        <h3>El cielo</h3>
+        <p class="camino-sub">Día, atardecer o noche</p>
+        <div class="camino-controles" id="camino-cielo-botones">
+          <button type="button" class="camino-boton" data-cielo="dia" aria-label="Día" aria-pressed="true"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-sol"/></svg></button>
+          <button type="button" class="camino-boton" data-cielo="atardecer" aria-label="Atardecer" aria-pressed="false"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-atardecer"/></svg></button>
+          <button type="button" class="camino-boton" data-cielo="noche" aria-label="Noche" aria-pressed="false"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-luna"/></svg></button>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -353,16 +415,36 @@
   </div>
 </div>
 
-<!-- ===================== MINI PLAYER ===================== -->
-<div id="mini-player" class="hidden-player fixed bottom-5 left-5 z-40 flex items-center gap-3 glass glow-gold rounded-full pl-2 pr-3 py-2">
-  <div id="mini-vinyl" class="vinyl-disc shrink-0"></div>
-  <button id="mini-player-toggle" aria-label="Reproducir o pausar" class="w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm"><svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></button>
-  <div class="leading-tight min-w-0">
-    <p id="mini-player-title" class="font-ui text-xs text-parchment font-semibold truncate max-w-[100px]"></p>
-    <div id="mini-eq" class="flex items-end gap-[2px] h-4 mt-1"></div>
+<!-- ===================== DOCK (punto 9): navegación integrada ===================== -->
+<nav id="dock" class="dock" aria-label="Navegación del jardín">
+  <button id="buzon-toggle" class="dock-btn" aria-label="El Buzón">
+    <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-sobre"/></svg><span>Buzón</span>
+    <span id="buzon-dot" class="dock-dot hidden"></span>
+  </button>
+  <button id="juegos-toggle" class="dock-btn" aria-label="Rincón de Juegos">
+    <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-mando"/></svg><span>Juegos</span>
+    <span id="juegos-dot" class="dock-dot oro hidden"></span>
+  </button>
+  <span class="dock-sep" aria-hidden="true"></span>
+  <div id="mini-player" class="dock-musica hidden-player" role="group" aria-label="Música">
+    <div id="mini-vinyl" class="vinyl-disc shrink-0"></div>
+    <button id="mini-player-toggle" aria-label="Reproducir o pausar"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></button>
+    <div class="dock-titulo">
+      <p id="mini-player-title" class="font-ui text-xs text-parchment font-semibold truncate"></p>
+      <div id="mini-eq" class="flex items-end gap-[2px]"></div>
+    </div>
+    <button id="mini-player-next" aria-label="Cambiar canción"><svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
   </div>
-  <button id="mini-player-next" aria-label="Cambiar canción" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm shrink-0"><svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
-</div>
+  <span class="dock-sep" aria-hidden="true"></span>
+  <button id="sunset-toggle" class="dock-btn" aria-label="Cielo: día. Toca para cambiar">
+    <span class="cielo-ico">
+      <svg class="ico i-sol" aria-hidden="true" focusable="false"><use href="#i-sol"/></svg>
+      <svg class="ico i-atardecer" aria-hidden="true" focusable="false"><use href="#i-atardecer"/></svg>
+      <svg class="ico i-luna" aria-hidden="true" focusable="false"><use href="#i-luna"/></svg>
+    </span><span id="cielo-etiqueta">Día</span>
+  </button>
+</nav>
+<div id="dock-nota" class="dock-nota" role="status" aria-live="polite"></div>
 
 <!-- ===================== REUSABLE MODAL ===================== -->
 <div id="app-modal" class="modal-backdrop">
@@ -413,6 +495,7 @@
 <script src="./js/secciones.js"></script>
 <script src="./js/buzon-juegos.js"></script>
 <script src="./js/extras.js"></script>
+<script src="./js/navegacion.js"></script>
 <script src="./js/escenas.js"></script>
 </body>
 </html>

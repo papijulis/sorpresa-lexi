@@ -127,6 +127,7 @@ function chooseSong(idx) {
   setTimeout(() => {
     screenSongs.style.display = 'none';
     mainContent.classList.remove('hidden-content');
+    document.getElementById('dock').classList.add('visible');
     updateScrollProgress();
     revealHeroTitle();
     setTimeout(() => document.getElementById('hero-panel').classList.add('shown'), 4500);
@@ -149,15 +150,3 @@ miniNext.addEventListener('click', () => {
 function pauseBgAudioForVoiceNote() {
   if (!bgAudio.paused) { bgAudio.pause(); updateMiniPlayerIcon(); }
 }
-
-/* ======================================================================
-   SUNSET TOGGLE
-====================================================================== */
-document.getElementById('sunset-toggle').addEventListener('click', () => {
-  isSunset = !isSunset;
-  document.body.classList.toggle('sunset-mode', isSunset);
-  particles = [];
-  if (!isSunset) { fireflies = []; birds = []; }
-  if (isSunset) showToast(SUNSET_TOAST_TEXT);
-});
-

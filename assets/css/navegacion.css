@@ -1,0 +1,156 @@
+/* ======================================================================
+   NAVEGACIÓN INTEGRADA (punto 9 del rediseño)
+   • Dock inferior: Buzón · Juegos · Música · Cielo (reemplaza las esquinas).
+   • "Caminos del jardín": cuatro escenas ilustradas dentro de la página.
+   • Transición de iris al abrir/cerrar las vistas a pantalla completa.
+   Va después de jardin.css/ornamentos.css y antes de movil.css.
+====================================================================== */
+
+/* ---------- dock ---------- */
+.dock {
+  position: fixed; left: 50%; bottom: calc(.9rem + env(safe-area-inset-bottom, 0px)); z-index: var(--z-flotante);
+  display: flex; align-items: center; gap: .1rem; padding: .35rem .55rem; max-width: calc(100vw - 1rem);
+  border-radius: var(--radio-pill);
+  background: rgba(var(--ciruela-rgb), .74); border: 1px solid rgba(255, 255, 255, .14);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--sombra-suave), var(--brillo-oro);
+  transform: translate(-50%, 160%); opacity: 0; pointer-events: none;
+  transition: transform .7s var(--ease-flor), opacity .5s ease;
+}
+.dock.visible { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+.dock-btn {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .2rem;
+  min-width: 3.7rem; min-height: 3.4rem; padding: .3rem .55rem; border: none; border-radius: 1.4rem;
+  background: transparent; color: var(--pergamino-50);
+  font-family: var(--fuente-ui); font-weight: 600; font-size: .75rem; line-height: 1;
+  transition: background var(--dur-rapida) ease, transform var(--dur-rapida) var(--ease-rebote);
+}
+.dock-btn .ico { width: 1.55rem; height: 1.55rem; color: var(--dorado-500); filter: drop-shadow(0 0 6px rgba(var(--dorado-rgb), .35)); }
+.dock-btn:active { transform: scale(.92); }
+@media (hover: hover) { .dock-btn:hover { background: rgba(255, 255, 255, .09); } }
+.dock-dot {
+  position: absolute; top: .45rem; right: .95rem; width: .6rem; height: .6rem; border-radius: 999px;
+  background: var(--rosa-400); box-shadow: 0 0 8px rgba(var(--rosa-rgb), .9);
+}
+.dock-dot.oro { background: var(--dorado-500); box-shadow: 0 0 8px rgba(var(--dorado-rgb), .9); }
+.dock-dot.hidden { display: none; }
+.dock-sep { width: 1px; align-self: stretch; margin: .55rem .3rem; background: rgba(255, 255, 255, .12); }
+
+/* grupo de música dentro del dock */
+.dock-musica {
+  display: flex; align-items: center; gap: .45rem; padding: .2rem .5rem; overflow: hidden; max-width: 24rem;
+  transition: max-width .6s var(--ease-flor), opacity .4s ease, padding .4s ease;
+}
+.dock-musica.hidden-player { max-width: 0; padding-left: 0; padding-right: 0; opacity: 0; pointer-events: none; transform: none; }
+.dock-musica .vinyl-disc { width: 1.9rem; height: 1.9rem; }
+#mini-player-toggle, #mini-player-next {
+  display: flex; align-items: center; justify-content: center; border: none; border-radius: 999px; flex: none;
+  transition: transform var(--dur-rapida) var(--ease-rebote), background var(--dur-rapida) ease;
+}
+#mini-player-toggle { width: 2.75rem; height: 2.75rem; background: var(--grad-oro-diagonal); color: var(--ciruela-900); box-shadow: var(--brillo-oro); }
+#mini-player-next { width: 2.4rem; height: 2.4rem; background: rgba(255, 255, 255, .1); color: var(--pergamino-50); }
+#mini-player-toggle:active, #mini-player-next:active { transform: scale(.9); }
+.dock-titulo { display: block; min-width: 0; line-height: 1.15; }
+.dock-titulo p { display: none; margin: 0; max-width: 7rem; }
+@media (min-width: 640px) { .dock-titulo p { display: block; } }
+#mini-eq { height: .9rem; margin-top: .25rem; }
+
+/* etiqueta flotante "Sonando: …" sobre el dock */
+.dock-nota {
+  position: fixed; left: 50%; bottom: calc(5.6rem + env(safe-area-inset-bottom, 0px)); z-index: var(--z-flotante);
+  transform: translate(-50%, 8px); opacity: 0; pointer-events: none; white-space: nowrap;
+  padding: .5rem 1.1rem; border-radius: var(--radio-pill); background: rgba(var(--ciruela-rgb), .85);
+  border: 1px solid rgba(var(--dorado-rgb), .3); font-family: var(--fuente-titulo); font-style: italic; font-size: .95rem; color: var(--pergamino-50);
+  transition: opacity .5s ease, transform .5s var(--ease-flor);
+}
+.dock-nota.on { opacity: 1; transform: translate(-50%, 0); }
+
+/* el aviso (toast) sube para no taparse con el dock */
+#toast { bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
+main { padding-bottom: 5.5rem; }
+
+/* ícono del cielo: sol / atardecer / luna según el estado */
+.cielo-ico { position: relative; width: 1.55rem; height: 1.55rem; }
+.cielo-ico .ico { position: absolute; inset: 0; transition: opacity .5s ease, transform .6s var(--ease-flor); opacity: 0; transform: rotate(-70deg) scale(.5); }
+body[data-cielo="dia"] .cielo-ico .i-sol,
+body[data-cielo="atardecer"] .cielo-ico .i-atardecer,
+body[data-cielo="noche"] .cielo-ico .i-luna { opacity: 1; transform: none; }
+
+/* ---------- Caminos del jardín ---------- */
+.caminos-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; max-width: 64rem; margin: 0 auto; }
+@media (min-width: 900px) { .caminos-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.4rem; } }
+.camino {
+  position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+  padding: 1.1rem .8rem 1rem; border-radius: var(--radio-lg); color: var(--pergamino-50);
+  background: var(--grad-cristal); border: 1px solid rgba(255, 255, 255, .13);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: opacity var(--dur-lenta) var(--ease-flor), transform var(--dur-media) var(--ease-flor), box-shadow var(--dur-media) ease, border-color var(--dur-media) ease;
+}
+@media (hover: hover) { .camino:hover { transform: translateY(-5px); border-color: rgba(var(--dorado-rgb), .4); box-shadow: var(--sombra-suave), var(--brillo-oro); } }
+.camino:active { transform: scale(.985); }
+.camino-escena { width: 100%; max-width: 10.5rem; height: auto; margin: 0 auto .5rem; color: var(--dorado-500); overflow: visible; }
+.camino h3 { margin: 0; font-family: var(--fuente-titulo); font-size: 1.15rem; font-weight: 600; color: var(--pergamino-50); }
+.camino-sub { margin: .3rem 0 .6rem; font-family: var(--fuente-ui); font-size: .8rem; color: rgba(var(--pergamino-rgb), .65); line-height: 1.35; }
+.camino-chip {
+  display: inline-block; margin-top: auto; padding: .3rem .75rem; border-radius: var(--radio-pill);
+  font-family: var(--fuente-ui); font-size: .75rem; font-weight: 600; color: var(--dorado-500);
+  background: rgba(var(--dorado-rgb), .1); border: 1px solid rgba(var(--dorado-rgb), .3);
+}
+.camino-controles { display: flex; gap: .5rem; justify-content: center; margin-top: auto; }
+.camino-boton {
+  display: inline-flex; align-items: center; justify-content: center; gap: .3rem; min-height: 2.75rem; min-width: 2.75rem; padding: 0 .85rem;
+  border-radius: var(--radio-pill); border: 1px solid rgba(255, 255, 255, .18); background: rgba(255, 255, 255, .07); color: var(--pergamino-50);
+  font-family: var(--fuente-ui); font-size: .78rem; font-weight: 600;
+  transition: background var(--dur-rapida) ease, border-color var(--dur-rapida) ease;
+}
+.camino-boton .ico { color: var(--dorado-500); }
+.camino-boton[aria-pressed="true"] { background: rgba(var(--dorado-rgb), .16); border-color: rgba(var(--dorado-rgb), .6); }
+@media (hover: hover) { .camino-boton:hover { background: rgba(255, 255, 255, .14); } }
+
+/* partes de las escenas (se animan con CSS porque son SVG en línea) */
+.e-trazo { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.e-fino { stroke-width: 1.3; opacity: .7; }
+.e-relleno { fill: rgba(var(--amatista-rgb), .22); }
+.e-suelo { fill: none; stroke: rgba(var(--orquidea-rgb), .5); stroke-width: 2; stroke-linecap: round; }
+.escena-buzon .bandera { transform-origin: 117px 62px; transform: rotate(78deg); transition: transform .9s var(--ease-rebote); }
+.escena-buzon.tiene-nuevas .bandera { transform: rotate(0deg); animation: banderaAgita 3.4s ease-in-out 1s infinite; }
+@keyframes banderaAgita { 0%, 70%, 100% { transform: rotate(0deg); } 78% { transform: rotate(-9deg); } 86% { transform: rotate(5deg); } 94% { transform: rotate(-3deg); } }
+.e-bandera { fill: var(--rosa-400); stroke: none; }
+.escena-invernadero .e-luz { fill: rgba(var(--dorado-rgb), .2); animation: haloLuz 4.2s ease-in-out infinite; }
+@keyframes haloLuz { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
+.escena-tocadiscos .disco { transform-origin: 66px 82px; animation: giraDisco 6s linear infinite; animation-play-state: paused; }
+.escena-tocadiscos.sonando .disco { animation-play-state: running; }
+@keyframes giraDisco { to { transform: rotate(360deg); } }
+.escena-tocadiscos .brazo { transform-origin: 120px 66px; transform: rotate(-22deg); transition: transform .9s var(--ease-flor); }
+.escena-tocadiscos.sonando .brazo { transform: rotate(0deg); }
+.escena-tocadiscos .nota-flota { opacity: 0; }
+.escena-tocadiscos.sonando .nota-flota { animation: notaSube 3.2s ease-out infinite; }
+.escena-tocadiscos.sonando .nota-flota.n2 { animation-delay: 1.5s; }
+@keyframes notaSube { 0% { opacity: 0; transform: translateY(6px); } 25% { opacity: .9; } 100% { opacity: 0; transform: translateY(-26px); } }
+.escena-cielo .astro { transition: transform 1.1s var(--ease-flor); }
+.escena-cielo[data-cielo="dia"] .astro { transform: translate(80px, 30px); }
+.escena-cielo[data-cielo="atardecer"] .astro { transform: translate(124px, 74px); }
+.escena-cielo[data-cielo="noche"] .astro { transform: translate(44px, 52px); }
+.escena-cielo .sol, .escena-cielo .luna { transition: opacity .8s ease; }
+.escena-cielo .luna, .escena-cielo[data-cielo="noche"] .sol { opacity: 0; }
+.escena-cielo[data-cielo="noche"] .luna { opacity: 1; }
+.escena-cielo[data-cielo="atardecer"] .sol { color: var(--ambar-500); }
+.escena-cielo .estrellas { opacity: 0; transition: opacity 1s ease; }
+.escena-cielo[data-cielo="noche"] .estrellas { opacity: 1; }
+
+/* ---------- iris: las vistas se abren desde donde tocaste ---------- */
+.app-view {
+  transform: none; clip-path: circle(0 at var(--ox, 50%) var(--oy, 100%));
+  transition: opacity .3s ease .35s, clip-path .8s var(--ease-flor);
+}
+.app-view.open {
+  opacity: 1; transform: none; clip-path: circle(150vmax at var(--ox, 50%) var(--oy, 100%));
+  transition: opacity .25s ease, clip-path .9s var(--ease-flor);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-view, .app-view.open { clip-path: none; transition: opacity .2s ease; }
+  .dock { transition: opacity .2s ease; transform: translate(-50%, 0); }
+  .escena-buzon.tiene-nuevas .bandera, .escena-invernadero .e-luz, .escena-tocadiscos.sonando .disco, .escena-tocadiscos.sonando .nota-flota { animation: none; }
+  .escena-cielo .astro { transition: none; }
+}

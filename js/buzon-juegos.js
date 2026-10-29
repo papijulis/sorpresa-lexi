@@ -71,8 +71,25 @@ const buzonToggleBtn = document.getElementById('buzon-toggle');
 const buzonCloseBtn = document.getElementById('buzon-close');
 
 function updateBuzonDot() {
-  const hasUnread = window.CARTAS.some((c) => cartaIsOpenable(c) && !buzonState.leidas.includes(c.id));
-  buzonDot.classList.toggle('hidden', !hasUnread);
+  const nuevas = window.CARTAS.filter((c) => cartaIsOpenable(c) && !buzonState.leidas.includes(c.id)).length;
+  buzonDot.classList.toggle('hidden', nuevas === 0);
+  /* la escena del Buzón en "Caminos del jardín": bandera arriba y cuenta de cartas nuevas */
+  const escena = document.getElementById('escena-buzon');
+  const chip = document.getElementById('camino-buzon-chip');
+  if (escena) escena.classList.toggle('tiene-nuevas', nuevas > 0);
+  if (chip) chip.textContent = nuevas === 0 ? 'Abrir' : (nuevas === 1 ? '1 carta nueva' : nuevas + ' cartas nuevas');
+}
+
+/* iris: la vista se abre (y se cierra) desde el botón que se tocó */
+function irisDesde(vista, origen) {
+  const el = origen && origen.currentTarget ? origen.currentTarget : origen;
+  let x = '50%', y = '100%';
+  if (el && el.getBoundingClientRect) {
+    const r = el.getBoundingClientRect();
+    if (r.width) { x = Math.round(r.left + r.width / 2) + 'px'; y = Math.round(r.top + r.height / 2) + 'px'; }
+  }
+  vista.style.setProperty('--ox', x);
+  vista.style.setProperty('--oy', y);
 }
 
 function showCartaModal(carta) {
@@ -151,8 +168,9 @@ function renderBuzon() {
   updateBuzonDot();
 }
 
-function openBuzonView() {
+function openBuzonView(origen) {
   renderBuzon();
+  irisDesde(viewBuzon, origen);
   viewBuzon.classList.add('open');
   history.replaceState(null, '', '#buzon');
   canvasPauseReasons.add('buzon');
@@ -298,8 +316,9 @@ function exitJuego() {
 }
 juegoExitBtn.addEventListener('click', exitJuego);
 
-function openJuegosView() {
+function openJuegosView(origen) {
   renderJuegosGrid();
+  irisDesde(viewJuegos, origen);
   viewJuegos.classList.add('open');
   history.replaceState(null, '', '#juegos');
   canvasPauseReasons.add('juegos');

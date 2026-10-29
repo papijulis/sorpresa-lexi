@@ -290,25 +290,29 @@ function applySeason() {
 }
 applySeason();
 
-/* ---- cielo nocturno + luna (easter egg: tocarla de noche) ---- */
+/* ---- cielo nocturno + luna (easter egg: tocarla de noche) ----
+   Construye las estrellas una sola vez; qué cielo se muestra (día /
+   atardecer / noche) lo decide setCielo() en js/navegacion.js. */
+let cieloNocturnoListo = false;
 function applyNightMode() {
-  const hour = mexicoCityHour();
-  const isNight = hour >= 20 || hour < 6;
-  if (!isNight) return;
-  document.body.classList.add('night-mode');
   const nightLayer = document.getElementById('bg-layer-night');
   const moonEl = document.getElementById('night-moon');
-  for (let i = 0; i < 36; i++) {
-    const star = document.createElement('div');
-    star.className = 'night-star';
-    const size = rand(1, 2.6);
-    star.style.width = size + 'px';
-    star.style.height = size + 'px';
-    star.style.left = rand(0, 100) + '%';
-    star.style.top = rand(0, 68) + '%';
-    star.style.animationDelay = rand(0, 3).toFixed(2) + 's';
-    nightLayer.insertBefore(star, moonEl);
+  if (!cieloNocturnoListo) {
+    cieloNocturnoListo = true;
+    for (let i = 0; i < 36; i++) {
+      const star = document.createElement('div');
+      star.className = 'night-star';
+      const size = rand(1, 2.6);
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.left = rand(0, 100) + '%';
+      star.style.top = rand(0, 68) + '%';
+      star.style.animationDelay = rand(0, 3).toFixed(2) + 's';
+      nightLayer.insertBefore(star, moonEl);
+    }
   }
+  const vieja = nightLayer.querySelector('.night-constellation');
+  if (vieja) vieja.remove();
   renderNightConstellation(nightLayer, moonEl);
 }
 
@@ -344,8 +348,6 @@ function renderNightConstellation(nightLayer, moonEl) {
 
   nightLayer.insertBefore(svg, moonEl);
 }
-applyNightMode();
-
 document.getElementById('night-moon').addEventListener('click', () => {
   if (!document.body.classList.contains('night-mode') || document.body.classList.contains('sunset-mode')) return;
   const rect = document.getElementById('night-moon').getBoundingClientRect();

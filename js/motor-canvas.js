@@ -27,18 +27,7 @@ function resizeCanvas() {
 /* scrollY cacheado: leerlo en cada cuadro (updateLily) forzaba un recálculo
    de layout por flor. Se actualiza solo al hacer scroll. */
 let scrollYCache = window.scrollY || 0;
-let fabLastY = 0;
-const fabEls = ['sunset-toggle', 'buzon-toggle', 'juegos-toggle'].map((id) => document.getElementById(id));
-window.addEventListener('scroll', () => {
-  scrollYCache = window.scrollY || 0;
-  /* en el teléfono, los botones flotantes se esconden al bajar y vuelven al subir */
-  if (window.innerWidth < 640) {
-    const y = scrollYCache;
-    if (y > 160 && y > fabLastY + 8) fabEls.forEach((el) => el && el.classList.add('fab-away'));
-    else if (y < fabLastY - 8 || y <= 160) fabEls.forEach((el) => el && el.classList.remove('fab-away'));
-    fabLastY = y;
-  }
-}, { passive: true });
+window.addEventListener('scroll', () => { scrollYCache = window.scrollY || 0; }, { passive: true });
 let resizeQueued = false;
 window.addEventListener('resize', () => {
   if (resizeQueued) return;

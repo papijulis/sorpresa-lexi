@@ -2,13 +2,6 @@
      MÓVIL — zonas seguras, toques de 44px, texto legible, sin hover pegado
   ====================================================================== */
   /* lo fijo respeta el notch y la barra de inicio del teléfono (viewport-fit=cover) */
-  #sunset-toggle { top: calc(1.25rem + env(safe-area-inset-top, 0px)); right: calc(1.25rem + env(safe-area-inset-right, 0px)); }
-  #buzon-toggle  { top: calc(1.25rem + env(safe-area-inset-top, 0px)); left: calc(1.25rem + env(safe-area-inset-left, 0px)); }
-  #juegos-toggle { top: calc(6rem + env(safe-area-inset-top, 0px)); left: calc(1.25rem + env(safe-area-inset-left, 0px)); }
-  #mini-player   { bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px)); left: calc(1.25rem + env(safe-area-inset-left, 0px)); }
-  #toast         { bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); }
-  #sunset-toggle, #buzon-toggle, #juegos-toggle { transition: opacity .3s ease, transform .2s ease; }
-  .fab-away { opacity: 0 !important; pointer-events: none !important; }
   .app-view, .modal-panel { overscroll-behavior: contain; }
 
   .clock-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -20,14 +13,17 @@
   }
 
   @media (max-width: 639px) {
-    #sunset-toggle, #buzon-toggle, #juegos-toggle { width: 3rem; height: 3rem; }
-    #juegos-toggle { top: calc(5rem + env(safe-area-inset-top, 0px)); }
+    .dock { padding: .3rem .4rem; bottom: calc(.6rem + env(safe-area-inset-bottom, 0px)); }
+    .dock-btn { min-width: 3.1rem; padding-left: .35rem; padding-right: .35rem; }
+    .dock-dot { right: .6rem; }
+    .dock-musica { gap: .3rem; padding-left: .25rem; padding-right: .25rem; }
+    .dock-sep { margin-left: .1rem; margin-right: .1rem; }
     .clock-grid > div { padding-top: 1rem; padding-bottom: 1rem; }
     /* calendario: casillas de ~43px para tocar cómodo */
     .cal-section { padding-left: .75rem; padding-right: .75rem; }
     .cal-card { padding: .75rem; }
     .cal-card .grid { gap: .25rem; }
-    #cal-prev, #cal-next, #mini-player-toggle, #mini-player-next, .banda-play { width: 2.75rem; height: 2.75rem; }
+    #cal-prev, #cal-next, #mini-player-toggle, .banda-play { width: 2.75rem; height: 2.75rem; }
     .app-view-close { width: 2.75rem; height: 2.75rem; }
     #modal-close { top: .35rem; right: .5rem; width: 2.75rem; height: 2.75rem; font-size: 1.75rem; display: flex; align-items: center; justify-content: center; }
     #letter-switch, #letter-back, #random-memory-btn, .juego-exit-btn { min-height: 2.75rem; }

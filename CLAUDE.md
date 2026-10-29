@@ -22,7 +22,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
    - `assets/img/og.jpg` (metatags para compartir) es la única imagen de `assets/img/` que **no** necesita `.webp` — solo la leen crawlers de redes sociales, nunca pasa por `pictureHTML()`.
    - Nunca borrar ni renombrar estos archivos originales.
 5. **Arreglos ya validados — no reintroducir los bugs que corrigen:**
-   - Selector de canciones: al elegir una, se oculta con `display:none` (quitar clase `active` y agregar `screen-out`) y se convierte en mini-reproductor en la esquina.
+   - Selector de canciones: al elegir una, se oculta con `display:none` (quitar clase `active` y agregar `screen-out`) y se convierte en el grupo de música del dock inferior (`#mini-player`).
    - Botón "No" del inicio: se vuelve `position:fixed` solo dinámicamente en JS (`ensureNoButtonFixed`), tomando antes el `getBoundingClientRect()`; nunca debe encimarse al "Sí".
    - **Sin contacto con Julio:** no hay botones de WhatsApp ni "responderle" en ninguna parte; donde antes había uno hay una nota romántica (`NOTA_CARTA`, `NOTA_CUPON`). Decisión de Julio.
    - **Privacidad:** el repo es público. Nada del chat, ni nombres de terceros, ni salud, intimidad o peleas en textos del sitio. El banco de amor y el chat viven fuera del repo.
@@ -162,12 +162,14 @@ existente en vez de agregar uno nuevo:
   calculan una sola vez al cargar, en `applySeason()`. Ambas variables
   están declaradas junto a `isSunset` para que `spawnPetal()` las pueda
   leer sin importar en qué orden se definan las funciones.
-- **Cielo nocturno**: `body.night-mode` se agrega automáticamente si la
-  hora de Ciudad de México está entre las 20:00 y las 6:00
-  (`applyNightMode()`). Es independiente del toggle manual de atardecer
-  (`sunset-mode`) — la cascada en CSS decide cuál gana cuando ambas
-  clases están presentes. La luna (`#night-moon`) solo es clicable
-  (`pointer-events`) cuando `night-mode` está activo y `sunset-mode` no.
+- **Cielo (día · atardecer · noche)**: `setCielo(estado)` (`js/navegacion.js`)
+  es el único que cambia `body.sunset-mode` / `body.night-mode` (son
+  excluyentes), `isSunset` y `body[data-cielo]`. Al abrir, sigue la hora de
+  Ciudad de México (20:00–6:00 → noche, si no día; sin guardarse); después
+  Lexi lo cambia con el botón del dock (cicla) o con la escena "El cielo".
+  `applyNightMode()` (extras.js) solo construye las estrellas (una vez) y
+  la constelación; ya no decide por hora. La luna (`#night-moon`) solo es
+  clicable (`pointer-events`) con `night-mode` activo.
 - **Corazones al escribir "te amo"**: tiene su propio arreglo
   (`heartRain`) y sus propias `updateHeartRain()`/`drawHeartRainItem()`,
   enganchadas al `loop()` del canvas ya existente — no reutiliza
@@ -216,7 +218,14 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Componentes** (`assets/css/ornamentos.css`): `.ico`, `.orn-divisor` (el trazo se dibuja con el scroll; se agrega solo bajo cada `.titulo-seccion` o donde pongas `data-orn-divisor`), `.tarjeta-flor` (esquinas de pétalo), `.btn-brillo` (brillo que pasa en botones dorados), flor de precarga, y el lenguaje de movimiento: `.mov-florecer`, `.mov-latido`, `.mov-revelar`, `.mov-halo` (con `prefers-reduced-motion` ya cubierto).
 - **Escenas** (`js/escenas.js`): motor de scroll sin librerías. `data-escena="trazo|pasada"` escribe `--p` (0→1) solo mientras el elemento está en pantalla; `.mov-*`/`data-en-vista` agregan `.en-vista` una vez. `Escenas.registrar(el)` para elementos creados por JS.
 - **Marca** (`node tools/generar-marca.js` + Inkscape, comandos impresos al final): íconos de la app, maskable, favicon y `og.jpg` con la misma flor maestra.
-- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
+- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
+
+## Navegación integrada (rediseño, punto 9)
+
+- **Dock inferior** (`<nav id="dock">`, `assets/css/navegacion.css`): Buzón · Juegos · música (`#mini-player`, con vinilo, play, EQ y siguiente) · Cielo. Reemplaza los botones de las esquinas y el mini-reproductor; **se conservaron los ids** (`buzon-toggle`, `juegos-toggle`, `sunset-toggle`, `buzon-dot`, `juegos-dot`) porque los usan Cacería y el JS existente. Aparece (`.visible`) al terminar la selección de canción. Los puntitos (`.dock-dot`) son los avisos de carta nueva / corazones pendientes. El toast sube sobre el dock; `main` lleva `padding-bottom` para que nada quede tapado.
+- **Caminos del jardín** (`#caminos`, tras el inicio): cuatro escenas SVG en línea con animación CSS — Buzón (bandera arriba si hay cartas nuevas, chip con la cuenta; la pone `updateBuzonDot()`), Rincón de Juegos (invernadero), Tocadiscos (disco y brazo animados según `bgAudio`) y El cielo (astro que viaja según `data-cielo`). Mismas funciones que el dock, no duplican estado.
+- **Iris**: `.app-view` se abre/cierra con `clip-path: circle()` desde `--ox/--oy`, el centro del botón que se tocó (`irisDesde()` en buzon-juegos.js; `openBuzonView(origen)` / `openJuegosView(origen)` aceptan el evento o el elemento). Con `prefers-reduced-motion` es solo un fundido.
+- `js/navegacion.js` carga después de `extras.js` (usa `mexicoCityHour` y `applyNightMode`) y antes de `escenas.js`. Los textos nuevos son rótulos de interfaz ("Caminos del jardín", subtítulos de cada escena), no voz personal.
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 
@@ -233,7 +242,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - Inicio: `#hero-panel` es un cuadro semitransparente que aparece ~4.5 s después de abrir el sitio (clase `.shown`) para que "Para ti" y el texto se lean sobre los lirios; sin la fecha "21 de septiembre" arriba. En modo ligero (`body.light-mode`) no usa blur.
 - Cursor: cursor nativo siempre visible (nunca `cursor:none`) y la manita (`cursor:pointer`) en todo lo clicable vía regla global `button, [role="button"], a[href]…` (venía del preflight de Tailwind y se había perdido). La capa superior `#cursor-canvas` (z 200) tiene su propio rAF (`topFrame`), independiente del loop principal, y dibuja el rastro de pétalos (por `pointermove` de mouse/lápiz, nunca touch) y los destellos de premio (`spawnSparkleBurst` los manda ahí cuando el canvas principal está pausado, así se ven al ganar un juego). Todo lo que decae lo hace por tiempo (dt), no por cuadro.
 - Rendimiento del canvas: los lirios ya florecidos se dibujan desde un sprite cacheado (`buildLilySprite`) en vez de rehacer 6 gradientes por flor por cuadro; `scrollYCache` evita leer `window.scrollY` (layout forzado) en cada cuadro; ningún loop debe llamar a `getBoundingClientRect()` por cuadro, guarda el tamaño en el resize.
-- Móvil (<640px): botones táctiles de 44px, texto mínimo 12px, zonas seguras (`env(safe-area-inset-*)`) en lo fijo, botones flotantes que se ocultan al bajar (`.fab-away`), cupones 2 columnas (1 columna <360px), selección de canción compacta, `@media (hover: none)` anula hovers pegados, caps de partículas y dpr 1.5 en teléfono; en horizontal, los juegos de lienzo piden girar el teléfono (`#juego-stage[data-portrait]`).
+- Móvil (<640px): botones táctiles de 44px, texto mínimo 12px, zonas seguras (`env(safe-area-inset-*)`) en lo fijo, dock inferior en vez de botones en las esquinas, cupones 2 columnas (1 columna <360px), selección de canción compacta, `@media (hover: none)` anula hovers pegados, caps de partículas y dpr 1.5 en teléfono; en horizontal, los juegos de lienzo piden girar el teléfono (`#juego-stage[data-portrait]`).
 - Ritual 11:11 en vivo: `check1111()` abre un aviso si está en el sitio a las
   11:11 o 23:11 (hora de México), una vez por cada 11:11 de cada día.
 

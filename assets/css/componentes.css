@@ -117,13 +117,6 @@
   }
   .flame-flicker { display: inline-block; animation: flameFlicker 2.3s ease-in-out infinite; }
 
-  /* ---- sunset icon morph ---- */
-  .icon-morph-wrap { position: relative; width: 26px; height: 26px; }
-  .icon-morph-wrap span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transition: opacity .5s ease, transform .5s ease; }
-  .icon-sunset { opacity: 0; transform: rotate(-80deg) scale(.6); }
-  body.sunset-mode .icon-sun { opacity: 0; transform: rotate(80deg) scale(.6); }
-  body.sunset-mode .icon-sunset { opacity: 1; transform: rotate(0) scale(1); }
-
   /* ---- vinyl ---- */
   .vinyl-disc {
     width: 30px; height: 30px; border-radius: 50%; shrink: 0;
@@ -170,9 +163,6 @@
 
   #main-content { transition: opacity 0.9s ease; }
   #main-content.hidden-content { opacity: 0; pointer-events: none; }
-
-  #mini-player { transition: transform 0.4s cubic-bezier(.2,.8,.3,1.2), opacity 0.4s ease; }
-  #mini-player.hidden-player { opacity: 0; transform: translateY(20px); pointer-events: none; }
 
   .day-cell { aspect-ratio: 1/1; }
 
