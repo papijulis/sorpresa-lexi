@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -30,6 +30,18 @@ const SHELL_URLS = [
   './assets/css/infinito.css',
   './js/infinito.js',
   './assets/css/utilities.css',
+  './assets/css/base.css',
+  './assets/css/componentes.css',
+  './assets/css/vistas.css',
+  './assets/css/jardin.css',
+  './assets/css/movil.css',
+  './js/nucleo.js',
+  './js/motor-canvas.js',
+  './js/ui.js',
+  './js/audio.js',
+  './js/secciones.js',
+  './js/buzon-juegos.js',
+  './js/extras.js',
   './assets/fonts/Inter-latin-300-700-normal.woff2',
   './assets/fonts/PlayfairDisplay-latin-400-900-normal.woff2',
   './assets/fonts/PlayfairDisplay-latin-400-900-italic.woff2',
