@@ -502,24 +502,139 @@ function renderTimeline() {
 }
 renderTimeline();
 
-/* ---- Nuestra banda sonora: lista con dedicatoria + reproducir ---- */
+/* ---- Nuestra banda sonora: selector de discos (reproductor de CD de los de antes) ----
+   Se arma solo con SONGS: más canciones = más discos, sin tocar nada aquí. Elegir un
+   disco lo pone al centro; Reproducir usa la misma música del sitio (playDedicatedSong /
+   bgAudio), así el mini-reproductor del dock y este aparato siempre van juntos. */
 function renderBandaSonora() {
-  const list = document.getElementById('banda-sonora-list');
-  if (!list) return;
-  (window.SONGS || []).forEach((song) => {
-    const row = document.createElement('div');
-    row.className = 'glass rounded-2xl p-5 flex items-center gap-4';
-    row.innerHTML = `
-      <button class="banda-play w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm" aria-label="Reproducir ${song.title}">${ico('i-play', 'ico-sm')}</button>
-      <div class="min-w-0 text-left">
-        <p class="font-display text-base text-parchment">${song.title}</p>
-        <p class="font-ui text-xs text-parchment/50 mb-1">${song.artist}</p>
-        <p class="font-hand text-sm" style="color:#E9D5FF;">${song.dedicatoria || ''}</p>
-      </div>
-    `;
-    row.querySelector('button').addEventListener('click', () => playDedicatedSong(song.title));
-    list.appendChild(row);
+  const host = document.getElementById('banda-sonora-list');
+  const songs = window.SONGS || [];
+  if (!host || !songs.length) return;
+  const N = songs.length;
+  const pad = (n) => (n < 10 ? '0' + n : '' + n);
+  const mmss = (t) => (isFinite(t) && t > 0 ? Math.floor(t / 60) + ':' + pad(Math.floor(t % 60)) : '0:00');
+  let foco = currentSongIndex >= 0 ? currentSongIndex : 0;
+
+  const discos = songs.map((song, i) => {
+    const rim = (song.title + ' · ' + song.artist + ' · ').toUpperCase();
+    return `
+      <button type="button" class="cd-disco" data-i="${i}" aria-label="Disco ${i + 1} de ${N}: ${song.title}, ${song.artist}">
+        <span class="cd-giro" aria-hidden="true">
+          <svg viewBox="0 0 100 100" focusable="false"><defs><path id="cd-ruta-${i}" d="M50 50m-41 0a41 41 0 1 1 82 0a41 41 0 1 1-82 0"/></defs>
+            <text class="cd-rim"><textPath href="#cd-ruta-${i}" startOffset="0">${rim.repeat(2)}</textPath></text>
+            <use href="#lirio-linea" x="36" y="36" width="28" height="28" class="cd-lirio"/></svg>
+        </span>
+        <span class="cd-brillo" aria-hidden="true"></span>
+        <span class="cd-hueco" aria-hidden="true"></span>
+      </button>`;
+  }).join('');
+  const numeros = songs.map((song, i) => `<button type="button" class="cd-num" data-i="${i}" aria-label="Elegir el disco ${i + 1}: ${song.title}">${i + 1}</button>`).join('');
+
+  host.className = 'cd-aparato tarjeta-flor';
+  host.innerHTML = `
+    <div class="cd-lcd" aria-hidden="true">
+      <div class="cd-lcd-fila"><span>DISCO <b id="cd-n">01</b>/${pad(N)}</span><span id="cd-tiempo">0:00</span></div>
+      <p class="cd-lcd-t" id="cd-titulo"></p>
+      <p class="cd-lcd-a" id="cd-artista"></p>
+      <div class="cd-lcd-barra"><i id="cd-barra"></i></div>
+    </div>
+    <div class="cd-escenario" role="group" aria-roledescription="carrusel de discos" aria-label="Discos de nuestra banda sonora">${discos}</div>
+    <div class="cd-mandos">
+      <button type="button" class="cd-btn cd-prev" id="cd-prev" aria-label="Disco anterior">${ico('i-siguiente')}</button>
+      <button type="button" class="cd-btn cd-play" id="cd-play" aria-label="Reproducir">${ico('i-play')}</button>
+      <button type="button" class="cd-btn cd-next" id="cd-next" aria-label="Disco siguiente">${ico('i-siguiente')}</button>
+    </div>
+    <div class="cd-numeros">${numeros}</div>
+    <p class="cd-dedicatoria font-hand" id="cd-dedicatoria"></p>
+    <p class="sr-only" id="cd-estado" role="status" aria-live="polite"></p>`;
+
+  const discoEls = Array.from(host.querySelectorAll('.cd-disco'));
+  const numEls = Array.from(host.querySelectorAll('.cd-num'));
+  const el = (id) => document.getElementById(id);
+
+  function layout() {
+    discoEls.forEach((d, i) => {
+      const o = i - foco, vis = Math.abs(o) <= 1;
+      d.style.setProperty('--x', (o * 70) + '%');
+      d.style.setProperty('--s', o === 0 ? 1 : 0.6);
+      d.style.opacity = o === 0 ? 1 : (vis ? 0.5 : 0);
+      d.style.zIndex = String(10 - Math.abs(o));
+      d.style.visibility = vis ? 'visible' : 'hidden';
+      d.setAttribute('aria-current', o === 0 ? 'true' : 'false');
+      d.tabIndex = o === 0 ? 0 : -1;
+    });
+    numEls.forEach((n, i) => n.setAttribute('aria-pressed', String(i === foco)));
+    const song = songs[foco];
+    el('cd-n').textContent = pad(foco + 1);
+    el('cd-titulo').textContent = song.title;
+    el('cd-artista').textContent = song.artist;
+    el('cd-dedicatoria').textContent = song.dedicatoria || '';
+    host.querySelector('.cd-prev').disabled = N < 2;
+    host.querySelector('.cd-next').disabled = N < 2;
+    sincronizar();
+  }
+  function sincronizar() {
+    const suena = !bgAudio.paused;
+    const esta = currentSongIndex === foco;
+    discoEls.forEach((d, i) => d.classList.toggle('sonando', suena && i === currentSongIndex));
+    const play = el('cd-play');
+    play.innerHTML = ico(suena && esta ? 'i-pausa' : 'i-play');
+    play.setAttribute('aria-label', suena && esta ? 'Pausar' : 'Reproducir');
+    el('cd-estado').textContent = `Disco ${foco + 1} de ${N}: ${songs[foco].title}, ${songs[foco].artist}.` + (suena && esta ? ' Reproduciendo.' : '');
+    tiempo();
+  }
+  function tiempo() {
+    const esta = currentSongIndex === foco;
+    const t = esta ? bgAudio.currentTime : 0, d = esta ? bgAudio.duration : 0;
+    el('cd-tiempo').textContent = mmss(t);
+    el('cd-barra').style.width = (esta && isFinite(d) && d > 0 ? Math.min(100, (t / d) * 100) : 0) + '%';
+  }
+  function ir(i) {
+    const n = ((i % N) + N) % N;
+    if (n === foco) return;
+    foco = n;
+    if (window.Sonidos) window.Sonidos.play('mes');
+    layout();
+  }
+  function reproducir() {
+    if (currentSongIndex === foco) {
+      if (bgAudio.paused) playCurrentSong(); else { bgAudio.pause(); updateMiniPlayerIcon(); }
+    } else {
+      playDedicatedSong(songs[foco].title);
+    }
+    sincronizar();
+  }
+
+  discoEls.forEach((d, i) => d.addEventListener('click', () => { if (i === foco) reproducir(); else ir(i); }));
+  numEls.forEach((n, i) => n.addEventListener('click', () => ir(i)));
+  el('cd-prev').addEventListener('click', () => ir(foco - 1));
+  el('cd-next').addEventListener('click', () => ir(foco + 1));
+  el('cd-play').addEventListener('click', reproducir);
+
+  /* deslizar para cambiar de disco */
+  const escenario = host.querySelector('.cd-escenario');
+  let x0 = null;
+  escenario.addEventListener('pointerdown', (e) => { x0 = e.clientX; });
+  escenario.addEventListener('pointerup', (e) => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) ir(foco + (dx < 0 ? 1 : -1));
   });
+  escenario.addEventListener('pointercancel', () => { x0 = null; });
+  escenario.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') { ir(foco + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { ir(foco - 1); e.preventDefault(); }
+  });
+
+  /* el aparato sigue a la música (también cuando cambia desde el dock) */
+  ['play', 'pause', 'ended'].forEach((ev) => bgAudio.addEventListener(ev, sincronizar));
+  bgAudio.addEventListener('loadstart', () => { if (currentSongIndex >= 0) foco = currentSongIndex; layout(); });
+  bgAudio.addEventListener('loadedmetadata', tiempo);
+  let visible = false;
+  bgAudio.addEventListener('timeupdate', () => { if (visible) tiempo(); });
+  if ('IntersectionObserver' in window) new IntersectionObserver((en) => { visible = en[0].isIntersecting; if (visible) tiempo(); }, { threshold: 0 }).observe(host);
+  else visible = true;
+  layout();
 }
 renderBandaSonora();
 
