@@ -44,7 +44,7 @@ window.JuegoMemorama = (function () {
       const frase = banco
         ? banco[Math.floor(Math.random() * banco.length)].texto
         : 'Encontraste todas nuestras fotos. Así te encuentro yo siempre a ti: sin importar dónde busque, siempre apareces.';
-      openModal({ icon: '🧩', title: '¡Las encontraste todas!', body: frase });
+      openModal({ icon: 'i-cartas', title: '¡Las encontraste todas!', body: frase });
     }
 
     deck.forEach((item, idx) => {
@@ -52,7 +52,7 @@ window.JuegoMemorama = (function () {
       card.className = 'memorama-card';
       card.innerHTML = `
         <div class="memorama-card-inner">
-          <div class="memorama-face memorama-face-back">💛</div>
+          <div class="memorama-face memorama-face-back">${ico('lirio', 'ico-xl')}</div>
           <div class="memorama-face memorama-face-front">${pictureHTML(item.src, '')}</div>
         </div>
       `;
@@ -98,7 +98,7 @@ window.JuegoMemorama = (function () {
   return {
     id: 'memorama',
     titulo: 'Memorama de nosotros',
-    emoji: '🧩',
+    icono: 'i-cartas',
     descripcion: 'Encuentra las parejas de nuestras fotos.',
     start,
     stop,

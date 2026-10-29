@@ -1,0 +1,78 @@
+/* ======================================================================
+   ORNAMENTOS Y MOVIMIENTO — la firma visual en componentes
+   Íconos SVG (.ico), divisor que se dibuja con el scroll, esquinas de
+   pétalo en tarjetas, botón con brillo, flor de precarga y el
+   "lenguaje de movimiento": florecer, trazo, latido, revelado.
+   Todo respeta prefers-reduced-motion (ver el final de este archivo).
+====================================================================== */
+
+/* ---------- íconos del sprite (js/ornamentos.js) ---------- */
+.ico { width: 1.25em; height: 1.25em; display: inline-block; vertical-align: -.22em; flex: none; overflow: visible; }
+.ico-sm { width: 1em; height: 1em; }
+.ico-lg { width: 1.6em; height: 1.6em; }
+.ico-xl { width: 2.4em; height: 2.4em; }
+.ico-2xl { width: 3.4em; height: 3.4em; }
+.ico use { pointer-events: none; }
+
+/* los íconos de tarjetas, cupones y modales llevan la luz dorada de la firma */
+.juego-card-emoji, .cupon-emoji, #modal-icon, .jar-ring-label { color: var(--dorado-500); }
+.juego-card-emoji .ico, .cupon-emoji .ico, #modal-icon .ico { filter: drop-shadow(0 0 8px rgba(var(--dorado-rgb), .35)); }
+
+/* ---------- divisor ornamental: el trazo se dibuja con el scroll ---------- */
+.orn-divisor { display: block; width: min(100%, 22rem); margin: .85rem auto 0; color: var(--dorado-500); opacity: .92; --p: 0; }
+.orn-divisor-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.orn-trazo { stroke-dasharray: 100; stroke-dashoffset: calc(100px * (1 - var(--p, 0))); }
+.orn-flor, .orn-punto { opacity: calc((var(--p, 0) - .35) * 1.9); }
+.orn-divisor-hero { margin: .2rem auto 1rem; width: min(100%, 15rem); }
+
+/* ---------- flor de la precarga: los pétalos florecen uno tras otro ---------- */
+.orn-lirio-carga { width: 6.5rem; height: 6.5rem; overflow: visible; filter: drop-shadow(0 0 16px rgba(var(--dorado-rgb), .5)); }
+.orn-lirio-carga .petalo { transform-origin: 0 0; animation: florecerPetalo 2.4s var(--ease-flor) infinite; animation-delay: calc(var(--i) * .16s); }
+.orn-lirio-carga .estambre, .orn-lirio-carga .centro { animation: aparecer 2.4s ease infinite; animation-delay: .9s; }
+@keyframes florecerPetalo { 0% { transform: scale(0); opacity: 0; } 32% { transform: scale(1.06); opacity: 1; } 42%, 82% { transform: scale(1); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+@keyframes aparecer { 0%, 20% { opacity: 0; } 42%, 82% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---------- esquinas de pétalo para tarjetas ---------- */
+.tarjeta-flor { position: relative; }
+.tarjeta-flor::before, .tarjeta-flor::after {
+  content: ''; position: absolute; width: 30px; height: 30px; pointer-events: none; opacity: .5;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30' fill='none' stroke='%23FFD700' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M2 28C2 13 13 2 28 2'/%3E%3Cpath d='M2 20C2 10 10 2 20 2' opacity='.55'/%3E%3Cpath d='M26.500 6.500c3 .2 4.500-1.500 4.500-4-2.800 0-4.500 1.200-4.500 4z' fill='%23FFD700' stroke='none'/%3E%3C/svg%3E") no-repeat center / contain;
+  transition: opacity var(--dur-media) var(--ease-flor), transform var(--dur-media) var(--ease-flor);
+}
+.tarjeta-flor::before { top: 8px; left: 8px; }
+.tarjeta-flor::after { bottom: 8px; right: 8px; transform: rotate(180deg); }
+.tarjeta-flor:hover::before, .tarjeta-flor:hover::after { opacity: .9; }
+
+/* ---------- botón dorado con brillo que pasa de vez en cuando ---------- */
+.btn-brillo { position: relative; overflow: hidden; isolation: isolate; }
+.btn-brillo::after {
+  content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, .55) 50%, transparent 62%);
+  transform: translateX(-130%); animation: brilloPasa 6s ease-in-out infinite;
+}
+@keyframes brilloPasa { 0%, 62% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+
+/* ---------- lenguaje de movimiento ---------- */
+/* florecer: entra creciendo y girando un poco (se activa con .en-vista) */
+.mov-florecer { opacity: 0; transform: scale(.6) rotate(-14deg); transition: opacity var(--dur-lenta) var(--ease-flor), transform var(--dur-florecer) var(--ease-rebote); }
+.mov-florecer.en-vista { opacity: 1; transform: none; }
+/* latido: pulso suave, como un corazón */
+.mov-latido { animation: latidoSuave 3.2s ease-in-out infinite; }
+@keyframes latidoSuave { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.09); } 24% { transform: scale(1); } 36% { transform: scale(1.05); } 48% { transform: scale(1); } }
+/* revelado: sube y se aclara */
+.mov-revelar { opacity: 0; transform: translateY(22px); transition: opacity var(--dur-lenta) var(--ease-flor), transform var(--dur-lenta) var(--ease-flor); }
+.mov-revelar.en-vista { opacity: 1; transform: none; }
+/* brillo respirando (halo dorado) */
+.mov-halo { animation: haloRespira 4s ease-in-out infinite; }
+@keyframes haloRespira { 0%, 100% { filter: drop-shadow(0 0 6px rgba(var(--dorado-rgb), .35)); } 50% { filter: drop-shadow(0 0 16px rgba(var(--dorado-rgb), .8)); } }
+
+/* ---------- timeline: cada fecha es un lirio ---------- */
+.timeline-flor { width: 22px; height: 22px; margin-top: -1px; color: rgba(255, 255, 255, .28); --lirio-centro: var(--ciruela-800); transition: color var(--dur-media) ease, transform var(--dur-florecer) var(--ease-rebote), filter var(--dur-media) ease; }
+.timeline-item.lit .timeline-flor { color: var(--dorado-500); transform: scale(1.15) rotate(30deg); filter: drop-shadow(0 0 7px rgba(var(--dorado-rgb), .7)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .orn-divisor { --p: 1 !important; }
+  .mov-florecer, .mov-revelar { opacity: 1; transform: none; transition: none; }
+  .mov-latido, .mov-halo, .btn-brillo::after, .orn-lirio-carga .petalo, .orn-lirio-carga .estambre, .orn-lirio-carga .centro { animation: none; }
+  .orn-lirio-carga .petalo, .orn-lirio-carga .estambre, .orn-lirio-carga .centro { opacity: 1; transform: none; }
+}

@@ -42,7 +42,7 @@ window.JuegoCaceria = (function () {
     const carta = (window.CARTAS || []).find((c) => c.desbloqueaCon === 'caceria');
     if (!carta || typeof openModal !== 'function') return;
     openModal({
-      icon: '💖',
+      icon: 'i-corazon-lleno',
       title: carta.titulo,
       bodyHTML: `<div class="letter-detail-text font-hand text-lg sm:text-xl leading-relaxed">${carta.texto}</div>`,
     });
@@ -59,7 +59,7 @@ window.JuegoCaceria = (function () {
       spawnSparkleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 18, true);
     }
     if (typeof showToast === 'function') {
-      showToast(`Encontraste un corazón 💛 (${state.encontrados.length}/${TOTAL})`);
+      showToast(`Encontraste un corazón {i-corazon-lleno} (${state.encontrados.length}/${TOTAL})`);
     }
     if (state.encontrados.length >= TOTAL && !state.completada) {
       state.completada = true;
@@ -79,7 +79,8 @@ window.JuegoCaceria = (function () {
       el.tabIndex = 0;
       el.className = 'heart-hotspot';
       el.setAttribute('aria-label', 'Un corazón escondido');
-      el.textContent = '💛';
+      el.innerHTML = ico('i-corazon-lleno');
+      el.style.color = 'var(--dorado-500)';
       if (spot.top) el.style.top = spot.top;
       if (spot.bottom) el.style.bottom = spot.bottom;
       if (spot.left) el.style.left = spot.left;
@@ -100,7 +101,7 @@ window.JuegoCaceria = (function () {
   return {
     id: 'caceria',
     titulo: 'Cacería de corazones',
-    emoji: '💘',
+    icono: 'i-caceria',
     descripcion: 'Doce corazones casi invisibles, escondidos por todo el sitio.',
     init,
     progressLabel() {

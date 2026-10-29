@@ -73,7 +73,7 @@
     #juego-stage[data-portrait="1"]::before {
       content: 'Para jugar, gira tu teléfono en vertical.';
       display: block; text-align: center; padding: 2rem 1rem;
-      font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: rgba(253,251,247,.8);
+      font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: rgba(var(--pergamino-rgb), .8);
     }
   }
   /* en pantallas táctiles el :hover se queda pegado tras el toque: se anula */

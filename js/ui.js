@@ -19,8 +19,8 @@ const modalBackdrop = document.getElementById('app-modal');
 const modalIcon = document.getElementById('modal-icon');
 const modalTitle = document.getElementById('modal-title');
 const modalBody = document.getElementById('modal-body');
-function openModal({ icon = '💛', title = '', body = '', bodyHTML = null }) {
-  modalIcon.textContent = icon;
+function openModal({ icon = 'i-corazon-lleno', title = '', body = '', bodyHTML = null }) {
+  modalIcon.innerHTML = iconoHTML(icon, 'ico-xl');
   modalTitle.textContent = title;
   if (bodyHTML) modalBody.innerHTML = bodyHTML; else modalBody.textContent = body;
   modalBackdrop.classList.add('open');
@@ -75,7 +75,7 @@ lightbox.addEventListener('touchend', (e) => {
 let toastTimer = null;
 function showToast(text) {
   const toast = document.getElementById('toast');
-  toast.innerHTML = `<div class="glass glow-gold rounded-2xl px-6 py-4 font-hand text-lg sm:text-xl text-gold toast-in">${text}</div>`;
+  toast.innerHTML = `<div class="glass glow-gold rounded-2xl px-6 py-4 font-hand text-lg sm:text-xl text-gold toast-in">${iconizar(text)}</div>`;
   toast.style.opacity = '1';
   toast.style.pointerEvents = 'auto';
   clearTimeout(toastTimer);

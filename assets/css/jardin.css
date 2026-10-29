@@ -5,14 +5,14 @@
   /* ---- cielo nocturno ---- */
   #bg-layer-night {
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: radial-gradient(circle at 50% 8%, #130d33 0%, #090112 55%, #03000a 100%);
+    background: radial-gradient(circle at 50% 8%, #130d33 0%, var(--ciruela-900) 55%, #03000a 100%);
     opacity: 0; transition: opacity 1.6s ease;
   }
   body.night-mode #bg-layer-day { opacity: 0; }
   body.night-mode #bg-layer-night { opacity: 1; }
   body.sunset-mode #bg-layer-night { opacity: 0; }
   @keyframes starTwinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
-  .night-star { position: absolute; border-radius: 50%; background: #FDFBF7; animation: starTwinkle 3.2s ease-in-out infinite; }
+  .night-star { position: absolute; border-radius: 50%; background: var(--pergamino-50); animation: starTwinkle 3.2s ease-in-out infinite; }
   #night-moon {
     position: absolute; top: 9%; right: 11%; font-size: 2.4rem; line-height: 1;
     background: none; border: none; padding: .6rem; cursor: pointer; pointer-events: none;
@@ -25,25 +25,24 @@
   /* ---- línea de tiempo ---- */
   .timeline-wrap { position: relative; max-width: 640px; margin: 0 auto; }
   .timeline-track { position: absolute; left: 19px; top: 8px; bottom: 8px; width: 2px; background: rgba(255,255,255,.12); }
-  .timeline-fill { position: absolute; left: 19px; top: 8px; width: 2px; height: 0; background: linear-gradient(to bottom, #FFD700, #A855F7); transform-origin: top; transform: scaleY(0); will-change: transform; }
+  .timeline-fill { position: absolute; left: 19px; top: 8px; width: 2px; height: 0; background: linear-gradient(to bottom, var(--dorado-500), var(--amatista-500)); transform-origin: top; transform: scaleY(0); will-change: transform; }
   .timeline-item { display: flex; gap: 1.1rem; padding-bottom: 2.1rem; }
   .timeline-dot-col { flex: 0 0 40px; display: flex; justify-content: center; }
-  .timeline-dot { width: 16px; height: 16px; border-radius: 50%; background: #18062B; border: 2px solid rgba(255,255,255,.22); margin-top: 2px; transition: background .3s ease, border-color .3s ease, box-shadow .3s ease; }
-  .timeline-item.lit .timeline-dot { background: #FFD700; border-color: #FFD700; box-shadow: 0 0 8px rgba(255,215,0,.7); }
   .timeline-content { flex: 1; min-width: 0; text-align: left; }
-  .timeline-date { font-family: 'Inter', sans-serif; font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: rgba(255,215,0,.75); margin-bottom: .3rem; }
-  .timeline-text { font-family: 'Playfair Display', serif; font-size: .92rem; color: rgba(253,251,247,.85); line-height: 1.55; }
+  .timeline-date { font-family: 'Inter', sans-serif; font-size: .68rem; text-transform: uppercase; letter-spacing: .04em; color: rgba(var(--dorado-rgb), .75); margin-bottom: .3rem; }
+  .timeline-text { font-family: 'Playfair Display', serif; font-size: .92rem; color: rgba(var(--pergamino-rgb), .85); line-height: 1.55; }
   .timeline-photo { width: 100%; max-width: 160px; border-radius: .6rem; margin-top: .6rem; box-shadow: 0 8px 18px rgba(0,0,0,.4); display: block; }
 
   .clock-infinity {
-    display: inline-block; color: #FFD700; font-size: 1.5em; line-height: 1;
+    display: inline-block; color: var(--dorado-500); font-size: 1.5em; line-height: 1;
     padding: .85rem .85rem; margin: -.85rem -.4rem -.85rem -.2rem; text-decoration: none; vertical-align: middle;
-    text-shadow: 0 0 12px rgba(255, 215, 0, .55); animation: infinityGlow 3.4s ease-in-out infinite;
+    animation: infinityGlow 3.4s ease-in-out infinite;
     transition: transform .25s ease;
   }
   .clock-infinity:hover { transform: scale(1.18); }
-  @keyframes infinityGlow { 0%, 100% { text-shadow: 0 0 8px rgba(255, 215, 0, .35); } 50% { text-shadow: 0 0 18px rgba(255, 215, 0, .85); } }
-  .clock-dedicatoria { max-width: 28rem; margin: 2.5rem auto 0; font-size: 1.05rem; line-height: 1.7; color: rgba(253,251,247,.82); }
+  .clock-infinity .ico { width: 2.3em; height: 1.15em; vertical-align: middle; --fondo-ornamento: var(--ciruela-800); }
+  @keyframes infinityGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(var(--dorado-rgb), .35)); } 50% { filter: drop-shadow(0 0 10px rgba(var(--dorado-rgb), .9)); } }
+  .clock-dedicatoria { max-width: 28rem; margin: 2.5rem auto 0; font-size: 1.05rem; line-height: 1.7; color: rgba(var(--pergamino-rgb), .82); }
   @media (min-width: 640px) { .clock-dedicatoria { font-size: 1.2rem; } }
 
   /* ---- easter egg: Panchito ---- */
@@ -64,20 +63,20 @@
   .lightbox-close {
     position: absolute; top: calc(1.25rem + env(safe-area-inset-top,0px)); right: calc(1.25rem + env(safe-area-inset-right,0px));
     width: 2.75rem; height: 2.75rem; border-radius: 999px;
-    background: rgba(255,255,255,.1); color: #FDFBF7; font-size: 1.6rem; line-height: 1;
+    background: rgba(255,255,255,.1); color: var(--pergamino-50); font-size: 1.6rem; line-height: 1;
     border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
   }
 
   /* ---- easter egg: corazón multilingüe (al escribir "i love you") ---- */
   .heart-lang-overlay {
     position: fixed; inset: 0; z-index: 90;
-    background: radial-gradient(circle at 50% 38%, #270D42, #05000a);
+    background: radial-gradient(circle at 50% 38%, var(--ciruela-700), var(--ciruela-950));
     display: flex; align-items: center; justify-content: center; flex-direction: column;
     opacity: 0; pointer-events: none; transition: opacity .5s ease;
     padding: calc(1.5rem + env(safe-area-inset-top,0px)) calc(1.25rem + env(safe-area-inset-right,0px)) calc(1.5rem + env(safe-area-inset-bottom,0px)) calc(1.25rem + env(safe-area-inset-left,0px));
   }
   .heart-lang-overlay.open { opacity: 1; pointer-events: auto; }
   .heart-lang-canvas { width: 100%; max-width: 480px; aspect-ratio: 10/9; touch-action: none; }
-  .heart-lang-hint { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; color: rgba(253,251,247,.65); margin-top: .5rem; text-align: center; }
+  .heart-lang-hint { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; color: rgba(var(--pergamino-rgb), .65); margin-top: .5rem; text-align: center; }
 
 

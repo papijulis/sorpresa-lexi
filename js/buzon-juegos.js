@@ -32,12 +32,12 @@ function dayOfYear(dateStr) {
 ====================================================================== */
 const BUZON_STORAGE_KEY = 'jardin.buzon.v1';
 const TIPO_META = {
-  mesiversario: { icon: '🌙', color: '#FFD700' },
-  'abre-cuando': { icon: '💌', color: '#FB7185' },
-  capsula: { icon: '⏳', color: '#A855F7' },
-  sorpresa: { icon: '🎁', color: '#F59E0B' },
+  mesiversario: { icon: 'i-luna', color: '#FFD700' },
+  'abre-cuando': { icon: 'i-sobre-corazon', color: '#FB7185' },
+  capsula: { icon: 'i-sandglass', color: '#A855F7' },
+  sorpresa: { icon: 'i-regalo', color: '#F59E0B' },
 };
-const SELLO_META = { lirio: '🌼', corazon: '❤️', estrella: '⭐' };
+const SELLO_META = { lirio: 'lirio-mini', corazon: 'i-corazon-lleno', estrella: 'brillo' };
 
 function loadBuzonState() {
   const raw = jardinStorage.get(BUZON_STORAGE_KEY);
@@ -82,7 +82,7 @@ function showCartaModal(carta) {
     html += pictureHTML(carta.foto, '', 'style="width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:16px;box-shadow:0 14px 30px rgba(0,0,0,.45);"');
   }
   if (carta.cancion) {
-    html += `<button id="carta-play-song" class="font-ui text-xs mt-4 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" style="color:${meta.color};">🎵 Escuchar «${carta.cancion}»</button>`;
+    html += `<button id="carta-play-song" class="font-ui text-xs mt-4 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" style="color:${meta.color};">${ico('i-nota', 'ico-sm')} Escuchar «${carta.cancion}»</button>`;
   }
   if (window.NOTA_CARTA) {
     html += `<p class="font-hand text-sm mt-5" style="color:rgba(253,251,247,.55);">${window.NOTA_CARTA}</p>`;
@@ -112,7 +112,7 @@ function renderBuzon() {
   window.CARTAS.forEach((carta) => {
     const openable = cartaIsOpenable(carta);
     const meta = TIPO_META[carta.tipo] || TIPO_META.sorpresa;
-    const sealEmoji = SELLO_META[carta.sello] || '💛';
+    const sealIcon = SELLO_META[carta.sello] || 'i-corazon-lleno';
     const leida = buzonState.leidas.includes(carta.id);
 
     const card = document.createElement('div');
@@ -126,11 +126,11 @@ function renderBuzon() {
       const dias = daysBetween(today, carta.apertura);
       subText = dias <= 1 ? 'se abre mañana' : `se abre en ${dias} días`;
     } else {
-      subText = leida ? 'leída ✓' : 'toca para abrir';
+      subText = leida ? `leída ${ico('i-palomita', 'ico-sm')}` : 'toca para abrir';
     }
 
     card.innerHTML = `
-      <div class="buzon-seal" style="background:${meta.color}22;border:1.5px solid ${meta.color}66;">${openable ? sealEmoji : '🔒'}</div>
+      <div class="buzon-seal" style="background:${meta.color}22;border:1.5px solid ${meta.color}66;color:${meta.color};">${ico(openable ? sealIcon : 'i-candado', 'ico-lg')}</div>
       <p class="font-display text-sm sm:text-base text-parchment">${carta.titulo}</p>
       <p class="font-ui text-[11px] sm:text-xs text-parchment/50 mt-1">${subText}</p>
       ${openable && !leida ? '<span class="buzon-unread-dot"></span>' : ''}
@@ -139,9 +139,9 @@ function renderBuzon() {
       if (openable) {
         openCarta(carta, card);
       } else if (carta.desbloqueaCon === 'caceria') {
-        showToast('Esta carta se desbloquea encontrando los 12 corazones escondidos por el sitio 💛');
+        showToast('Esta carta se desbloquea encontrando los 12 corazones escondidos por el sitio {i-corazon-lleno}');
       } else if (carta.desbloqueaCon) {
-        showToast('Esta carta se desbloquea en el Rincón de Juegos 💛');
+        showToast('Esta carta se desbloquea en el Rincón de Juegos {i-corazon-lleno}');
       } else {
         showToast(`Esta carta se abre el ${carta.apertura.split('-').reverse().join('/')}`);
       }
@@ -190,7 +190,7 @@ function renderMesiversarioCard() {
   const todaysMesiversario = window.CARTAS.find((c) => c.tipo === 'mesiversario' && c.apertura === today);
 
   if (day === 28 && todaysMesiversario) {
-    mesiversarioIcon.textContent = '🎉';
+    mesiversarioIcon.innerHTML = ico('brillo', 'ico-lg');
     mesiversarioTitle.textContent = '¡Nueva carta de mesiversario!';
     mesiversarioBody.textContent = `«${todaysMesiversario.titulo}» te espera en el Buzón`;
     mesiversarioCard.onclick = openBuzonView;
@@ -199,7 +199,7 @@ function renderMesiversarioCard() {
   if (day === 28) {
     const banco = (window.FRASES && window.FRASES.length) ? window.FRASES : [{ texto: 'Hoy es 28, y aunque no hay carta nueva, aquí sigo, queriéndote igual.' }];
     const frase = banco[dayOfYear(today) % banco.length];
-    mesiversarioIcon.textContent = '💛';
+    mesiversarioIcon.innerHTML = ico('i-corazon-lleno', 'ico-lg');
     mesiversarioTitle.textContent = 'Hoy es 28';
     mesiversarioBody.textContent = frase.texto;
     mesiversarioCard.onclick = null;
@@ -207,7 +207,7 @@ function renderMesiversarioCard() {
   }
   const next = nextMesiversarioDate(today);
   const dias = daysBetween(today, next);
-  mesiversarioIcon.textContent = '🌙';
+  mesiversarioIcon.innerHTML = ico('i-luna', 'ico-lg');
   mesiversarioTitle.textContent = 'Próximo mesiversario';
   mesiversarioBody.textContent = dias <= 1 ? 'Es mañana' : `Faltan ${dias} días`;
   mesiversarioCard.onclick = openBuzonView;
@@ -221,7 +221,7 @@ function celebrateMesiversarioIfNeeded() {
   if (jardinStorage.get(key)) return;
   jardinStorage.set(key, '1');
   setTimeout(() => {
-    showToast('¡Feliz mesiversario, Lexi! 💛');
+    showToast('¡Feliz mesiversario, Lexi! {i-corazon-lleno}');
     spawnSparkleBurst(vw / 2, vh * 0.3, 70, true);
     spawnBokeh(vw / 2, vh * 0.35, 6);
   }, 1800);
@@ -252,9 +252,9 @@ function renderJuegosGrid() {
   juegosGridEl.innerHTML = '';
   JUEGOS_JUGABLES.forEach((juego) => {
     const card = document.createElement('div');
-    card.className = 'juego-card glass rounded-3xl';
+    card.className = 'juego-card tarjeta-flor glass rounded-3xl';
     card.innerHTML = `
-      <span class="juego-card-emoji">${juego.emoji}</span>
+      <span class="juego-card-emoji">${iconoHTML(juego.icono || juego.emoji, 'ico-xl')}</span>
       <p class="font-display text-lg text-parchment">${juego.titulo}</p>
       <p class="font-ui text-xs" style="color:rgba(253,251,247,.6);">${juego.descripcion}</p>
       ${juego.progressLabel ? `<p class="juego-card-progress">${juego.progressLabel()}</p>` : ''}
@@ -265,9 +265,9 @@ function renderJuegosGrid() {
 
   if (window.JuegoCaceria) {
     const card = document.createElement('div');
-    card.className = 'juego-card glass rounded-3xl';
+    card.className = 'juego-card tarjeta-flor glass rounded-3xl';
     card.innerHTML = `
-      <span class="juego-card-emoji">${window.JuegoCaceria.emoji}</span>
+      <span class="juego-card-emoji">${iconoHTML(window.JuegoCaceria.icono || window.JuegoCaceria.emoji, 'ico-xl')}</span>
       <p class="font-display text-lg text-parchment">${window.JuegoCaceria.titulo}</p>
       <p class="font-ui text-xs" style="color:rgba(253,251,247,.6);">${window.JuegoCaceria.descripcion}</p>
       <p class="juego-card-progress">${window.JuegoCaceria.progressLabel()}</p>

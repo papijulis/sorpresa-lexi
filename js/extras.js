@@ -57,7 +57,7 @@ window.addEventListener('keydown', (e) => {
   if (teAmoBuffer.includes('te amo')) {
     teAmoBuffer = '';
     spawnHeartRain();
-    showToast('Yo también te amo 💕');
+    showToast('Yo también te amo {i-corazon-lleno}');
     openHeartLanguages();
   }
   iLoveYouBuffer = (iLoveYouBuffer + e.key.toLowerCase()).slice(-11);
@@ -350,7 +350,7 @@ document.getElementById('night-moon').addEventListener('click', () => {
   if (!document.body.classList.contains('night-mode') || document.body.classList.contains('sunset-mode')) return;
   const rect = document.getElementById('night-moon').getBoundingClientRect();
   spawnSparkleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 30, true);
-  openModal({ icon: '🌙', title: 'Un secreto de la luna', body: window.MOON_SECRET_TEXT || '' });
+  openModal({ icon: 'i-luna', title: 'Un secreto de la luna', body: window.MOON_SECRET_TEXT || '' });
 });
 
 /* ---- saludo dinámico + frase del día (entrada suave, una vez por visita) ---- */
@@ -387,7 +387,7 @@ function check1111(h, m, force) {
   if (!force && jardinStorage.get(key)) return false;
   jardinStorage.set(key, '1');
   spawnSparkleBurst(window.innerWidth / 2, window.innerHeight / 2, 80, true);
-  openModal({ icon: '✨', title: '11:11', body: window.RITUAL_1111_TEXT || 'Son las 11:11. Pide un deseo.' });
+  openModal({ icon: 'brillo', title: '11:11', body: window.RITUAL_1111_TEXT || 'Son las 11:11. Pide un deseo.' });
   return true;
 }
 setInterval(() => {
@@ -405,7 +405,7 @@ function checkAusencia() {
   jardinStorage.set(key, today);
   if (!last || last === today) return;
   if (daysBetween(last, today) >= 3) {
-    setTimeout(() => showToast('Te extrañaba 🌷'), 2600);
+    setTimeout(() => showToast('Te extrañaba {lirio-mini}'), 2600);
   }
 }
 checkAusencia();
@@ -447,7 +447,7 @@ function renderTimeline() {
     el.className = 'timeline-item';
     const photo = PHOTO_BY_DATE[m.date];
     el.innerHTML = `
-      <div class="timeline-dot-col"><div class="timeline-dot"></div></div>
+      <div class="timeline-dot-col">${ico('lirio-mini', 'timeline-flor')}</div>
       <div class="timeline-content">
         <p class="timeline-date">${m.display}</p>
         <p class="timeline-text">${m.text}</p>
@@ -498,7 +498,7 @@ function renderBandaSonora() {
     const row = document.createElement('div');
     row.className = 'glass rounded-2xl p-5 flex items-center gap-4';
     row.innerHTML = `
-      <button class="banda-play w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm" aria-label="Reproducir ${song.title}">▶</button>
+      <button class="banda-play w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm" aria-label="Reproducir ${song.title}">${ico('i-play', 'ico-sm')}</button>
       <div class="min-w-0 text-left">
         <p class="font-display text-base text-parchment">${song.title}</p>
         <p class="font-ui text-xs text-parchment/50 mb-1">${song.artist}</p>

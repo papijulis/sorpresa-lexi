@@ -116,7 +116,7 @@ window.JuegoCupones = (function () {
       return;
     }
     const btn = document.createElement('button');
-    btn.className = 'cupon-redeem-btn';
+    btn.className = 'cupon-redeem-btn btn-brillo';
     btn.textContent = 'Acepto';
     btn.setAttribute('aria-label', `Aceptar el cupón ${cupon.titulo}`);
     btn.addEventListener('click', () => {
@@ -135,7 +135,7 @@ window.JuegoCupones = (function () {
     const reveal = document.createElement('div');
     reveal.className = 'cupon-reveal';
     reveal.innerHTML = `
-      <span class="cupon-emoji">${cupon.emoji}</span>
+      <span class="cupon-emoji">${iconoHTML(cupon.icono || cupon.emoji, 'ico-xl')}</span>
       <p class="font-display text-sm" style="color:#FDFBF7;">${cupon.titulo}</p>
       <p class="font-ui text-[11px]" style="color:rgba(253,251,247,.6);">${cupon.descripcion}</p>
     `;
@@ -174,7 +174,7 @@ window.JuegoCupones = (function () {
   return {
     id: 'cupones',
     titulo: 'Cupones para raspar',
-    emoji: '🎟️',
+    icono: 'i-cupon',
     descripcion: 'Raspa cada tarjeta y descubre tu premio.',
     progressLabel() {
       const s = loadState();

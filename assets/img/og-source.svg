@@ -1,33 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
-  <defs>
-    <radialGradient id="bg" cx="38%" cy="45%" r="85%">
-      <stop offset="0%" stop-color="#3a1458"/>
-      <stop offset="55%" stop-color="#18062B"/>
-      <stop offset="100%" stop-color="#090112"/>
-    </radialGradient>
-    <linearGradient id="petal" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FEF08A"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FFE9A8" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#FFE9A8" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-
+<defs>
+  <radialGradient id="bg" cx="38%" cy="45%" r="85%"><stop offset="0%" stop-color="#3a1458"/><stop offset="55%" stop-color="#18062B"/><stop offset="100%" stop-color="#090112"/></radialGradient>
+  <linearGradient id="petal" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#FEF08A"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFE9A8" stop-opacity=".5"/><stop offset="100%" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>
+</defs>
   <rect width="1200" height="630" fill="url(#bg)"/>
-  <circle cx="300" cy="305" r="190" fill="url(#glow)"/>
-
-  <g transform="translate(300,315) scale(1.05)">
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(0)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(60)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(120)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(180)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(240)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(300)"/>
-    <circle cx="0" cy="0" r="19" fill="#B45309"/>
-  </g>
-
+  <g transform="translate(300 290)"><circle r="168" fill="url(#glow)"/><path d="M0 0C47.25 -42 34.65 -108 0 -150C-34.65 -108 -47.25 -42 0 0Z" transform="rotate(0)" fill="url(#petal)" stroke="#B45309" stroke-width="3.3"/><path d="M0 0C47.25 -42 34.65 -108 0 -150C-34.65 -108 -47.25 -42 0 0Z" transform="rotate(60)" fill="url(#petal)" stroke="#B45309" stroke-width="3.3"/><path d="M0 0C47.25 -42 34.65 -108 0 -150C-34.65 -108 -47.25 -42 0 0Z" transform="rotate(120)" fill="url(#petal)" stroke="#B45309" stroke-width="3.3"/><path d="M0 0C47.25 -42 34.65 -108 0 -150C-34.65 -108 -47.25 -42 0 0Z" transform="rotate(180)" fill="url(#petal)" stroke="#B45309" stroke-width="3.3"/><path d="M0 0C47.25 -42 34.65 -108 0 -150C-34.65 -108 -47.25 -42 0 0Z" transform="rotate(240)" fill="url(#petal)" stroke="#B45309" stroke-width="3.3"/><path d="M0 0C47.25 -42 34.65 -108 0 -150C-34.65 -108 -47.25 -42 0 0Z" transform="rotate(300)" fill="url(#petal)" stroke="#B45309" stroke-width="3.3"/><g transform="rotate(17.2)"><path d="M0 0V-82.5" stroke="#D97706" stroke-width="2.4" fill="none"/><circle cy="-82.5" r="7.5" fill="#D97706"/></g><g transform="rotate(77.2)"><path d="M0 0V-82.5" stroke="#D97706" stroke-width="2.4" fill="none"/><circle cy="-82.5" r="7.5" fill="#D97706"/></g><g transform="rotate(137.2)"><path d="M0 0V-82.5" stroke="#D97706" stroke-width="2.4" fill="none"/><circle cy="-82.5" r="7.5" fill="#D97706"/></g><g transform="rotate(197.2)"><path d="M0 0V-82.5" stroke="#D97706" stroke-width="2.4" fill="none"/><circle cy="-82.5" r="7.5" fill="#D97706"/></g><g transform="rotate(257.2)"><path d="M0 0V-82.5" stroke="#D97706" stroke-width="2.4" fill="none"/><circle cy="-82.5" r="7.5" fill="#D97706"/></g><g transform="rotate(317.2)"><path d="M0 0V-82.5" stroke="#D97706" stroke-width="2.4" fill="none"/><circle cy="-82.5" r="7.5" fill="#D97706"/></g><circle r="21" fill="#B45309"/></g>
+  <path d="M420 520L419.64 525.37L418.56 530.63L416.81 535.68L414.42 540.43L411.47 544.8L408.03 548.74L404.18 552.19L400 555.14L395.58 557.57L390.99 559.48L386.29 560.89L381.56 561.83L376.83 562.33L372.15 562.41L367.56 562.12L363.07 561.49L358.7 560.57L354.47 559.37L350.38 557.94L346.43 556.3L342.63 554.49L338.97 552.52L335.43 550.42L332.03 548.2L328.74 545.89L325.56 543.5L322.47 541.04L319.47 538.52L316.55 535.95L313.69 533.35L310.89 530.71L308.13 528.05L305.4 525.38L302.69 522.69L300 520L297.31 517.31L294.6 514.62L291.87 511.95L289.11 509.29L286.31 506.65L283.45 504.05L280.53 501.48L277.53 498.96L274.44 496.5L271.26 494.11L267.97 491.8L264.57 489.58L261.03 487.48L257.37 485.51L253.57 483.7L249.62 482.06L245.53 480.63L241.3 479.43L236.93 478.51L232.44 477.88L227.85 477.59L223.17 477.67L218.44 478.17L213.71 479.11L209.01 480.52L204.42 482.43L200 484.86L195.82 487.81L191.97 491.26L188.53 495.2L185.58 499.57L183.19 504.32L181.44 509.37L180.36 514.63L180 520L180.36 525.37L181.44 530.63L183.19 535.68L185.58 540.43L188.53 544.8L191.97 548.74L195.82 552.19L200 555.14L204.42 557.57L209.01 559.48L213.71 560.89L218.44 561.83L223.17 562.33L227.85 562.41L232.44 562.12L236.93 561.49L241.3 560.57L245.53 559.37L249.62 557.94L253.57 556.3L257.37 554.49L261.03 552.52L264.57 550.42L267.97 548.2L271.26 545.89L274.44 543.5L277.53 541.04L280.53 538.52L283.45 535.95L286.31 533.35L289.11 530.71L291.87 528.05L294.6 525.38L297.31 522.69L300 520L302.69 517.31L305.4 514.62L308.13 511.95L310.89 509.29L313.69 506.65L316.55 504.05L319.47 501.48L322.47 498.96L325.56 496.5L328.74 494.11L332.03 491.8L335.43 489.58L338.97 487.48L342.63 485.51L346.43 483.7L350.38 482.06L354.47 480.63L358.7 479.43L363.07 478.51L367.56 477.88L372.15 477.59L376.83 477.67L381.56 478.17L386.29 479.11L390.99 480.52L395.58 482.43L400 484.86L404.18 487.81L408.03 491.26L411.47 495.2L414.42 499.57L416.81 504.32L418.56 509.37L419.64 514.63L420 520Z" fill="none" stroke="#FFD700" stroke-width="8" stroke-linejoin="round" opacity=".92"/>
   <text x="560" y="290" font-family="DejaVu Serif, Georgia, serif" font-size="88" font-weight="700" fill="#FDFBF7">Para Lexi</text>
   <text x="560" y="290" font-family="DejaVu Serif, Georgia, serif" font-size="88" font-weight="700" fill="#FFD700" opacity="0.9">Para Lexi</text>
   <text x="564" y="352" font-family="DejaVu Sans, Arial, sans-serif" font-size="25" fill="#E9D5FF">Un pequeño mundo hecho de flores amarillas,</text>

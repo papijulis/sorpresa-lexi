@@ -10,17 +10,21 @@
 <link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
 <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
 <link rel="preload" href="./assets/fonts/PlayfairDisplay-latin-400-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./assets/css/tokens.css">
+<link rel="stylesheet" href="./assets/css/ornamentos.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
 </head>
 <body>
+<script src="./js/ornamentos.js"></script>
 <div class="aurora" aria-hidden="true"></div>
 
 <a id="volver" class="btn-volver" href="./index.html" aria-label="Volver al jardín">← Volver al jardín</a>
 
 <main class="inf-wrap">
   <header class="inf-title">
-    <p class="inf-symbol" aria-hidden="true">∞</p>
+    <p class="inf-symbol" aria-hidden="true"><svg class="ico" focusable="false"><use href="#infinito"/></svg></p>
     <h1>Hoy, mañana y siempre</h1>
+    <div class="orn-divisor" data-escena="trazo" data-orn-divisor></div>
   </header>
 
   <section class="inf-stage" aria-label="Un corazón hecho de flores que se va dibujando">
@@ -39,12 +43,12 @@
       <p class="inf-never">Este contador nunca se va a detener.</p>
       <p class="inf-love">Te amo por y para siempre.</p>
       <p class="inf-sign">— Julio</p>
-      <button type="button" id="hug-btn" class="hug-btn" aria-label="Recibir un abrazo">Un abrazo</button>
+      <button type="button" id="hug-btn" class="hug-btn btn-brillo" aria-label="Recibir un abrazo">Un abrazo</button>
     </div>
   </section>
 
   <section class="inf-code" aria-label="Un poema escrito como código">
-    <div class="code-panel" id="code-panel" aria-hidden="true"><span id="code-out"></span><span class="code-caret">▍</span></div>
+    <div class="code-panel tarjeta-flor" id="code-panel" aria-hidden="true"><span id="code-out"></span><span class="code-caret">▍</span></div>
     <p class="sr-only" id="code-sr"></p>
   </section>
 </main>
@@ -53,5 +57,6 @@
 
 <script src="./contenido/config.js"></script>
 <script src="./js/infinito.js"></script>
+<script src="./js/escenas.js"></script>
 </body>
 </html>

@@ -50,7 +50,7 @@ document.getElementById('clock-infinity-link').addEventListener('click', (e) => 
 });
 window.addEventListener('focus', tickClock);
 document.getElementById('badge-1111').addEventListener('click', () => {
-  openModal({ icon: '✨', title: '11:11', body: WISH_1111_TEXT });
+  openModal({ icon: 'brillo', title: '11:11', body: WISH_1111_TEXT });
 });
 
 /* ======================================================================
@@ -80,10 +80,11 @@ function renderCalendar() {
     cell.innerHTML = `<span>${day}</span>`;
     if (memory) {
       const heart = document.createElement('span');
-      heart.textContent = memory.special ? '💛' : '🩶';
+      heart.innerHTML = ico('i-corazon-lleno', 'ico-sm');
       heart.className = 'text-sm leading-none mt-0.5 ' + (memory.special ? 'heart-special' : '');
+      heart.style.color = memory.special ? 'var(--dorado-500)' : 'rgba(var(--pergamino-rgb), .35)';
       cell.appendChild(heart);
-      cell.addEventListener('click', () => openModal({ icon: memory.special ? '💛' : '🩷', title: memory.display, body: memory.text }));
+      cell.addEventListener('click', () => openModal({ icon: memory.special ? 'i-corazon-lleno' : 'i-corazon', title: memory.display, body: memory.text }));
     }
     calGrid.appendChild(cell);
   }
@@ -97,7 +98,7 @@ document.getElementById('random-memory-btn').addEventListener('click', () => {
   const [y, mo] = m.date.split('-').map(Number);
   const foundIdx = MONTHS_SEQUENCE.findIndex((ms) => ms.year === y && ms.month === mo - 1);
   if (foundIdx !== -1) { calIndex = foundIdx; renderCalendar(); }
-  openModal({ icon: m.special ? '💛' : '🩷', title: m.display, body: m.text });
+  openModal({ icon: m.special ? 'i-corazon-lleno' : 'i-corazon', title: m.display, body: m.text });
 });
 
 /* ======================================================================
@@ -121,7 +122,7 @@ voiceAudio.addEventListener('loadedmetadata', () => { voiceDuration.textContent 
 voiceAudio.addEventListener('timeupdate', () => { voiceCurrent.textContent = formatTime(voiceAudio.currentTime); });
 voiceAudio.addEventListener('error', () => { voiceFallbackNote.classList.remove('hidden'); });
 voiceAudio.addEventListener('ended', () => {
-  voicePlayIcon.textContent = '▶';
+  voicePlayIcon.innerHTML = ico('i-play');
   if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.remove('playing'));
 });
 voicePlayBtn.addEventListener('click', () => {
@@ -129,11 +130,11 @@ voicePlayBtn.addEventListener('click', () => {
     pauseBgAudioForVoiceNote();
     setupAnalysers();
     voiceAudio.play().catch(() => { voiceFallbackNote.classList.remove('hidden'); });
-    voicePlayIcon.textContent = '❚❚';
+    voicePlayIcon.innerHTML = ico('i-pausa');
     if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.add('playing'));
   } else {
     voiceAudio.pause();
-    voicePlayIcon.textContent = '▶';
+    voicePlayIcon.innerHTML = ico('i-play');
     if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.remove('playing'));
   }
 });
@@ -153,7 +154,7 @@ const jarSecretBtn = document.getElementById('jar-secret-btn');
 
 const JAR_STORAGE_KEY = 'jardin.frasco.v1';
 const JAR_RING_CIRCUMFERENCE = 314.159; // 2 * PI * r(50) — matches the SVG circle above
-const JAR_HEART_EMOJI = ['💛', '💜', '🩷'];
+const JAR_HEART_COLORS = ['var(--dorado-500)', 'var(--amatista-500)', 'var(--rosa-400)'];
 const JAR_MAX_HEARTS = 42; // hand-placed 9 + up to 33 more as the frasco fills
 
 const discoverableIndices = REASONS.map((_, i) => i).filter((i) => !REASONS[i].secret);
@@ -203,13 +204,16 @@ function jarProgress() { return JAR_TOTAL > 0 ? jarState.pointer / JAR_TOTAL : 0
 function growJarHearts(progress) {
   const target = Math.min(JAR_MAX_HEARTS, 9 + Math.round(progress * (JAR_MAX_HEARTS - 9)));
   while (jarHeartsRendered < target) {
-    const el = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    const size = rand(11, 18) * 1.05;
+    const el = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+    el.setAttribute('href', '#i-corazon-lleno');
     el.setAttribute('x', rand(54, 146).toFixed(1));
-    el.setAttribute('y', rand(74, 242).toFixed(1));
-    el.setAttribute('font-size', rand(11, 18).toFixed(1));
+    el.setAttribute('y', (rand(74, 242) - size * 0.85).toFixed(1));
+    el.setAttribute('width', size.toFixed(1));
+    el.setAttribute('height', size.toFixed(1));
     el.setAttribute('class', 'jar-heart-float');
     el.style.animationDelay = rand(0, 3).toFixed(2) + 's';
-    el.textContent = JAR_HEART_EMOJI[Math.floor(rand(0, JAR_HEART_EMOJI.length))];
+    el.style.color = JAR_HEART_COLORS[Math.floor(rand(0, JAR_HEART_COLORS.length))];
     jarHeartsGroup.appendChild(el);
     jarHeartsRendered++;
   }
@@ -226,9 +230,9 @@ function updateJarVisuals() {
   jarRingTotal.textContent = JAR_TOTAL;
   jarCounter.textContent = `${jarState.pointer} de ${JAR_TOTAL} razones descubiertas`;
 
-  jarBtn.textContent = jarState.pointer >= JAR_TOTAL
-    ? (jarState.secretUnlocked ? 'Ya las encontré todas 💛' : 'Encontré las 100... espera la sorpresa')
-    : 'Tomar una razón de por qué eres mi todo';
+  jarBtn.innerHTML = iconizar(jarState.pointer >= JAR_TOTAL
+    ? (jarState.secretUnlocked ? 'Ya las encontré todas {i-corazon-lleno}' : 'Encontré las 100... espera la sorpresa')
+    : 'Tomar una razón de por qué eres mi todo');
   jarSecretBtn.classList.toggle('hidden', !jarState.secretUnlocked);
 }
 updateJarVisuals();
@@ -259,7 +263,7 @@ function milestoneBodyHTML(hito) {
     return html;
   }
   if (p.tipo === 'cancion') {
-    return frase + `<p class="font-ui text-xs mt-3" style="color:#7E22CE;">🎵 Sonando para ti: <strong>${p.valor}</strong></p>`;
+    return frase + `<p class="font-ui text-xs mt-3" style="color:#7E22CE;">${ico('i-nota', 'ico-sm')} Sonando para ti: <strong>${p.valor}</strong></p>`;
   }
   if (p.tipo === 'carta') {
     return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:#3B2A1A;">${p.texto}</p>`;
@@ -285,7 +289,7 @@ function triggerMilestone(hito) {
 }
 
 function openSecretReason() {
-  openModal({ icon: '✨', title: 'La Razón 101', body: REASONS[secretIndex].texto });
+  openModal({ icon: 'brillo', title: 'La Razón 101', body: REASONS[secretIndex].texto });
 }
 jarSecretBtn.addEventListener('click', openSecretReason);
 
@@ -312,12 +316,12 @@ jarBtn.addEventListener('click', () => {
     if (hito) {
       triggerMilestone(hito);
       openModal({
-        icon: hito.premio.tipo === 'final' ? '✨' : '💌',
+        icon: hito.premio.tipo === 'final' ? 'brillo' : 'i-sobre-corazon',
         title: hito.premio.tipo === 'final' ? 'Encontraste las 100 razones' : 'Una razón por la que eres mi todo',
         bodyHTML: `<span>${REASONS[idx].texto}</span><div style="margin-top:18px;padding-top:18px;border-top:1px solid rgba(0,0,0,.12);">${milestoneBodyHTML(hito)}</div>`,
       });
     } else {
-      openModal({ icon: '💌', title: 'Una razón por la que eres mi todo', body: REASONS[idx].texto });
+      openModal({ icon: 'i-sobre-corazon', title: 'Una razón por la que eres mi todo', body: REASONS[idx].texto });
     }
   }, 280);
 });

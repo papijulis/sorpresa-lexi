@@ -70,7 +70,7 @@ window.JuegoCurame = (function () {
       btn.type = 'button';
       btn.className = 'curame-heart';
       btn.setAttribute('aria-label', 'Curar a Julio');
-      btn.textContent = '💛';
+      btn.innerHTML = ico('i-corazon-lleno', 'ico-xl');
       const rect = arenaEl.getBoundingClientRect();
       const x = 8 + Math.random() * Math.max(10, rect.width - 64);
       const y = 8 + Math.random() * Math.max(10, rect.height - 64);
@@ -105,7 +105,7 @@ window.JuegoCurame = (function () {
         spawnSparkleBurst(r.left + r.width / 2, r.top + r.height / 2, 60, true);
       }
       setTimeout(() => {
-        if (typeof openModal === 'function') openModal({ icon: '💛', title: '¡Me curaste!', body: 'Otra vez. Eres mi healer favorita. Se abrió una carta nueva en el Buzón.' });
+        if (typeof openModal === 'function') openModal({ icon: 'i-curame', title: '¡Me curaste!', body: 'Otra vez. Eres mi healer favorita. Se abrió una carta nueva en el Buzón.' });
       }, 350);
     }
 
@@ -156,7 +156,7 @@ window.JuegoCurame = (function () {
   return {
     id: 'curame',
     titulo: 'Cúrame',
-    emoji: '💛',
+    icono: 'i-curame',
     descripcion: 'Cura a Julio antes de que se acabe la barra.',
     progressLabel() { return loadState().completada ? 'curado' : 'sin completar'; },
     start,

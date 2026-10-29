@@ -174,7 +174,7 @@ window.JuegoConstelacion = (function () {
   return {
     id: 'constelacion',
     titulo: 'Constelación',
-    emoji: '✨',
+    icono: 'i-constelacion',
     descripcion: 'Une las estrellas y forma un corazón.',
     start,
     stop,

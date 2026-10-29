@@ -11,21 +11,21 @@
   /* ---- polaroid ---- */
   .polaroid-wrap { perspective: 1200px; }
   .polaroid {
-    background: #FDFBF7; padding: 12px 12px 40px 12px;
+    background: var(--pergamino-50); padding: 12px 12px 40px 12px;
     box-shadow: 0 14px 30px rgba(0,0,0,0.45);
     transition: transform .25s ease-out, box-shadow .25s ease-out, opacity .8s ease;
     transform-style: preserve-3d;
   }
   .polaroid:hover { will-change: transform; }
-  .polaroid img, .polaroid .img-fallback { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: linear-gradient(135deg,#F5EBE1,#F59E0B33); }
+  .polaroid img, .polaroid .img-fallback { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: linear-gradient(135deg,var(--pergamino-100),#F59E0B33); }
 
   /* ---- letter ---- */
   .letter-scroll {
     background: #FAF5EB; position: relative; overflow: hidden;
     background-image:
       radial-gradient(circle at 8% 12%, rgba(245,158,11,0.08) 0, transparent 45%),
-      radial-gradient(circle at 92% 88%, rgba(168,85,247,0.08) 0, transparent 45%);
-    color: #3B2A1A;
+      radial-gradient(circle at 92% 88%, rgba(var(--amatista-rgb), 0.08) 0, transparent 45%);
+    color: var(--tinta);
   }
   .ink-hidden { opacity: 0; filter: blur(3px); transition: opacity .9s ease, filter .9s ease; }
   .ink-in { opacity: 1; filter: blur(0); }
@@ -40,17 +40,17 @@
   .flourish { position: absolute; opacity: 0.16; pointer-events: none; }
   .letter-switch-btn {
     background: none; border: none; cursor: pointer; padding: .5rem .75rem; border-radius: .5rem;
-    color: #B45309; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px;
+    color: var(--sepia-700); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px;
     transition: color .2s ease, transform .2s ease;
   }
   .letter-switch-btn:hover { color: #7C2D12; }
-  .letter-switch-btn:focus-visible { outline: 2px solid #B45309; outline-offset: 3px; }
+  .letter-switch-btn:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 3px; }
   .letter-switch-btn:disabled { opacity: .5; cursor: default; }
 
   /* ---- hero shimmer ---- */
   @keyframes shimmerText { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
   .shimmer-gold {
-    background: linear-gradient(90deg, #FFD700, #FFF8DC 50%, #FFD700);
+    background: linear-gradient(90deg, var(--dorado-500), var(--dorado-100) 50%, var(--dorado-500));
     background-size: 200% 100%;
     -webkit-background-clip: text; background-clip: text; color: transparent;
     animation: shimmerText 3.5s linear infinite;
@@ -59,13 +59,13 @@
   .char-in { display: inline-block; opacity: 0; transform: translateY(16px); animation: charIn .6s ease forwards; }
   /* las letras inline-block no heredan el background-clip:text del padre y quedaban invisibles ("Lexi"); cada letra lleva su propio degradado */
   .shimmer-gold .char-in {
-    background: linear-gradient(90deg, #FFD700, #FFF8DC 50%, #FFD700); background-size: 200% 100%;
+    background: linear-gradient(90deg, var(--dorado-500), var(--dorado-100) 50%, var(--dorado-500)); background-size: 200% 100%;
     -webkit-background-clip: text; background-clip: text; color: transparent;
     animation: charIn .6s ease forwards, shimmerText 3.5s linear infinite;
   }
 
   /* ---- jar ---- */
-  .jar-glass { fill: url(#jarGlassGradient); stroke: rgba(255,215,0,0.4); }
+  .jar-glass { fill: url(#jarGlassGradient); stroke: rgba(var(--dorado-rgb), 0.4); }
   .jar-rib { stroke: rgba(255,255,255,0.14); stroke-width: 1.4; fill: none; }
   .jar-shine-wrap { position: absolute; inset: 0; overflow: hidden; pointer-events: none; border-radius: 50% / 8%; }
   @keyframes jarShineMove { 0%{ left:-60%; } 100%{ left:130%; } }
@@ -97,14 +97,14 @@
   .jar-ring { width: 100%; height: 100%; }
   .jar-ring-track { fill: none; stroke: rgba(255,255,255,0.12); stroke-width: 7; }
   .jar-ring-fill {
-    fill: none; stroke: #FFD700; stroke-width: 7; stroke-linecap: round;
+    fill: none; stroke: var(--dorado-500); stroke-width: 7; stroke-linecap: round;
     stroke-dasharray: 314.159; stroke-dashoffset: 314.159;
     transition: stroke-dashoffset .7s cubic-bezier(.2,.8,.2,1);
-    filter: drop-shadow(0 0 4px rgba(255,215,0,0.55));
+    filter: drop-shadow(0 0 4px rgba(var(--dorado-rgb), 0.55));
   }
   .jar-ring-label {
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-    color: #FFD700; font-size: 1.05rem;
+    color: var(--dorado-500); font-size: 1.05rem;
   }
   .jar-ring-sep { opacity: 0.5; margin: 0 2px; font-size: .85rem; }
 
@@ -137,7 +137,7 @@
   /* ---- modal ---- */
   .modal-backdrop {
     position: fixed; inset: 0; z-index: 80;
-    background: rgba(5,0,10,0.78); backdrop-filter: blur(6px);
+    background: rgba(var(--abismo-rgb), 0.78); backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity 0.35s ease; padding: 1.25rem;
   }
@@ -150,7 +150,7 @@
 
   /* ---- screens ---- */
   #preloader {
-    position: fixed; inset: 0; z-index: 100; background: #05000a;
+    position: fixed; inset: 0; z-index: 100; background: var(--ciruela-950);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
     transition: opacity .7s ease;
   }
@@ -176,5 +176,5 @@
 
   .day-cell { aspect-ratio: 1/1; }
 
-  #scroll-heart { filter: drop-shadow(0 0 6px rgba(255,215,0,.7)); transition: left .12s linear; }
+  #scroll-heart { filter: drop-shadow(0 0 6px rgba(var(--dorado-rgb), .7)); transition: left .12s linear; }
 

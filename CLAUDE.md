@@ -32,7 +32,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
    - Ecualizador con `AnalyserNode` real (`setupAnalysers`) y fallback CSS (clase `.playing` en las barras) si falla `createMediaElementSource`.
 6. **Accesibilidad mínima:** botones con `aria-label`, contraste suficiente, foco visible, nada esencial depende solo del hover (los flujos táctiles tienen su propia rama, p. ej. `evadeNo`).
 7. **Voz y textos de Julio:** el contenido personal (razones, cartas, frases) que redacte Claude Code va marcado `borrador: true` en el array y listado en `REVISAR.md` para que Julio lo edite/apruebe. Nunca inventar recuerdos o hechos de la pareja que no estén en `PROMPT-claude-code.md` o ya en el código.
-8. **Emojis:** no agregar emojis nuevos; reutilizar los que el sitio ya usa. Pies de foto de polaroids sin emoji. **Estética existente a respetar:** paleta ciruela/amatista/dorado/rosa/pergamino, tipografías Playfair Display (títulos **y** texto íntimo en itálica — clase `.font-hand`, sin usar nunca una fuente script/cursiva) e Inter (UI). Modo día y modo atardecer (`isSunset`). Mantener el espíritu: lirios procedurales en canvas, pétalos, mariposas moradas, luciérnagas, bokeh.
+8. **Íconos, no emojis:** el sitio ya no usa emojis; todo ícono sale del sprite SVG de la firma visual (`ico('i-corazon')`, ver sección "Firma visual"). Pies de foto de polaroids sin emoji ni ícono. **Estética existente a respetar:** paleta ciruela/amatista/dorado/rosa/pergamino, tipografías Playfair Display (títulos **y** texto íntimo en itálica — clase `.font-hand`, sin usar nunca una fuente script/cursiva) e Inter (UI). Modo día y modo atardecer (`isSunset`). Mantener el espíritu: lirios procedurales en canvas, pétalos, mariposas moradas, luciérnagas, bokeh.
 9. Si algo de un plan de fase choca con estas reglas, ganan estas reglas — documentarlo en el commit.
 
 ## Arquitectura
@@ -206,6 +206,17 @@ del bloque de "te amo".
   `visibilitychange`, agregado solo mientras el overlay está abierto y
   quitado al cerrarlo (mismo patrón de limpieza por arreglo de funciones
   que usan los módulos de `js/juegos/`).
+
+## Firma visual (rediseño, punto 1)
+
+Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo continuo, unido al ∞**.
+
+- **Tokens** (`assets/css/tokens.css`): únicos dueños de colores (`--dorado-500`, `--amatista-500`…), canales para `rgba(var(--dorado-rgb), .4)`, degradados, radios, sombras/brillos, curvas (`--ease-flor`, `--ease-rebote`), duraciones y escala de capas (`--z-*`). **No pongas hex ni rgba sueltos en CSS nuevo.** (En JS/canvas los colores siguen siendo literales.)
+- **Sprite de ornamentos e íconos**: la geometría vive en `tools/generar-ornamentos.js` (fuente única). Correr `node tools/generar-ornamentos.js` regenera `assets/img/ornamentos.svg` (referencia) y `js/ornamentos.js` (se inyecta al inicio del `<body>`; funciona con `file://`). Nunca edites esos dos a mano. Helpers globales: `ico('i-sobre', 'ico-lg')`, `iconoHTML(id|texto)`, `iconizar('Texto {i-corazon-lleno}')` (los toasts y modales ya lo aplican), `ornDivisor()`, `ornPreloader()`. Convención: `i-*` = íconos de línea 24×24 (heredan `currentColor`); sin prefijo = símbolos de firma (`lirio`, `lirio-linea`, `lirio-mini`, `infinito`, `infinito-flor`, `brillo`). Los íconos de juegos/cupones se declaran con `icono:` (id del sprite), no `emoji:`.
+- **Componentes** (`assets/css/ornamentos.css`): `.ico`, `.orn-divisor` (el trazo se dibuja con el scroll; se agrega solo bajo cada `.titulo-seccion` o donde pongas `data-orn-divisor`), `.tarjeta-flor` (esquinas de pétalo), `.btn-brillo` (brillo que pasa en botones dorados), flor de precarga, y el lenguaje de movimiento: `.mov-florecer`, `.mov-latido`, `.mov-revelar`, `.mov-halo` (con `prefers-reduced-motion` ya cubierto).
+- **Escenas** (`js/escenas.js`): motor de scroll sin librerías. `data-escena="trazo|pasada"` escribe `--p` (0→1) solo mientras el elemento está en pantalla; `.mov-*`/`data-en-vista` agregan `.en-vista` una vez. `Escenas.registrar(el)` para elementos creados por JS.
+- **Marca** (`node tools/generar-marca.js` + Inkscape, comandos impresos al final): íconos de la app, maskable, favicon y `og.jpg` con la misma flor maestra.
+- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 

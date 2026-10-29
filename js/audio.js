@@ -88,7 +88,7 @@ SONGS.forEach((song, idx) => {
   const card = document.createElement('div');
   card.className = 'song-select-card glass rounded-2xl p-5 flex flex-col items-center text-center hover:-translate-y-1 transition-transform cursor-pointer';
   card.innerHTML = `
-    <div class="vinyl-mini w-full aspect-square rounded-xl mb-4 flex items-center justify-center text-4xl bg-gradient-to-br from-amethyst-orchid/60 to-gold-amber/40 border border-white/10">🎵</div>
+    <div class="vinyl-mini w-full aspect-square rounded-xl mb-4 flex items-center justify-center text-4xl bg-gradient-to-br from-amethyst-orchid/60 to-gold-amber/40 border border-white/10" style="color:var(--dorado-500);">${ico('i-vinilo', 'ico-2xl')}</div>
     <p class="font-display text-base text-parchment mb-1">${song.title}</p>
     <p class="font-ui text-xs text-parchment/50 mb-4">${song.artist}</p>
     <div class="flex items-end gap-[3px] h-6 eq-wrap"></div>
@@ -102,7 +102,7 @@ SONGS.forEach((song, idx) => {
 });
 
 function updateMiniPlayerIcon() {
-  miniToggle.textContent = bgAudio.paused ? '▶' : '❚❚';
+  miniToggle.innerHTML = ico(bgAudio.paused ? 'i-play' : 'i-pausa', 'ico-sm');
   miniVinyl.classList.toggle('spinning', !bgAudio.paused);
   if (!useRealEq) miniEqBars.forEach((b) => b.classList.toggle('playing', !bgAudio.paused));
 }

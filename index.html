@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
 
 <meta property="og:type" content="website">
-<meta property="og:title" content="Para Lexi 💛">
+<meta property="og:title" content="Para Lexi">
 <meta property="og:description" content="Un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.">
 <meta property="og:image" content="https://papijulis.github.io/sorpresa-lexi/assets/img/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -20,25 +20,28 @@
 <meta property="og:url" content="https://papijulis.github.io/sorpresa-lexi/">
 <meta property="og:locale" content="es_MX">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Para Lexi 💛">
+<meta name="twitter:title" content="Para Lexi">
 <meta name="twitter:description" content="Un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.">
 <meta name="twitter:image" content="https://papijulis.github.io/sorpresa-lexi/assets/img/og.jpg">
 
 <link rel="preload" href="./assets/fonts/PlayfairDisplay-latin-400-900-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./assets/fonts/Inter-latin-300-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="./assets/css/utilities.css">
+<link rel="stylesheet" href="./assets/css/tokens.css">
 <link rel="stylesheet" href="./assets/css/base.css">
 <link rel="stylesheet" href="./assets/css/componentes.css">
 <link rel="stylesheet" href="./assets/css/vistas.css">
 <link rel="stylesheet" href="./assets/css/jardin.css">
+<link rel="stylesheet" href="./assets/css/ornamentos.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
 <body class="locked">
+<script src="./js/ornamentos.js"></script>
 
 <div id="bg-layer-day"></div>
 <div id="bg-layer-sunset"></div>
 <div id="bg-layer-night">
-  <button id="night-moon" aria-label="La luna" type="button">🌙</button>
+  <button id="night-moon" aria-label="La luna" type="button"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-luna"/></svg></button>
 </div>
 <div class="vignette"></div>
 <canvas id="fx-canvas"></canvas>
@@ -46,7 +49,7 @@
 
 <!-- PRELOADER -->
 <div id="preloader">
-  <span class="text-5xl heartbeat">💛</span>
+  <div class="mov-latido" data-orn-carga></div>
   <p class="font-hand text-xl text-gold">preparando nuestra historia...</p>
 </div>
 
@@ -54,7 +57,7 @@
 <div class="fixed top-0 left-0 w-full h-[3px] z-40 bg-white/5">
   <div id="scroll-progress-fill" class="h-full bg-gradient-to-r from-amethyst-orchid via-amethyst to-gold" style="width:0%"></div>
 </div>
-<div id="scroll-heart" class="fixed top-0 z-40 text-base -translate-x-1/2 -translate-y-1/3" style="left:0%;">💜</div>
+<div id="scroll-heart" class="fixed top-0 z-40 text-base -translate-x-1/2 -translate-y-1/3" style="left:0%;color:var(--amatista-500);"><svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-corazon-lleno"/></svg></div>
 
 <!-- ===================== SCREEN 1: GATEKEEPER ===================== -->
 <div id="screen-gate" class="pre-hidden">
@@ -62,7 +65,7 @@
     <p class="font-hand text-gold text-3xl mb-2">Antes de continuar...</p>
     <h1 class="font-display text-4xl sm:text-5xl text-parchment mb-8">¿Me amas?</h1>
     <div class="relative flex items-center justify-center gap-6 h-16">
-      <button id="btn-si" class="font-ui font-semibold px-8 py-3 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold-amber text-plum-dark shadow-lg shadow-gold/30 hover:scale-105 active:scale-95 transition-transform">Sí</button>
+      <button id="btn-si" class="btn-brillo font-ui font-semibold px-8 py-3 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold-amber text-plum-dark shadow-lg shadow-gold/30 hover:scale-105 active:scale-95 transition-transform">Sí</button>
       <button id="btn-no" class="font-ui font-semibold px-8 py-3 rounded-full bg-white/10 border border-white/20 text-parchment">No</button>
     </div>
   </div>
@@ -82,25 +85,26 @@
 
   <button id="sunset-toggle" aria-label="Nuestro atardecer" class="fixed top-5 right-5 z-40 w-14 h-14 rounded-full glass glow-gold flex items-center justify-center hover:scale-110 active:scale-95 transition-transform float-soft">
     <span class="icon-morph-wrap">
-      <span class="icon-sun text-2xl">☀️</span>
-      <span class="icon-sunset text-2xl">🌇</span>
+      <span class="icon-sun text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-sol"/></svg></span>
+      <span class="icon-sunset text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-atardecer"/></svg></span>
     </span>
   </button>
 
   <button id="buzon-toggle" aria-label="El Buzón" class="fixed top-5 left-5 z-40 w-14 h-14 rounded-full glass glow-gold flex items-center justify-center hover:scale-110 active:scale-95 transition-transform float-soft relative">
-    <span class="text-2xl">📮</span>
-    <span id="buzon-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full" style="background:#FB7185;box-shadow:0 0 6px rgba(251,113,133,.8);"></span>
+    <span class="text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-sobre"/></svg></span>
+    <span id="buzon-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full" style="background:var(--rosa-400);box-shadow:0 0 6px rgba(var(--rosa-rgb),.8);"></span>
   </button>
 
   <button id="juegos-toggle" aria-label="Rincón de Juegos" class="fixed top-24 left-5 z-40 w-14 h-14 rounded-full glass glow-gold flex items-center justify-center hover:scale-110 active:scale-95 transition-transform float-soft relative">
-    <span class="text-2xl">🎮</span>
-    <span id="juegos-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full" style="background:#FFD700;box-shadow:0 0 6px rgba(255,215,0,.8);"></span>
+    <span class="text-2xl"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-mando"/></svg></span>
+    <span id="juegos-dot" class="hidden absolute -top-1 -right-1 w-3 h-3 rounded-full" style="background:var(--dorado-500);box-shadow:0 0 6px rgba(var(--dorado-rgb),.8);"></span>
   </button>
 
   <!-- HERO -->
   <section class="hero-section min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
     <div id="hero-panel" class="hero-panel flex flex-col items-center">
       <h1 class="font-display text-5xl sm:text-7xl text-parchment leading-tight mb-4">Para ti,<br><span id="hero-lexi" class="shimmer-gold"></span></h1>
+      <div class="orn-divisor orn-divisor-hero" data-escena="trazo" data-orn-divisor></div>
       <p class="font-ui text-amethyst-lavender max-w-md text-sm sm:text-base">Un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.</p>
       <p id="saludo-dinamico" class="font-ui text-gold text-sm sm:text-base mt-6"></p>
       <p id="frase-del-dia" class="font-hand text-lg sm:text-xl text-parchment max-w-md mt-4 frase-del-dia"></p>
@@ -113,8 +117,8 @@
 
   <!-- LOVE CLOCK -->
   <section class="reveal py-24 px-6 flex flex-col items-center text-center">
-    <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2">Desde el 28 de mayo de 2026</h2>
-    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <a id="clock-infinity-link" class="clock-infinity" href="./infinito.html" target="_blank" aria-label="Abrir nuestra página infinita" title="Infinito">∞</a></p>
+    <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2 titulo-seccion">Desde el 28 de mayo de 2026</h2>
+    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <a id="clock-infinity-link" class="clock-infinity" href="./infinito.html" target="_blank" aria-label="Abrir nuestra página infinita" title="Infinito"><svg class="ico" aria-hidden="true" focusable="false"><use href="#infinito-flor"/></svg></a></p>
     <div class="clock-grid grid gap-3 sm:gap-6 max-w-3xl w-full">
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-months" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Meses</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-days" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Días</p></div>
@@ -128,15 +132,15 @@
       Te amo por y para siempre.
     </p>
     <button id="badge-1111" class="mt-14 glass glow-gold rounded-full px-6 py-3 flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform">
-      <span class="text-2xl">✨</span>
+      <span class="text-2xl" style="color:var(--dorado-500);"><svg class="ico ico-lg mov-halo" aria-hidden="true" focusable="false"><use href="#brillo"/></svg></span>
       <span class="font-hand text-xl sm:text-2xl text-gold">11:11 — Nuestra hora</span>
     </button>
   </section>
 
   <!-- NEXT MESIVERSARIO -->
   <section class="reveal py-10 px-6 flex justify-center">
-    <button id="mesiversario-card" class="glass glow-gold rounded-3xl px-8 py-7 max-w-md w-full text-center hover:scale-105 active:scale-95 transition-transform">
-      <p id="mesiversario-icon" class="text-3xl mb-2">🌙</p>
+    <button id="mesiversario-card" class="tarjeta-flor glass glow-gold rounded-3xl px-8 py-7 max-w-md w-full text-center hover:scale-105 active:scale-95 transition-transform">
+      <p id="mesiversario-icon" class="text-3xl mb-2" style="color:var(--dorado-500);"><svg class="ico ico-lg" aria-hidden="true" focusable="false"><use href="#i-luna"/></svg></p>
       <p id="mesiversario-title" class="font-display text-xl sm:text-2xl text-parchment mb-1">Próximo mesiversario</p>
       <p id="mesiversario-body" class="font-ui text-sm text-parchment/60"></p>
     </button>
@@ -145,10 +149,10 @@
   <!-- CALENDAR -->
   <section class="cal-section reveal py-24 px-6">
     <div class="max-w-3xl mx-auto text-center mb-10">
-      <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-3">Nuestros Días más Especiales</h2>
+      <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-3 titulo-seccion">Nuestros Días más Especiales</h2>
       <p class="font-ui text-parchment/60 text-sm sm:text-base max-w-xl mx-auto">Cada día a tu lado guarda un espacio especial en mi corazón, pero estos son "Nuestros Días más Especiales" (aunque todos lo son).</p>
     </div>
-    <div class="cal-card max-w-lg mx-auto glass rounded-3xl p-5 sm:p-7">
+    <div class="cal-card tarjeta-flor max-w-lg mx-auto glass rounded-3xl p-5 sm:p-7">
       <div class="flex items-center justify-between mb-5">
         <button id="cal-prev" aria-label="Mes anterior" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-parchment">‹</button>
         <h3 id="cal-title" class="font-display text-xl text-gold"></h3>
@@ -167,12 +171,12 @@
   <!-- VOICE NOTE -->
   <section class="reveal py-24 px-6">
     <div class="max-w-md mx-auto text-center mb-8">
-      <h2 class="font-display text-2xl sm:text-3xl text-parchment mb-2">Escucha esto solo cuando me extrañes</h2>
+      <h2 class="font-display text-2xl sm:text-3xl text-parchment mb-2 titulo-seccion">Escucha esto solo cuando me extrañes</h2>
       <p class="font-ui text-parchment/60 text-sm">Para los días difíciles, para cuando estés cansada, o cuando simplemente me extrañes...</p>
     </div>
     <div class="max-w-md mx-auto glass glow-rose rounded-3xl p-6 flex items-center gap-5">
       <button id="voice-play" aria-label="Reproducir nota de voz" class="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-rose to-rose-deep flex items-center justify-center text-2xl shadow-lg shadow-rose/40 hover:scale-105 active:scale-95 transition-transform">
-        <span id="voice-play-icon">▶</span>
+        <span id="voice-play-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></span>
       </button>
       <div class="flex-1 min-w-0">
         <div class="flex items-end gap-[3px] h-8 mb-2" id="voice-wave"></div>
@@ -188,7 +192,7 @@
 
   <!-- REASON JAR -->
   <section class="reveal py-24 px-6 text-center">
-    <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-10">El Frasco de Razones</h2>
+    <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-10 titulo-seccion">El Frasco de Razones</h2>
     <div id="jar" class="relative mx-auto w-40 sm:w-48 mb-6 select-none">
       <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto">
         <defs>
@@ -234,20 +238,20 @@
         <ellipse cx="100" cy="165" rx="40" ry="56" fill="url(#jarGlowGradient)" id="jar-glow-progress" class="jar-glow-progress"/>
 
         <g id="jar-hearts">
-          <text x="63" y="100" font-size="17" class="jar-heart-float" style="animation-delay:0s">💛</text>
-          <text x="112" y="112" font-size="15" class="jar-heart-float" style="animation-delay:.3s">💜</text>
-          <text x="82" y="138" font-size="20" class="jar-heart-float" style="animation-delay:.6s">💛</text>
-          <text x="122" y="160" font-size="14" class="jar-heart-float" style="animation-delay:.9s">🩷</text>
-          <text x="58" y="172" font-size="17" class="jar-heart-float" style="animation-delay:1.2s">💛</text>
-          <text x="100" y="200" font-size="19" class="jar-heart-float" style="animation-delay:1.5s">💜</text>
-          <text x="128" y="128" font-size="13" class="jar-heart-float" style="animation-delay:1.8s">💛</text>
-          <text x="72" y="215" font-size="16" class="jar-heart-float" style="animation-delay:2.1s">🩷</text>
-          <text x="103" y="228" font-size="15" class="jar-heart-float" style="animation-delay:2.4s">💛</text>
+          <use href="#i-corazon-lleno" x="63" y="84.8" width="17.9" height="17.9" class="jar-heart-float" style="animation-delay:0s;color:var(--dorado-500)"/>
+          <use href="#i-corazon-lleno" x="112" y="98.6" width="15.8" height="15.8" class="jar-heart-float" style="animation-delay:.3s;color:var(--amatista-500)"/>
+          <use href="#i-corazon-lleno" x="82" y="120.2" width="21.0" height="21.0" class="jar-heart-float" style="animation-delay:.6s;color:var(--dorado-500)"/>
+          <use href="#i-corazon-lleno" x="122" y="147.5" width="14.7" height="14.7" class="jar-heart-float" style="animation-delay:.9s;color:var(--rosa-400)"/>
+          <use href="#i-corazon-lleno" x="58" y="156.8" width="17.9" height="17.9" class="jar-heart-float" style="animation-delay:1.2s;color:var(--dorado-500)"/>
+          <use href="#i-corazon-lleno" x="100" y="183.1" width="19.9" height="19.9" class="jar-heart-float" style="animation-delay:1.5s;color:var(--amatista-500)"/>
+          <use href="#i-corazon-lleno" x="128" y="116.4" width="13.7" height="13.7" class="jar-heart-float" style="animation-delay:1.8s;color:var(--dorado-500)"/>
+          <use href="#i-corazon-lleno" x="72" y="200.7" width="16.8" height="16.8" class="jar-heart-float" style="animation-delay:2.1s;color:var(--rosa-400)"/>
+          <use href="#i-corazon-lleno" x="103" y="214.6" width="15.8" height="15.8" class="jar-heart-float" style="animation-delay:2.4s;color:var(--dorado-500)"/>
         </g>
       </svg>
       <div class="jar-shine-wrap"><div class="jar-shine"></div><div class="jar-shine-2"></div></div>
     </div>
-    <button id="jar-btn" class="font-ui font-semibold px-8 py-4 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold-amber text-plum-dark shadow-lg shadow-gold/30 hover:scale-105 active:scale-95 transition-transform">
+    <button id="jar-btn" class="btn-brillo font-ui font-semibold px-8 py-4 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold-amber text-plum-dark shadow-lg shadow-gold/30 hover:scale-105 active:scale-95 transition-transform">
       Tomar una razón de por qué eres mi todo
     </button>
     <div class="jar-progress-wrap mt-6">
@@ -260,24 +264,24 @@
       </div>
     </div>
     <p id="jar-counter" class="mt-3 font-ui text-xs text-parchment/50" aria-live="polite"></p>
-    <button id="jar-secret-btn" class="hidden mt-6 font-ui text-sm px-6 py-3 rounded-full bg-white/5 border border-white/15 text-gold hover:bg-white/10 transition-colors">Leer la Razón 101 💛</button>
+    <button id="jar-secret-btn" class="hidden mt-6 font-ui text-sm px-6 py-3 rounded-full bg-white/5 border border-white/15 text-gold hover:bg-white/10 transition-colors">Leer la Razón 101 <svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-corazon-lleno"/></svg></button>
   </section>
 
   <!-- FAVORITE PHOTOS OF US -->
   <section class="reveal py-24 px-6">
-    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment">Y una de mis fotos favoritas de nosotros</h2></div>
+    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Y una de mis fotos favoritas de nosotros</h2></div>
     <div id="favorite-photos-grid" class="polaroid-wrap max-w-5xl mx-auto grid grid-cols-2 gap-6 sm:gap-8 place-items-center"></div>
   </section>
 
   <!-- POLAROID GALLERY -->
   <section class="reveal py-24 px-6">
-    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment">Todas las flores que te he dado</h2></div>
+    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Todas las flores que te he dado</h2></div>
     <div id="polaroid-grid" class="polaroid-wrap max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 place-items-center"></div>
   </section>
 
   <!-- TIMELINE -->
   <section class="reveal py-24 px-6">
-    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment">Nuestra línea del tiempo</h2></div>
+    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Nuestra línea del tiempo</h2></div>
     <div class="timeline-wrap">
       <div class="timeline-track"></div>
       <div class="timeline-fill" id="timeline-fill"></div>
@@ -287,7 +291,7 @@
 
   <!-- NUESTRA BANDA SONORA -->
   <section class="reveal py-24 px-6">
-    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment">Nuestra banda sonora</h2></div>
+    <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Nuestra banda sonora</h2></div>
     <div id="banda-sonora-list" class="max-w-xl mx-auto flex flex-col gap-4"></div>
   </section>
 
@@ -303,7 +307,7 @@
       <div id="letter-wish-block" class="mt-14 pt-10 border-t border-black/10 text-center">
         <p class="font-hand text-xl sm:text-2xl mb-6">Cierra los ojos, piensa en nuestro deseo y tócalo...</p>
         <button id="wish-candle" aria-label="Pedir un deseo" class="hover:scale-110 active:scale-95 transition-transform">
-          <span class="flame-flicker text-5xl sm:text-6xl">🕯️</span>
+          <span class="flame-flicker text-5xl sm:text-6xl" style="color:var(--ambar-500);"><svg class="ico ico-2xl" aria-hidden="true" focusable="false"><use href="#i-vela"/></svg></span>
         </button>
         <p id="wish-final" class="hidden font-hand text-xl sm:text-2xl mt-8 opacity-0 transition-opacity duration-1000">
           Guardado en mi corazón. Te prometo que haré todo lo que esté en mis manos para cumplirlo contigo.
@@ -352,12 +356,12 @@
 <!-- ===================== MINI PLAYER ===================== -->
 <div id="mini-player" class="hidden-player fixed bottom-5 left-5 z-40 flex items-center gap-3 glass glow-gold rounded-full pl-2 pr-3 py-2">
   <div id="mini-vinyl" class="vinyl-disc shrink-0"></div>
-  <button id="mini-player-toggle" aria-label="Reproducir o pausar" class="w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm">▶</button>
+  <button id="mini-player-toggle" aria-label="Reproducir o pausar" class="w-9 h-9 rounded-full bg-gradient-to-br from-gold to-gold-amber text-plum-dark flex items-center justify-center shrink-0 text-sm"><svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></button>
   <div class="leading-tight min-w-0">
     <p id="mini-player-title" class="font-ui text-xs text-parchment font-semibold truncate max-w-[100px]"></p>
     <div id="mini-eq" class="flex items-end gap-[2px] h-4 mt-1"></div>
   </div>
-  <button id="mini-player-next" aria-label="Cambiar canción" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm shrink-0">⇥</button>
+  <button id="mini-player-next" aria-label="Cambiar canción" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-sm shrink-0"><svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
 </div>
 
 <!-- ===================== REUSABLE MODAL ===================== -->
@@ -409,5 +413,6 @@
 <script src="./js/secciones.js"></script>
 <script src="./js/buzon-juegos.js"></script>
 <script src="./js/extras.js"></script>
+<script src="./js/escenas.js"></script>
 </body>
 </html>

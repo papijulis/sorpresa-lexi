@@ -18,6 +18,34 @@ window.JuegoLluviaLirios = (function () {
   let finished = false;
   let listeners = [];
 
+  /* Sprites del juego: el lirio de la firma (mismo dibujo del fondo, paintLilyShape)
+     y una flor marchita con espinas. Se pintan una sola vez al empezar. */
+  let lilySprite = null, thornSprite = null;
+  function buildSprites() {
+    const d = Math.min(window.devicePixelRatio || 1, 2), S = 48;
+    const mk = (draw) => {
+      const c = document.createElement('canvas');
+      c.width = c.height = Math.round(S * d);
+      const g = c.getContext('2d');
+      g.scale(d, d); g.translate(S / 2, S / 2);
+      draw(g);
+      return c;
+    };
+    lilySprite = mk((g) => { if (typeof paintLilyShape === 'function') paintLilyShape(g, 19, 0, false); });
+    thornSprite = mk((g) => {
+      g.beginPath();
+      for (let i = 0; i < 16; i++) {
+        const a = (i / 16) * Math.PI * 2 - Math.PI / 2, r = i % 2 ? 8 : 21;
+        g[i ? 'lineTo' : 'moveTo'](Math.cos(a) * r, Math.sin(a) * r);
+      }
+      g.closePath();
+      const grad = g.createRadialGradient(0, 0, 2, 0, 0, 21);
+      grad.addColorStop(0, '#7F1D2E'); grad.addColorStop(1, '#3B0A1A');
+      g.fillStyle = grad; g.fill();
+      g.lineWidth = 1.2; g.strokeStyle = 'rgba(251,113,133,.7)'; g.stroke();
+    });
+  }
+
   function resize() {
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -57,7 +85,7 @@ window.JuegoLluviaLirios = (function () {
       ? banco[Math.floor(Math.random() * banco.length)].texto
       : '¡Atrapaste todos los lirios! Así de fácil se me hace quererte, sin esfuerzo, uno tras otro.';
     setTimeout(() => {
-      if (typeof openModal === 'function') openModal({ icon: '🌼', title: '¡Atrapaste todos los lirios!', body: frase });
+      if (typeof openModal === 'function') openModal({ icon: 'lirio', title: '¡Atrapaste todos los lirios!', body: frase });
     }, 300);
   }
 
@@ -79,12 +107,8 @@ window.JuegoLluviaLirios = (function () {
       it.y += it.speed * (dt / 16);
       it.x += Math.sin(t / 600 + it.sway) * 0.4;
 
-      ctx.save();
-      ctx.font = it.size + 'px serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(it.thorn ? '🥀' : '🌼', it.x, it.y);
-      ctx.restore();
+      const sprite = it.thorn ? thornSprite : lilySprite;
+      if (sprite) ctx.drawImage(sprite, it.x - it.size, it.y - it.size, it.size * 2, it.size * 2);
 
       const hitY = it.y > paddleY - 14 && it.y < paddleY + 14;
       const hitX = Math.abs(it.x - paddleCx) < paddleW / 2;
@@ -126,9 +150,10 @@ window.JuegoLluviaLirios = (function () {
 
   function start(mount) {
     mountEl = mount;
+    if (!lilySprite) buildSprites();
     mount.innerHTML = `
       <div class="lirios-wrap">
-        <div class="lirios-hud"><span>🌼 <span id="lirios-count">0 / ${TARGET}</span></span></div>
+        <div class="lirios-hud"><span style="color:var(--dorado-500);">${ico('lirio-mini', 'ico-sm')}</span> <span><span id="lirios-count">0 / ${TARGET}</span></span></div>
         <canvas class="lirios-canvas" id="lirios-canvas"></canvas>
         <p class="font-ui text-[11px] mt-3" style="color:rgba(253,251,247,.5);">Mueve el dedo o el mouse para atrapar los lirios. Las espinas no te detienen.</p>
         <button id="lirios-replay" class="cupon-redeem-btn" style="margin-top:.75rem;display:none;">Jugar de nuevo</button>
@@ -173,7 +198,7 @@ window.JuegoLluviaLirios = (function () {
   return {
     id: 'lluvia-lirios',
     titulo: 'Lluvia de lirios',
-    emoji: '🌧️',
+    icono: 'i-gota',
     descripcion: 'Atrapa los lirios, esquiva las espinas.',
     start,
     stop,

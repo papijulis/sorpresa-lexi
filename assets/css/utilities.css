@@ -203,28 +203,28 @@
 .hover\:bg-white\/20:hover { background-color: rgba(255,255,255,.20); }
 
 /* ---- brand palette text colors ---- */
-.text-gold { color: #FFD700; }
-.text-parchment { color: #FDFBF7; }
-.text-parchment\/40 { color: rgba(253,251,247,.4); }
-.text-parchment\/50 { color: rgba(253,251,247,.5); }
-.text-parchment\/60 { color: rgba(253,251,247,.6); }
-.text-parchment\/30 { color: rgba(253,251,247,.3); }
-.text-parchment\/80 { color: rgba(253,251,247,.8); }
+.text-gold { color: var(--dorado-500); }
+.text-parchment { color: var(--pergamino-50); }
+.text-parchment\/40 { color: rgba(var(--pergamino-rgb), .4); }
+.text-parchment\/50 { color: rgba(var(--pergamino-rgb), .5); }
+.text-parchment\/60 { color: rgba(var(--pergamino-rgb), .6); }
+.text-parchment\/30 { color: rgba(var(--pergamino-rgb), .3); }
+.text-parchment\/80 { color: rgba(var(--pergamino-rgb), .8); }
 .text-amethyst-lavender\/80 { color: rgba(233,213,255,.8); }
-.text-plum-dark { color: #090112; }
-.hover\:text-gold:hover { color: #FFD700; }
-.hover\:text-parchment:hover { color: #FDFBF7; }
+.text-plum-dark { color: var(--ciruela-900); }
+.hover\:text-gold:hover { color: var(--dorado-500); }
+.hover\:text-parchment:hover { color: var(--pergamino-50); }
 
 /* ---- gradients (exact combinations used on this page) ---- */
-.bg-gradient-to-r.from-gold.via-gold-soft.to-gold-amber { background-image: linear-gradient(to right, #FFD700, #FACC15, #F59E0B); }
-.bg-gradient-to-r.from-amethyst-orchid.via-amethyst.to-gold { background-image: linear-gradient(to right, #7E22CE, #A855F7, #FFD700); }
+.bg-gradient-to-r.from-gold.via-gold-soft.to-gold-amber { background-image: linear-gradient(to right, var(--dorado-500), var(--dorado-400), var(--ambar-500)); }
+.bg-gradient-to-r.from-amethyst-orchid.via-amethyst.to-gold { background-image: linear-gradient(to right, #7E22CE, var(--amatista-500), var(--dorado-500)); }
 .bg-gradient-to-br.from-amethyst-orchid\/60.to-gold-amber\/40 { background-image: linear-gradient(to bottom right, rgba(126,34,206,.6), rgba(245,158,11,.4)); }
-.bg-gradient-to-br.from-rose.to-rose-deep { background-image: linear-gradient(to bottom right, #FB7185, #E11D48); }
-.bg-gradient-to-br.from-gold.to-gold-amber { background-image: linear-gradient(to bottom right, #FFD700, #F59E0B); }
+.bg-gradient-to-br.from-rose.to-rose-deep { background-image: linear-gradient(to bottom right, var(--rosa-400), var(--rosa-600)); }
+.bg-gradient-to-br.from-gold.to-gold-amber { background-image: linear-gradient(to bottom right, var(--dorado-500), var(--ambar-500)); }
 
 /* ---- shadows (exact combinations used on this page) ---- */
-.shadow-lg.shadow-gold\/30 { box-shadow: 0 10px 15px -3px rgba(255,215,0,.3), 0 4px 6px -4px rgba(255,215,0,.3); }
-.shadow-lg.shadow-rose\/40 { box-shadow: 0 10px 15px -3px rgba(251,113,133,.4), 0 4px 6px -4px rgba(251,113,133,.4); }
+.shadow-lg.shadow-gold\/30 { box-shadow: 0 10px 15px -3px rgba(var(--dorado-rgb), .3), 0 4px 6px -4px rgba(var(--dorado-rgb), .3); }
+.shadow-lg.shadow-rose\/40 { box-shadow: 0 10px 15px -3px rgba(var(--rosa-rgb), .4), 0 4px 6px -4px rgba(var(--rosa-rgb), .4); }
 .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0,0,0,.5); }
 
 /* ---- misc ---- */

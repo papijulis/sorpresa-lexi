@@ -1,44 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <defs>
-    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
-      <stop offset="0%" stop-color="#3a1458"/>
-      <stop offset="55%" stop-color="#18062B"/>
-      <stop offset="100%" stop-color="#090112"/>
-    </radialGradient>
-    <linearGradient id="petal" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#FEF08A"/>
-      <stop offset="100%" stop-color="#F59E0B"/>
-    </linearGradient>
-    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#FFE9A8" stop-opacity="0.55"/>
-      <stop offset="100%" stop-color="#FFE9A8" stop-opacity="0"/>
-    </radialGradient>
-  </defs>
-
+<defs>
+  <radialGradient id="bg" cx="50%" cy="38%" r="85%"><stop offset="0%" stop-color="#3a1458"/><stop offset="55%" stop-color="#18062B"/><stop offset="100%" stop-color="#090112"/></radialGradient>
+  <linearGradient id="petal" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stop-color="#F59E0B"/><stop offset="100%" stop-color="#FEF08A"/></linearGradient>
+  <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFE9A8" stop-opacity=".5"/><stop offset="100%" stop-color="#FFE9A8" stop-opacity="0"/></radialGradient>
+</defs>
   <rect width="512" height="512" fill="url(#bg)"/>
-  <circle cx="256" cy="256" r="150" fill="url(#glow)"/>
-
-  <g transform="translate(256,266) scale(0.62)">
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(0)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(60)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(120)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(180)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(240)"/>
-    <path d="M0,0 C34,-12 44,-62 0,-128 C-44,-62 -34,-12 0,0 Z" fill="url(#petal)" stroke="#B45309" stroke-width="3" transform="rotate(300)"/>
-
-    <line x1="0" y1="0" x2="0" y2="-62" stroke="#D97706" stroke-width="5" stroke-linecap="round" transform="rotate(0)"/>
-    <circle cx="0" cy="-62" r="7" fill="#B45309" transform="rotate(0)"/>
-    <line x1="0" y1="0" x2="0" y2="-62" stroke="#D97706" stroke-width="5" stroke-linecap="round" transform="rotate(60)"/>
-    <circle cx="0" cy="-62" r="7" fill="#B45309" transform="rotate(60)"/>
-    <line x1="0" y1="0" x2="0" y2="-62" stroke="#D97706" stroke-width="5" stroke-linecap="round" transform="rotate(120)"/>
-    <circle cx="0" cy="-62" r="7" fill="#B45309" transform="rotate(120)"/>
-    <line x1="0" y1="0" x2="0" y2="-62" stroke="#D97706" stroke-width="5" stroke-linecap="round" transform="rotate(180)"/>
-    <circle cx="0" cy="-62" r="7" fill="#B45309" transform="rotate(180)"/>
-    <line x1="0" y1="0" x2="0" y2="-62" stroke="#D97706" stroke-width="5" stroke-linecap="round" transform="rotate(240)"/>
-    <circle cx="0" cy="-62" r="7" fill="#B45309" transform="rotate(240)"/>
-    <line x1="0" y1="0" x2="0" y2="-62" stroke="#D97706" stroke-width="5" stroke-linecap="round" transform="rotate(300)"/>
-    <circle cx="0" cy="-62" r="7" fill="#B45309" transform="rotate(300)"/>
-
-    <circle cx="0" cy="0" r="19" fill="#B45309"/>
-  </g>
+  <g transform="translate(256 226)"><circle r="112" fill="url(#glow)"/><path d="M0 0C31.5 -28 23.1 -72 0 -100C-23.1 -72 -31.5 -28 0 0Z" transform="rotate(0)" fill="url(#petal)" stroke="#B45309" stroke-width="2.2"/><path d="M0 0C31.5 -28 23.1 -72 0 -100C-23.1 -72 -31.5 -28 0 0Z" transform="rotate(60)" fill="url(#petal)" stroke="#B45309" stroke-width="2.2"/><path d="M0 0C31.5 -28 23.1 -72 0 -100C-23.1 -72 -31.5 -28 0 0Z" transform="rotate(120)" fill="url(#petal)" stroke="#B45309" stroke-width="2.2"/><path d="M0 0C31.5 -28 23.1 -72 0 -100C-23.1 -72 -31.5 -28 0 0Z" transform="rotate(180)" fill="url(#petal)" stroke="#B45309" stroke-width="2.2"/><path d="M0 0C31.5 -28 23.1 -72 0 -100C-23.1 -72 -31.5 -28 0 0Z" transform="rotate(240)" fill="url(#petal)" stroke="#B45309" stroke-width="2.2"/><path d="M0 0C31.5 -28 23.1 -72 0 -100C-23.1 -72 -31.5 -28 0 0Z" transform="rotate(300)" fill="url(#petal)" stroke="#B45309" stroke-width="2.2"/><g transform="rotate(17.2)"><path d="M0 0V-55" stroke="#D97706" stroke-width="1.6" fill="none"/><circle cy="-55" r="5" fill="#D97706"/></g><g transform="rotate(77.2)"><path d="M0 0V-55" stroke="#D97706" stroke-width="1.6" fill="none"/><circle cy="-55" r="5" fill="#D97706"/></g><g transform="rotate(137.2)"><path d="M0 0V-55" stroke="#D97706" stroke-width="1.6" fill="none"/><circle cy="-55" r="5" fill="#D97706"/></g><g transform="rotate(197.2)"><path d="M0 0V-55" stroke="#D97706" stroke-width="1.6" fill="none"/><circle cy="-55" r="5" fill="#D97706"/></g><g transform="rotate(257.2)"><path d="M0 0V-55" stroke="#D97706" stroke-width="1.6" fill="none"/><circle cy="-55" r="5" fill="#D97706"/></g><g transform="rotate(317.2)"><path d="M0 0V-55" stroke="#D97706" stroke-width="1.6" fill="none"/><circle cy="-55" r="5" fill="#D97706"/></g><circle r="14" fill="#B45309"/></g>
+  <path d="M342 392L341.74 395.85L340.97 399.62L339.71 403.24L338 406.64L335.89 409.78L333.42 412.6L330.66 415.07L327.67 417.18L324.5 418.92L321.21 420.29L317.84 421.31L314.45 421.98L311.06 422.33L307.71 422.39L304.42 422.19L301.2 421.74L298.07 421.07L295.04 420.22L292.11 419.19L289.28 418.02L286.55 416.72L283.93 415.31L281.39 413.8L278.95 412.21L276.6 410.56L274.31 408.84L272.1 407.08L269.95 405.27L267.86 403.43L265.81 401.57L263.8 399.68L261.82 397.77L259.87 395.85L257.93 393.93L256 392L254.07 390.07L252.13 388.15L250.18 386.23L248.2 384.32L246.19 382.43L244.14 380.57L242.05 378.73L239.9 376.92L237.69 375.16L235.4 373.44L233.05 371.79L230.61 370.2L228.07 368.69L225.45 367.28L222.72 365.98L219.89 364.81L216.96 363.78L213.93 362.93L210.8 362.26L207.58 361.81L204.29 361.61L200.94 361.67L197.55 362.02L194.16 362.69L190.79 363.71L187.5 365.08L184.33 366.82L181.34 368.93L178.58 371.4L176.11 374.22L174 377.36L172.29 380.76L171.03 384.38L170.26 388.15L170 392L170.26 395.85L171.03 399.62L172.29 403.24L174 406.64L176.11 409.78L178.58 412.6L181.34 415.07L184.33 417.18L187.5 418.92L190.79 420.29L194.16 421.31L197.55 421.98L200.94 422.33L204.29 422.39L207.58 422.19L210.8 421.74L213.93 421.07L216.96 420.22L219.89 419.19L222.72 418.02L225.45 416.72L228.07 415.31L230.61 413.8L233.05 412.21L235.4 410.56L237.69 408.84L239.9 407.08L242.05 405.27L244.14 403.43L246.19 401.57L248.2 399.68L250.18 397.77L252.13 395.85L254.07 393.93L256 392L257.93 390.07L259.87 388.15L261.82 386.23L263.8 384.32L265.81 382.43L267.86 380.57L269.95 378.73L272.1 376.92L274.31 375.16L276.6 373.44L278.95 371.79L281.39 370.2L283.93 368.69L286.55 367.28L289.28 365.98L292.11 364.81L295.04 363.78L298.07 362.93L301.2 362.26L304.42 361.81L307.71 361.61L311.06 361.67L314.45 362.02L317.84 362.69L321.21 363.71L324.5 365.08L327.67 366.82L330.66 368.93L333.42 371.4L335.89 374.22L338 377.36L339.71 380.76L340.97 384.38L341.74 388.15L342 392Z" fill="none" stroke="#FFD700" stroke-width="7" stroke-linejoin="round" opacity=".92"/>
 </svg>
