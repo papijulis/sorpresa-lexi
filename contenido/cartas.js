@@ -67,6 +67,17 @@ window.CARTAS = [
     borrador: true,
   },
   {
+    id: "mes-6",
+    titulo: "Seis meses",
+    tipo: "mesiversario",
+    apertura: "2026-11-28",
+    sello: "corazon",
+    texto: "Lexi:\n\nSeis meses. Hace seis meses un \"Holaaa, Lexi? Soy Julio\" tuvo la mejor respuesta posible: un \"La misma\". Yo no sabía que ese mensaje iba a cambiarme los días.\n\nMe gusta repasar lo que hemos vivido desde entonces, porque cada cosa tiene tu nombre: el primer atardecer que te dediqué y todos los que han venido después, Panchito llegando a tus manos, el ramo que te di y el que te hice yo mismo, tan feo y tan nuestro que terminó siendo la foto de mi chat. Los girasoles y tu primera carta. Colomos. El concierto de Taylor, y yo llorando de felicidad al verte. Tus uñas con una J: \"las escogí por ti\".\n\nPero lo que más quiero de estos seis meses no son solo los días grandes. Son los chiquitos: los buldaks y las películas, el 11:11, las canciones que ya son nuestras, vivir a diez minutos de ti y aun así extrañarte. Me pediste tiempo el primer día, y todavía no me canso de dártelo.\n\nMe dijiste que esta página iba a ser tu lugar seguro, y es de lo más bonito que me han dicho. Así que aquí te dejo, a mitad de nuestro primer año, lo mismo que te prometí desde el principio: no voy a prometerte cosas, te las voy a demostrar.\n\nGracias por estos seis meses, por quedarte y por dejarme amarte. Todavía nos falta la cabaña de Navidad, y muchos meses más por escribir.\n\nFeliz mesiversario, Lexi. Hoy, mañana y siempre.\n\nJulio",
+    foto: "./assets/img/fondo-chat.jpeg",
+    cancion: "Lover",
+    borrador: true,
+  },
+  {
     id: "abre-triste",
     titulo: "Ábrela cuando estés triste",
     tipo: "abre-cuando",
