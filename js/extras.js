@@ -216,17 +216,27 @@ function applyNightMode() {
   const moonEl = document.getElementById('night-moon');
   if (!cieloNocturnoListo) {
     cieloNocturnoListo = true;
-    for (let i = 0; i < 36; i++) {
+    const via = document.createElement('div');
+    via.className = 'night-via';
+    nightLayer.insertBefore(via, moonEl);
+    const total = LIGHT_MODE ? 40 : (vw < 640 ? 64 : 110);
+    for (let i = 0; i < total; i++) {
       const star = document.createElement('div');
-      star.className = 'night-star';
-      const size = rand(1, 2.6);
+      const r = Math.random(), tono = Math.random();
+      star.className = 'night-star' + (tono < 0.18 ? ' azul' : tono < 0.3 ? ' dorada' : '') + (r < 0.07 ? ' grande' : '');
+      const size = r < 0.07 ? rand(2.4, 3.4) : rand(0.8, 2);
       star.style.width = size + 'px';
       star.style.height = size + 'px';
       star.style.left = rand(0, 100) + '%';
-      star.style.top = rand(0, 68) + '%';
+      star.style.top = rand(0, 74) + '%';
+      star.style.animationDuration = rand(2.4, 5.4).toFixed(2) + 's';
       star.style.animationDelay = rand(0, 3).toFixed(2) + 's';
       nightLayer.insertBefore(star, moonEl);
     }
+    const fugaz = document.createElement('div');
+    fugaz.className = 'night-fugaz';
+    fugaz.setAttribute('aria-hidden', 'true');
+    nightLayer.insertBefore(fugaz, moonEl);
   }
   const vieja = nightLayer.querySelector('.night-constellation');
   if (vieja) vieja.remove();

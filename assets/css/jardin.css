@@ -2,25 +2,50 @@
   .frase-del-dia { opacity: 0; transform: translateY(10px); transition: opacity 1.4s ease, transform 1.4s ease; }
   .frase-del-dia.in { opacity: .85; transform: translateY(0); }
 
-  /* ---- cielo nocturno ---- */
+  /* ---- cielo nocturno (punto 8): índigo profundo, vía láctea, estrellas de tres tonos,
+     luna grande con halo y una estrella fugaz de vez en cuando ---- */
   #bg-layer-night {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: radial-gradient(circle at 50% 8%, #130d33 0%, var(--ciruela-900) 55%, #03000a 100%);
+    position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    background:
+      radial-gradient(ellipse 90% 40% at 50% 108%, rgba(var(--amatista-rgb), .22), transparent 70%),
+      radial-gradient(circle at 50% 6%, var(--ciruela-700) 0%, var(--ciruela-800) 42%, var(--ciruela-900) 78%, var(--ciruela-950) 100%);
     opacity: 0; transition: opacity 1.6s ease;
   }
   body.night-mode #bg-layer-day { opacity: 0; }
   body.night-mode #bg-layer-night { opacity: 1; }
   body.sunset-mode #bg-layer-night { opacity: 0; }
+  .night-via {
+    position: absolute; left: -25%; right: -25%; top: 16%; height: 36%; transform: rotate(-24deg);
+    background: radial-gradient(ellipse at 50% 50%, rgba(var(--orquidea-rgb), .17), rgba(var(--amatista-rgb), .07) 46%, transparent 72%);
+    filter: blur(18px);
+  }
   @keyframes starTwinkle { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
   .night-star { position: absolute; border-radius: 50%; background: var(--pergamino-50); animation: starTwinkle 3.2s ease-in-out infinite; }
+  .night-star.azul { background: var(--lavanda-200); }
+  .night-star.dorada { background: var(--dorado-500); }
+  .night-star.grande { box-shadow: 0 0 6px 1px rgba(var(--pergamino-rgb), .55); }
+  .night-fugaz {
+    position: absolute; width: 130px; height: 2px; border-radius: 2px; opacity: 0;
+    background: linear-gradient(to right, var(--pergamino-50), rgba(var(--pergamino-rgb), 0));
+    transform: rotate(-35deg);
+  }
+  .night-fugaz.go { animation: estrellaFugaz 1.3s ease-out forwards; }
+  @keyframes estrellaFugaz {
+    0% { opacity: 0; transform: translate(0, 0) rotate(-35deg); }
+    12% { opacity: 1; }
+    100% { opacity: 0; transform: translate(-240px, 168px) rotate(-35deg); }
+  }
   #night-moon {
-    position: absolute; top: 9%; right: 11%; font-size: 2.4rem; line-height: 1;
+    position: absolute; top: 8%; right: 10%; font-size: 3.6rem; line-height: 1; color: var(--pergamino-50);
     background: none; border: none; padding: .6rem; cursor: pointer; pointer-events: none;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,.4));
-    animation: moonGlow 4.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px rgba(var(--pergamino-rgb), .5)) drop-shadow(0 0 40px rgba(var(--orquidea-rgb), .5));
+    animation: moonGlow 5s ease-in-out infinite;
   }
   body.night-mode:not(.sunset-mode) #night-moon { pointer-events: auto; }
-  @keyframes moonGlow { 0%, 100% { filter: drop-shadow(0 0 8px rgba(255,255,255,.35)); } 50% { filter: drop-shadow(0 0 18px rgba(255,255,255,.65)); } }
+  @keyframes moonGlow {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(var(--pergamino-rgb), .4)) drop-shadow(0 0 32px rgba(var(--orquidea-rgb), .4)); }
+    50% { filter: drop-shadow(0 0 14px rgba(var(--pergamino-rgb), .7)) drop-shadow(0 0 54px rgba(var(--orquidea-rgb), .65)); }
+  }
 
   /* ---- línea de tiempo ---- */
   .timeline-wrap { position: relative; max-width: 640px; margin: 0 auto; }

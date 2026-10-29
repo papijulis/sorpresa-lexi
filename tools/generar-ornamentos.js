@@ -94,6 +94,7 @@ const HEART24 = 'M12 20.2S4.5 15.6 4.5 10a4.1 4.1 0 0 1 7.5-2.3A4.1 4.1 0 0 1 19
 const ICONOS = {
   sol: L(`<circle cx="12" cy="12" r="4.2"/><path d="${rayos(12, 12, 7.2, 9.6, 8)}"/>`),
   luna: L('<path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.8 6.8 0 0 0 10.2 10.2z"/>'),
+  'luna-solida': `<path d="M20 14.2A8.5 8.5 0 1 1 9.8 4a6.8 6.8 0 0 0 10.2 10.2z" fill="currentColor"/>`,
   atardecer: L('<path d="M6.8 15.5a5.2 5.2 0 0 1 10.4 0"/><path d="M3 15.5h18M6 19h12"/><path d="M12 5.2v2.3M5.4 8.4l1.6 1.6M18.6 8.4L17 10M3.4 12h2M18.6 12h2"/>'),
   sobre: L('<rect x="3" y="5.5" width="18" height="13" rx="2.6"/><path d="M3.6 7.6 12 13.4l8.4-5.8"/>'),
   'sobre-corazon': L('<rect x="3" y="5.5" width="18" height="13" rx="2.6"/><path d="M3.6 7.6 12 13.4l8.4-5.8"/><path d="M12 17.2s-2.2-1.4-2.2-3a1.2 1.2 0 0 1 2.2-.7 1.2 1.2 0 0 1 2.200.7c0 1.600-2.200 3-2.200 3z" fill="currentColor" stroke="none"/>'),

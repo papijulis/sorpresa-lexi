@@ -72,9 +72,9 @@ main { padding-bottom: 5.5rem; }
 /* ícono del cielo: sol / atardecer / luna según el estado */
 .cielo-ico { position: relative; width: 1.55rem; height: 1.55rem; }
 .cielo-ico .ico { position: absolute; inset: 0; transition: opacity .5s ease, transform .6s var(--ease-flor); opacity: 0; transform: rotate(-70deg) scale(.5); }
-body[data-cielo="dia"] .cielo-ico .i-sol,
-body[data-cielo="atardecer"] .cielo-ico .i-atardecer,
-body[data-cielo="noche"] .cielo-ico .i-luna { opacity: 1; transform: none; }
+[data-cielo="dia"] .cielo-ico .i-sol,
+[data-cielo="atardecer"] .cielo-ico .i-atardecer,
+[data-cielo="noche"] .cielo-ico .i-luna { opacity: 1; transform: none; }
 
 /* ---------- Caminos del jardín ---------- */
 .caminos-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; max-width: 64rem; margin: 0 auto; }

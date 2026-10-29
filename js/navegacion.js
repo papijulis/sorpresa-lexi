@@ -12,6 +12,7 @@
 const CIELOS = ['dia', 'atardecer', 'noche'];
 const CIELO_ETIQUETA = { dia: 'Día', atardecer: 'Atardecer', noche: 'Noche' };
 let cieloActual = 'dia';
+const THEME_COLOR = { dia: '#18062B', atardecer: '#5C182B', noche: '#0B1130' };
 
 function cieloAutomatico() {
   const h = mexicoCityHour();
@@ -31,17 +32,20 @@ function actualizarCieloUI() {
 
 function setCielo(estado, silencioso) {
   if (!CIELOS.includes(estado)) return;
-  const eraAtardecer = isSunset;
+  const eraAtardecer = isSunset, eraNoche = isNight;
   cieloActual = estado;
   isSunset = estado === 'atardecer';
+  isNight = estado === 'noche';
   document.body.classList.toggle('sunset-mode', isSunset);
-  document.body.classList.toggle('night-mode', estado === 'noche');
-  document.body.dataset.cielo = estado;
-  if (estado === 'noche') applyNightMode();
-  if (eraAtardecer !== isSunset) {
-    particles = [];
-    if (!isSunset) { fireflies = []; birds = []; }
-  }
+  document.body.classList.toggle('night-mode', isNight);
+  /* en <html>: así los tokens de color (tokens.css) cambian de paleta con el cielo */
+  document.documentElement.dataset.cielo = estado;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', THEME_COLOR[estado]);
+  if (isNight) applyNightMode();
+  if (eraAtardecer !== isSunset || eraNoche !== isNight) particles = [];
+  if (!isSunset && !isNight) fireflies = [];
+  if (!isSunset) birds = [];
   actualizarCieloUI();
   if (!silencioso && estado === 'atardecer') showToast(SUNSET_TOAST_TEXT);
 }
@@ -54,6 +58,19 @@ document.getElementById('camino-cielo-botones').addEventListener('click', (e) =>
   if (b) setCielo(b.dataset.cielo);
 });
 setCielo(cieloAutomatico(), true);
+
+/* ---- estrella fugaz: de vez en cuando cruza el cielo de noche ---- */
+const SIN_MOVIMIENTO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function lanzarFugaz() {
+  const el = document.querySelector('.night-fugaz');
+  if (!el || !isNight || document.hidden || canvasPauseReasons.size || SIN_MOVIMIENTO) return;
+  el.style.top = rand(4, 34).toFixed(1) + '%';
+  el.style.left = rand(40, 92).toFixed(1) + '%';
+  el.classList.remove('go');
+  void el.offsetWidth;
+  el.classList.add('go');
+}
+setInterval(() => { if (Math.random() < 0.65) lanzarFugaz(); }, 8000);
 
 /* ---- Caminos: Buzón y Juegos ---- */
 document.getElementById('camino-buzon').addEventListener('click', openBuzonView);

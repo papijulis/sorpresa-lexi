@@ -6,6 +6,26 @@
    Paleta: ciruela (fondo) · amatista/orquídea (acento) · dorado (luz) ·
    rosa (cariño) · pergamino (papel). Morado = color favorito de Lexi.
 ====================================================================== */
+/* Tokens que cambian de tema (día ↔ noche) se registran como <color>/<number>#
+   para que el cambio de cielo los interpole suavemente en vez de saltar. */
+@property --ciruela-950 { syntax: '<color>'; inherits: true; initial-value: #05000a; }
+@property --ciruela-900 { syntax: '<color>'; inherits: true; initial-value: #090112; }
+@property --ciruela-800 { syntax: '<color>'; inherits: true; initial-value: #18062B; }
+@property --ciruela-700 { syntax: '<color>'; inherits: true; initial-value: #270D42; }
+@property --amatista-500 { syntax: '<color>'; inherits: true; initial-value: #A855F7; }
+@property --orquidea-400 { syntax: '<color>'; inherits: true; initial-value: #C084FC; }
+@property --lavanda-200 { syntax: '<color>'; inherits: true; initial-value: #E9D5FF; }
+@property --dorado-500 { syntax: '<color>'; inherits: true; initial-value: #FFD700; }
+@property --dorado-400 { syntax: '<color>'; inherits: true; initial-value: #FACC15; }
+@property --pergamino-50 { syntax: '<color>'; inherits: true; initial-value: #FDFBF7; }
+@property --pergamino-100 { syntax: '<color>'; inherits: true; initial-value: #F5EBE1; }
+@property --dorado-rgb { syntax: '<number>#'; inherits: true; initial-value: 255, 215, 0; }
+@property --amatista-rgb { syntax: '<number>#'; inherits: true; initial-value: 168, 85, 247; }
+@property --orquidea-rgb { syntax: '<number>#'; inherits: true; initial-value: 192, 132, 252; }
+@property --pergamino-rgb { syntax: '<number>#'; inherits: true; initial-value: 253, 251, 247; }
+@property --ciruela-rgb { syntax: '<number>#'; inherits: true; initial-value: 9, 1, 18; }
+@property --abismo-rgb { syntax: '<number>#'; inherits: true; initial-value: 5, 0, 10; }
+
 :root {
   /* ---- ciruela: fondos ---- */
   --ciruela-950: #05000a;
@@ -92,3 +112,17 @@
   --fuente-titulo: 'Playfair Display', serif;
   --fuente-ui: 'Inter', sans-serif;
 }
+
+/* ---- tema NOCHE (punto 8): índigo profundo, plata lunar y un dorado más tenue.
+   Va sobre :root (no sobre body) para que los degradados y sombras derivados
+   (--grad-*, --brillo-*) se vuelvan a calcular con la paleta nocturna. ---- */
+:root { transition: --ciruela-950 1.4s ease, --ciruela-900 1.4s ease, --ciruela-800 1.4s ease, --ciruela-700 1.4s ease, --amatista-500 1.4s ease, --orquidea-400 1.4s ease, --lavanda-200 1.4s ease, --dorado-500 1.4s ease, --dorado-400 1.4s ease, --pergamino-50 1.4s ease, --pergamino-100 1.4s ease, --dorado-rgb 1.4s ease, --amatista-rgb 1.4s ease, --orquidea-rgb 1.4s ease, --pergamino-rgb 1.4s ease, --ciruela-rgb 1.4s ease, --abismo-rgb 1.4s ease; }
+:root[data-cielo="noche"] {
+  --ciruela-950: #02030b; --ciruela-900: #050818; --ciruela-800: #0b1130; --ciruela-700: #141c4d;
+  --amatista-500: #8B93FF; --orquidea-400: #A9B6FF; --lavanda-200: #DCE3FF;
+  --dorado-500: #FBE7A1; --dorado-400: #EAD07E; --dorado-100: #FFF8E1;
+  --pergamino-50: #F3F6FF; --pergamino-100: #E3E9FA;
+  --dorado-rgb: 251, 231, 161; --amatista-rgb: 139, 147, 255; --orquidea-rgb: 169, 182, 255;
+  --pergamino-rgb: 243, 246, 255; --ciruela-rgb: 5, 8, 24; --abismo-rgb: 2, 3, 11;
+}
+@media (prefers-reduced-motion: reduce) { :root { transition: none; } }

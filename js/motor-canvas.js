@@ -40,6 +40,7 @@ window.addEventListener('resize', () => {
 resizeCanvas();
 
 let isSunset = false;
+let isNight = false; // cielo de noche (js/navegacion.js → setCielo)
 let SEASON_PALETTE = null; // set from the current month (Fase 4 — temporadas), see end of script
 
 /* Fase 5 — modo ligero automático: si prefiere menos movimiento, o si
@@ -74,12 +75,12 @@ setInterval(() => { windTarget = rand(-1.6, 1.6); }, 5600);
 
 /* ---- petals ---- */
 function spawnPetal() {
-  const palette = isSunset ? ['#F59E0B', '#FB7185', '#FFD700'] : (SEASON_PALETTE || ['#FFD700', '#FACC15', '#E9D5FF']);
+  const palette = isSunset ? ['#F59E0B', '#FB7185', '#FFD700'] : isNight ? ['#DCE3FF', '#A9B6FF', '#FBE7A1'] : (SEASON_PALETTE || ['#FFD700', '#FACC15', '#E9D5FF']);
   particles.push({
     x: rand(0, vw),
     y: isSunset ? vh + 20 : -20,
     size: rand(6, 13),
-    speedY: rand(0.4, 1.1) * (isSunset ? -1 : 1),
+    speedY: rand(0.4, 1.1) * (isSunset ? -1 : 1) * (isNight ? 0.7 : 1),
     speedX: rand(-0.4, 0.4),
     rot: rand(0, Math.PI * 2),
     rotSpeed: rand(-0.02, 0.02),
@@ -110,7 +111,7 @@ function updateParticles(t) {
       particles.splice(i, 1);
     }
   }
-  if (particles.length < PARTICLE_CAP && t - lastPetalSpawn > 260) { spawnPetal(); lastPetalSpawn = t; }
+  if (particles.length < (isNight ? Math.round(PARTICLE_CAP * 0.6) : PARTICLE_CAP) && t - lastPetalSpawn > 260) { spawnPetal(); lastPetalSpawn = t; }
 }
 
 /* ---- botanical bezier lily ---- */
@@ -183,7 +184,7 @@ function drawLily(b) {
   if (b.progress <= 0) return;
   const p = Math.min(1, b.progress);
   const y = b.renderY !== undefined ? b.renderY : b.y;
-  const baseAlpha = b.alpha !== undefined ? b.alpha : 1;
+  const baseAlpha = (b.alpha !== undefined ? b.alpha : 1) * (isNight ? 0.8 : 1); // de noche los lirios brillan menos
 
   if (p >= 1) {
     if (!b.sprite) buildLilySprite(b);
@@ -338,12 +339,12 @@ function drawButterfly(b) {
   ctx.restore();
 }
 
-/* ---- fireflies (sunset mode) ---- */
+/* ---- fireflies (atardecer y noche) ---- */
 function spawnFirefly() {
   fireflies.push({ x: rand(0, vw), y: rand(vh * 0.2, vh), vx: rand(-0.15, 0.15), vy: rand(-0.2, -0.05), phase: rand(0, Math.PI * 2) });
 }
 function updateFireflies(t) {
-  if (isSunset && fireflies.length < FIREFLY_CAP && Math.random() < 0.05) spawnFirefly();
+  if ((isSunset || isNight) && fireflies.length < FIREFLY_CAP && Math.random() < 0.05) spawnFirefly();
   for (let i = fireflies.length - 1; i >= 0; i--) {
     const f = fireflies[i];
     f.x += f.vx; f.y += f.vy;
@@ -354,8 +355,9 @@ function drawFirefly(f, t) {
   const glow = 0.4 + Math.sin(t / 400 + f.phase) * 0.4;
   ctx.save();
   ctx.globalAlpha = Math.max(0.05, glow);
-  ctx.fillStyle = '#FFD700';
-  if (!LIGHT_MODE) { ctx.shadowColor = '#FFD700'; ctx.shadowBlur = 10; }
+  const luz = isNight ? '#FBE7A1' : '#FFD700';
+  ctx.fillStyle = luz;
+  if (!LIGHT_MODE) { ctx.shadowColor = luz; ctx.shadowBlur = 10; }
   ctx.beginPath(); ctx.arc(f.x, f.y, 2, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
@@ -399,7 +401,7 @@ const isDesktopPointer = window.matchMedia('(pointer: fine)').matches;
 const TRAIL_LIFE_MS = 480;
 function drawTopLayer() {
   if (cursorTrail.length) {
-    cursorCtx.fillStyle = isSunset ? '#FB7185' : '#FFD700';
+    cursorCtx.fillStyle = isSunset ? '#FB7185' : isNight ? '#DCE3FF' : '#FFD700';
     cursorTrail.forEach((c) => {
       cursorCtx.globalAlpha = Math.max(0, c.life) * 0.6;
       cursorCtx.beginPath();

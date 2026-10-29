@@ -163,13 +163,23 @@ existente en vez de agregar uno nuevo:
   están declaradas junto a `isSunset` para que `spawnPetal()` las pueda
   leer sin importar en qué orden se definan las funciones.
 - **Cielo (día · atardecer · noche)**: `setCielo(estado)` (`js/navegacion.js`)
-  es el único que cambia `body.sunset-mode` / `body.night-mode` (son
-  excluyentes), `isSunset` y `body[data-cielo]`. Al abrir, sigue la hora de
-  Ciudad de México (20:00–6:00 → noche, si no día; sin guardarse); después
-  Lexi lo cambia con el botón del dock (cicla) o con la escena "El cielo".
-  `applyNightMode()` (extras.js) solo construye las estrellas (una vez) y
-  la constelación; ya no decide por hora. La luna (`#night-moon`) solo es
-  clicable (`pointer-events`) con `night-mode` activo.
+  es el único que cambia `body.sunset-mode` / `body.night-mode` (excluyentes),
+  `isSunset`, `isNight` (motor-canvas.js) y `<html data-cielo>`. Al abrir, sigue
+  la hora de Ciudad de México (20:00–6:00 → noche, si no día; sin guardarse);
+  después Lexi lo cambia con el botón del dock (cicla) o con la escena "El cielo".
+- **Tema NOCHE (punto 8)**: `:root[data-cielo="noche"]` en `tokens.css` redefine
+  los tokens de color (índigo profundo, amatista→azul periwinkle, dorado→champán
+  lunar, pergamino frío). Va en `:root`, no en `body`, para que `--grad-*` y
+  `--brillo-*` se recalculen. Los tokens que cambian están registrados con
+  `@property` para interpolar en 1.4 s al cambiar de cielo; sin soporte, saltan.
+  Cielo: `applyNightMode()` (extras.js) construye una vez la vía láctea, 110
+  estrellas (64 en móvil, 40 en modo ligero; azules/doradas/grandes) y la
+  estrella fugaz (`lanzarFugaz()` en navegacion.js, cada ~8 s, nunca con vistas
+  abiertas ni con reduced-motion); la constelación se vuelve a dibujar cada vez
+  que se entra a la noche. Canvas: pétalos lavanda/champán más lentos y 60 %
+  de cantidad, luciérnagas también de noche, lirios al 80 %, rastro del cursor
+  lavanda. `<meta theme-color>` cambia con el cielo. La luna (`#night-moon`,
+  ícono `i-luna-solida`) solo es clicable con `night-mode` activo.
 - **Corazones al escribir "te amo"**: tiene su propio arreglo
   (`heartRain`) y sus propias `updateHeartRain()`/`drawHeartRainItem()`,
   enganchadas al `loop()` del canvas ya existente — no reutiliza
