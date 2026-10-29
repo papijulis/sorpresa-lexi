@@ -1,0 +1,83 @@
+/* ======================================================================
+   PORTADA EN CAPAS (bloque 2 del rediseño)
+   Escena fija detrás del contenido, con parallax de scroll y de puntero:
+     sol/luna (según la hora) · colinas lejanas · colinas medias · hierba con
+     lirios en silueta · lirios grandes al frente (sobre el canvas de pétalos).
+   Todo se desvanece al bajar del inicio (--fade). Los colores salen de los
+   tokens, así la noche la recolorea sola; el color de la luz (--sol-rgb) lo
+   escribe js/portada.js según el cielo y la hora de Ciudad de México.
+====================================================================== */
+@property --sol-rgb { syntax: '<number>#'; inherits: true; initial-value: 255, 215, 0; }
+@property --sol-a { syntax: '<number>'; inherits: true; initial-value: .5; }
+
+#portada, #portada-frente {
+  position: fixed; inset: 0; pointer-events: none; overflow: hidden;
+  opacity: var(--fade, 1);
+}
+#portada { z-index: 1; --sol-x: 50%; --sol-y: 20%; transition: --sol-rgb 2.4s ease, --sol-a 2.4s ease; }
+#portada-frente { z-index: 3; }
+#portada.oculta, #portada-frente.oculta { visibility: hidden; }
+/* la escena aparece cuando empieza el recorrido (al elegir canción) */
+#portada > *, #portada-frente > * { transition: opacity 2.2s ease; }
+body.locked #portada > *, body.locked #portada-frente > * { opacity: 0; }
+
+/* ---- luz: resplandor + disco ---- */
+.p-sol {
+  position: absolute; left: var(--sol-x); top: var(--sol-y); width: 120vmax; height: 120vmax;
+  margin: -60vmax 0 0 -60vmax; border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--sol-rgb), var(--sol-a)) 0%, rgba(var(--sol-rgb), .14) 22%, transparent 52%);
+  transition: left 2.6s var(--ease-flor), top 2.6s var(--ease-flor);
+  transform: translate3d(calc(var(--mx, 0) * -10px), calc(var(--sy, 0) * -.02px * var(--par, 1)), 0);
+}
+.p-disco {
+  position: absolute; left: var(--sol-x); top: var(--sol-y); width: 3.2rem; height: 3.2rem; margin: -1.6rem 0 0 -1.6rem; border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--pergamino-rgb), .95) 0%, rgba(var(--sol-rgb), .95) 55%, rgba(var(--sol-rgb), 0) 72%);
+  transition: left 2.6s var(--ease-flor), top 2.6s var(--ease-flor), opacity 1.6s ease;
+}
+[data-cielo="noche"] .p-disco { opacity: 0 !important; } /* de noche la luna ya vive en el cielo */
+
+/* ---- capas con parallax ---- */
+.p-capa {
+  position: absolute; left: -4%; right: -4%; bottom: 0; will-change: transform;
+  transform: translate3d(calc(var(--mx, 0) * var(--px, 8) * 1px), calc(var(--sy, 0) * var(--vy, .1) * -1px * var(--par, 1)), 0);
+}
+.p-capa svg { display: block; width: 100%; overflow: visible; }
+.p-lejos { --px: 6; --vy: .06; }
+.p-medio { --px: 12; --vy: .14; }
+.p-hierba { --px: 22; --vy: .26; }
+.p-lejos svg { height: clamp(15rem, 52vh, 32rem); }
+.p-medio svg { height: clamp(12rem, 42vh, 26rem); }
+.p-hierba svg { height: clamp(13rem, 40vh, 26rem); transform-origin: 50% 100%; animation: brisaHierba 8s ease-in-out infinite alternate; }
+@keyframes brisaHierba { from { transform: skewX(-.7deg); } to { transform: skewX(.9deg); } }
+
+.p-colina { stroke: none; }
+.p-c-lejos { fill: var(--ciruela-700); opacity: .9; }
+.p-c-medio { fill: var(--ciruela-800); }
+.p-rim { fill: none; stroke: rgba(var(--sol-rgb), .38); stroke-width: 1.6; vector-effect: non-scaling-stroke; }
+.p-pasto { fill: var(--ciruela-950); }
+.p-tallo { fill: none; stroke: var(--ciruela-950); stroke-width: 3.4; stroke-linecap: round; }
+.p-silueta { color: var(--ciruela-900); --lirio-centro: var(--ciruela-950); }
+.p-borde { color: rgba(var(--sol-rgb), .55); }
+
+/* ---- lirios grandes al frente (desenfocados: profundidad de campo) ---- */
+.p-flor {
+  position: absolute; width: clamp(13rem, 44vmin, 30rem); height: auto; opacity: .92; filter: blur(2.5px);
+  will-change: transform; animation: brisaFlor 9s ease-in-out infinite alternate;
+}
+.p-flor.izq { left: -9vmin; bottom: -11vmin; --px: 34; --vy: .42; --rot: -16deg; }
+.p-flor.der { right: -12vmin; bottom: -5vmin; width: clamp(10rem, 34vmin, 23rem); --px: 28; --vy: .32; --rot: 20deg; animation-duration: 11s; animation-direction: alternate-reverse; }
+.p-flor { transform: translate3d(calc(var(--mx, 0) * var(--px, 30) * 1px), calc(var(--sy, 0) * var(--vy, .4) * -1px * var(--par, 1)), 0) rotate(var(--rot, 0deg)); }
+@keyframes brisaFlor { from { transform: translate3d(calc(var(--mx, 0) * var(--px, 30) * 1px), calc(var(--sy, 0) * var(--vy, .4) * -1px * var(--par, 1)), 0) rotate(calc(var(--rot, 0deg) - 2deg)); } to { transform: translate3d(calc(var(--mx, 0) * var(--px, 30) * 1px), calc(var(--sy, 0) * var(--vy, .4) * -1px * var(--par, 1)), 0) rotate(calc(var(--rot, 0deg) + 2deg)); } }
+
+/* el texto del inicio se mueve más lento que el scroll y se aclara al irse */
+.hero-panel { transform: translate3d(0, calc(var(--sy, 0) * .12px * var(--par, 1)), 0); }
+
+/* celulares y modo ligero: sin desenfoque ni vaivén */
+@media (max-width: 639px) { .p-flor { filter: none; opacity: .85; } .p-lejos svg { height: clamp(12rem, 40vh, 22rem); } .p-medio svg { height: clamp(10rem, 32vh, 18rem); } }
+body.light-mode .p-flor { filter: none; animation: none; }
+body.light-mode .p-hierba svg { animation: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .p-hierba svg, .p-flor { animation: none; }
+  .p-sol, .p-disco { transition: none; }
+}

@@ -47,6 +47,7 @@ function setCielo(estado, silencioso) {
   if (!isSunset && !isNight) fireflies = [];
   if (!isSunset) birds = [];
   actualizarCieloUI();
+  if (window.Portada) window.Portada.actualizar(estado);
   if (!silencioso && estado === 'atardecer') showToast(SUNSET_TOAST_TEXT);
 }
 

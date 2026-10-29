@@ -216,7 +216,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Componentes** (`assets/css/ornamentos.css`): `.ico`, `.orn-divisor` (el trazo se dibuja con el scroll; se agrega solo bajo cada `.titulo-seccion` o donde pongas `data-orn-divisor`), `.tarjeta-flor` (esquinas de pétalo), `.btn-brillo` (brillo que pasa en botones dorados), flor de precarga, y el lenguaje de movimiento: `.mov-florecer`, `.mov-latido`, `.mov-revelar`, `.mov-halo` (con `prefers-reduced-motion` ya cubierto).
 - **Escenas** (`js/escenas.js`): motor de scroll sin librerías. `data-escena="trazo|pasada"` escribe `--p` (0→1) solo mientras el elemento está en pantalla; `.mov-*`/`data-en-vista` agregan `.en-vista` una vez. `Escenas.registrar(el)` para elementos creados por JS.
 - **Marca** (`node tools/generar-marca.js` + Inkscape, comandos impresos al final): íconos de la app, maskable, favicon y `og.jpg` con la misma flor maestra.
-- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `infinito`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
+- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `portada`, `infinito`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `portada`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
 
 ## Navegación integrada (rediseño, punto 9)
 
@@ -224,6 +224,13 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Caminos del jardín** (`#caminos`, tras el inicio): cuatro escenas SVG en línea con animación CSS — Buzón (bandera arriba si hay cartas nuevas, chip con la cuenta; la pone `updateBuzonDot()`), Rincón de Juegos (invernadero), Tocadiscos (disco y brazo animados según `bgAudio`) y El cielo (astro que viaja según `data-cielo`). Mismas funciones que el dock, no duplican estado.
 - **Iris**: `.app-view` se abre/cierra con `clip-path: circle()` desde `--ox/--oy`, el centro del botón que se tocó (`irisDesde()` en buzon-juegos.js; `openBuzonView(origen)` / `openJuegosView(origen)` aceptan el evento o el elemento). Con `prefers-reduced-motion` es solo un fundido.
 - `js/navegacion.js` carga después de `extras.js` (usa `mexicoCityHour` y `applyNightMode`) y antes de `escenas.js`. Los textos nuevos son rótulos de interfaz ("Caminos del jardín", subtítulos de cada escena), no voz personal.
+
+## Portada en capas (rediseño, bloque 2)
+
+- `#portada` (fija, z 1, antes de la viñeta) y `#portada-frente` (fija, z 3, sobre el canvas de pétalos y bajo `main`): luz (`.p-sol`/`.p-disco`), colinas lejanas y medias, hierba con tallos y lirios en silueta (SVG en `index.html`, generados una sola vez; los colores salen de tokens, así la noche los recolorea) y dos lirios grandes desenfocados al frente. Estilos en `assets/css/portada.css`; lógica en `js/portada.js` (`window.Portada.actualizar(cielo)`, la llama `setCielo()`).
+- **Luz según cielo y hora de Ciudad de México**: día = arco de 6:00 a 18:00 (x 12→88 %, rosa en los extremos y dorado a mediodía; si eligió "día" fuera de horario, mediodía); atardecer = sol bajo ámbar; noche = resplandor plata en la esquina de la luna, sin disco. Se recalcula cada 5 min. `--sol-rgb`/`--sol-a` están registrados con `@property` y la posición transiciona 2.6 s.
+- **Parallax**: scroll → `--sy`, puntero fino → `--mx/--my` (un rAF por movimiento, `js/portada.js`); cada capa tiene `--vy`/`--px`. Todo se desvanece (`--fade`) y se oculta (`.oculta`) al bajar del inicio. `prefers-reduced-motion` pone `--par:0` (sin parallax ni vaivén). Modo ligero (`body.light-mode`) y <640px: sin desenfoque. El panel del inicio se mueve más lento que el scroll.
+- El canvas principal suma unas pocas luciérnagas de día mientras se ve la portada (`updateFireflies`).
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 

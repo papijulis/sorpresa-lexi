@@ -344,7 +344,9 @@ function spawnFirefly() {
   fireflies.push({ x: rand(0, vw), y: rand(vh * 0.2, vh), vx: rand(-0.15, 0.15), vy: rand(-0.2, -0.05), phase: rand(0, Math.PI * 2) });
 }
 function updateFireflies(t) {
-  if ((isSunset || isNight) && fireflies.length < FIREFLY_CAP && Math.random() < 0.05) spawnFirefly();
+  /* atardecer y noche: todas; de día, unas pocas solo mientras se ve la portada */
+  const tope = (isSunset || isNight) ? FIREFLY_CAP : (scrollYCache < vh * 0.9 ? Math.round(FIREFLY_CAP * 0.35) : 0);
+  if (fireflies.length < tope && Math.random() < 0.05) spawnFirefly();
   for (let i = fireflies.length - 1; i >= 0; i--) {
     const f = fireflies[i];
     f.x += f.vx; f.y += f.vy;
