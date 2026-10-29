@@ -1,0 +1,60 @@
+/* ======================================================================
+   LÍNEA DEL TIEMPO PLEGABLE (bloque 5 del rediseño)
+   Los recuerdos se agrupan por mes; cada mes se pliega/despliega y una
+   enredadera (SVG) crece a su lado según vas leyendo: el tallo se dibuja y le
+   salen hojas y zarcillos. Antes medía ~6,800 px en el teléfono; con los meses
+   plegados cabe en una pantalla y media.
+====================================================================== */
+.tl-controles { display: flex; justify-content: center; margin: -.6rem 0 1.4rem; }
+.tl-todo {
+  min-height: 2.75rem; padding: 0 1.1rem; border-radius: var(--radio-pill); cursor: pointer;
+  font-family: var(--fuente-ui); font-size: .8rem; font-weight: 600; color: var(--dorado-500);
+  background: rgba(var(--dorado-rgb), .08); border: 1px solid rgba(var(--dorado-rgb), .3);
+  transition: background var(--dur-rapida) ease;
+}
+@media (hover: hover) { .tl-todo:hover { background: rgba(var(--dorado-rgb), .16); } }
+
+/* ---- la enredadera ---- */
+.tl-vine { position: absolute; left: 0; top: 0; width: 40px; overflow: visible; pointer-events: none; z-index: 0; }
+.tl-vine-track { stroke: rgba(255, 255, 255, .12); stroke-width: 2; stroke-linecap: round; }
+.tl-vine-fill {
+  stroke: var(--dorado-500); stroke-width: 2.4; stroke-linecap: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1; filter: drop-shadow(0 0 5px rgba(var(--dorado-rgb), .45));
+}
+.tl-deco { transform-origin: 0 0; transform: scale(.2); opacity: 0; transition: transform .8s var(--ease-rebote), opacity .6s ease; }
+.tl-deco.lit { transform: scale(1); opacity: 1; }
+.tl-hoja { fill: rgba(var(--oliva-rgb), .7); stroke: rgba(var(--oliva-rgb), .9); stroke-width: .8; }
+.tl-zarcillo { stroke: rgba(var(--orquidea-rgb), .75); stroke-width: 1.5; stroke-linecap: round; }
+
+/* ---- un mes ---- */
+.tl-mes { position: relative; z-index: 1; }
+.tl-mes-h { margin: 0; }
+.tl-mes-btn {
+  display: flex; align-items: center; gap: 1.1rem; width: 100%; min-height: 3.6rem; padding: .35rem .9rem .35rem 0; text-align: left;
+  background: none; border: none; color: var(--pergamino-50); cursor: pointer; border-radius: var(--radio-md);
+}
+.tl-mes-btn .timeline-dot-col { align-self: center; }
+.tl-flor-mes { width: 32px !important; height: 32px !important; }
+.tl-mes-nom { font-family: var(--fuente-display); font-weight: 600; font-size: 1.9rem; line-height: 1; text-shadow: var(--texto-sombra); }
+.tl-mes-nom small { display: block; margin-top: .3rem; font-family: var(--fuente-ui); font-size: .68rem; font-weight: 500; letter-spacing: .12em; color: rgba(var(--pergamino-rgb), .5); }
+.tl-mes-cuenta { margin-left: auto; font-family: var(--fuente-ui); font-size: .72rem; color: rgba(var(--dorado-rgb), .8); white-space: nowrap; }
+.tl-mes-mas { position: relative; flex: none; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .14); }
+.tl-mes-mas::before, .tl-mes-mas::after { content: ''; position: absolute; left: 50%; top: 50%; width: .8rem; height: 1.5px; background: var(--pergamino-50); transform: translate(-50%, -50%); transition: transform .45s var(--ease-flor); }
+.tl-mes-mas::after { transform: translate(-50%, -50%) rotate(90deg); }
+.tl-mes.abierto .tl-mes-mas::after { transform: translate(-50%, -50%) rotate(0deg); }
+@media (hover: hover) { .tl-mes-btn:hover .tl-mes-mas { background: rgba(var(--dorado-rgb), .16); } }
+
+/* panel que se pliega: grid 0fr → 1fr anima la altura sin medirla */
+.tl-panel { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .6s var(--ease-flor), visibility 0s linear .6s; }
+.tl-mes.abierto .tl-panel { grid-template-rows: 1fr; visibility: visible; transition-delay: 0s; }
+.tl-panel-in { min-height: 0; overflow: hidden; padding-top: .3rem; }
+.tl-mes:not(.abierto) .tl-panel-in { padding-top: 0; }
+.tl-mes.abierto { padding-bottom: .4rem; }
+
+.tl-mes.lit .tl-flor-mes { color: var(--dorado-500); transform: scale(1.12) rotate(30deg); filter: drop-shadow(0 0 8px rgba(var(--dorado-rgb), .7)); }
+
+@media (max-width: 639px) { .tl-mes-nom { font-size: 1.7rem; } .tl-mes-cuenta { font-size: .68rem; } }
+@media (prefers-reduced-motion: reduce) {
+  .tl-panel, .tl-deco, .tl-mes-mas::before, .tl-mes-mas::after { transition: none; }
+  .tl-deco { transform: scale(1); opacity: 1; }
+}

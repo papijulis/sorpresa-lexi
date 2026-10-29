@@ -358,9 +358,10 @@ spawnMonthlyFlowers();
 /* ---- línea de tiempo: se ilumina al hacer scroll ---- */
 function renderTimeline() {
   const itemsContainer = document.getElementById('timeline-items');
-  const fillEl = document.getElementById('timeline-fill');
   const wrap = document.querySelector('.timeline-wrap');
-  if (!itemsContainer || !fillEl || !wrap) return;
+  const svg = document.getElementById('timeline-vine');
+  const toggleAll = document.getElementById('tl-toggle-todo');
+  if (!itemsContainer || !wrap || !svg) return;
 
   // Mapeo best-effort entre fechas de MEMORIES y fotos ya existentes en fotos.js
   const PHOTO_BY_DATE = {
@@ -370,52 +371,134 @@ function renderTimeline() {
     '2026-08-18': './assets/img/fondo-chat.jpeg',
     '2026-09-16': './assets/img/viendo-edgerunners.jpeg',
   };
+  const MESES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
-  const itemEls = (window.MEMORIES || []).map((m) => {
-    const el = document.createElement('div');
-    el.className = 'timeline-item';
-    const photo = PHOTO_BY_DATE[m.date];
-    el.innerHTML = `
-      <div class="timeline-dot-col">${ico('lirio-mini', 'timeline-flor')}</div>
-      <div class="timeline-content">
-        <p class="timeline-date">${m.display}</p>
-        <p class="timeline-text">${m.text}</p>
-        ${photo ? pictureHTML(photo, '', 'class="timeline-photo"') : ''}
-      </div>
-    `;
-    itemsContainer.appendChild(el);
-    return el;
+  /* recuerdos agrupados por mes (cronológico); el último mes arranca abierto */
+  const grupos = [];
+  (window.MEMORIES || []).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).forEach((m) => {
+    const key = m.date.slice(0, 7);
+    let g = grupos[grupos.length - 1];
+    if (!g || g.key !== key) { g = { key, anio: key.slice(0, 4), mes: Number(key.slice(5, 7)) - 1, items: [] }; grupos.push(g); }
+    g.items.push(m);
   });
 
-  let tlTop = 0, tlHeight = 0, itemTops = [], tlTicking = false;
-  function measureTimeline() {
+  const litTargets = [];   // encabezados e ítems que se "encienden" al pasar la marca de lectura
+  const mesEls = grupos.map((g, gi) => {
+    const mes = document.createElement('section');
+    mes.className = 'tl-mes' + (gi === grupos.length - 1 ? ' abierto' : '');
+    const panelId = 'tl-panel-' + g.key;
+    const n = g.items.length;
+    mes.innerHTML = `
+      <h3 class="tl-mes-h">
+        <button type="button" class="tl-mes-btn" aria-expanded="${gi === grupos.length - 1}" aria-controls="${panelId}">
+          <span class="timeline-dot-col">${ico('lirio-mini', 'timeline-flor tl-flor-mes')}</span>
+          <span class="tl-mes-nom">${MESES[g.mes]} <small>${g.anio}</small></span>
+          <span class="tl-mes-cuenta">${n} ${n === 1 ? 'recuerdo' : 'recuerdos'}</span>
+          <span class="tl-mes-mas" aria-hidden="true"></span>
+        </button>
+      </h3>
+      <div class="tl-panel" id="${panelId}" role="region"><div class="tl-panel-in"></div></div>`;
+    const inner = mes.querySelector('.tl-panel-in');
+    g.items.forEach((m) => {
+      const el = document.createElement('div');
+      el.className = 'timeline-item';
+      const photo = PHOTO_BY_DATE[m.date];
+      el.innerHTML = `
+        <div class="timeline-dot-col">${ico('lirio-mini', 'timeline-flor')}</div>
+        <div class="timeline-content">
+          <p class="timeline-date">${m.display}</p>
+          <p class="timeline-text">${m.text}</p>
+          ${photo ? pictureHTML(photo, '', 'class="timeline-photo"') : ''}
+        </div>`;
+      inner.appendChild(el);
+      litTargets.push(el);
+    });
+    itemsContainer.appendChild(mes);
+    litTargets.push(mes);
+    return mes;
+  });
+
+  /* ---- plegar / desplegar ---- */
+  function setMes(mes, abrir) {
+    mes.classList.toggle('abierto', abrir);
+    mes.querySelector('.tl-mes-btn').setAttribute('aria-expanded', String(abrir));
+  }
+  function actualizarBotonTodo() {
+    if (!toggleAll) return;
+    const todos = mesEls.every((m) => m.classList.contains('abierto'));
+    toggleAll.textContent = todos ? 'Cerrar todos los meses' : 'Abrir todos los meses';
+  }
+  mesEls.forEach((mes) => {
+    mes.querySelector('.tl-mes-btn').addEventListener('click', () => { setMes(mes, !mes.classList.contains('abierto')); actualizarBotonTodo(); });
+  });
+  if (toggleAll) toggleAll.addEventListener('click', () => {
+    const abrir = !mesEls.every((m) => m.classList.contains('abierto'));
+    mesEls.forEach((m) => setMes(m, abrir));
+    actualizarBotonTodo();
+  });
+  actualizarBotonTodo();
+
+  /* ---- la enredadera: un tallo que se dibuja con el scroll, con hojas y zarcillos ---- */
+  const NS = 'http://www.w3.org/2000/svg';
+  let vineFill = null, decos = [], tlTop = 0, tlHeight = 0, tops = [], tlTicking = false, lastBuiltH = -1;
+  function buildVine(h) {
+    lastBuiltH = h;
+    svg.setAttribute('viewBox', `0 0 40 ${h}`);
+    svg.setAttribute('height', h);
+    let d = 'M20 0';
+    const paso = 120, amp = 5;
+    for (let y = 0, i = 0; y < h; y += paso, i++) {
+      const y2 = Math.min(h, y + paso), dir = i % 2 ? -1 : 1;
+      d += `C${20 + dir * amp * 2} ${(y + paso * 0.33).toFixed(1)} ${20 - dir * amp * 2} ${(y + paso * 0.66).toFixed(1)} 20 ${y2}`;
+    }
+    let html = `<path class="tl-vine-track" d="${d}" fill="none"/><path class="tl-vine-fill" d="${d}" pathLength="1" fill="none"/>`;
+    decos = [];
+    for (let y = 64, k = 0; y < h - 20; y += 78, k++) {
+      const lado = k % 2 ? -1 : 1;
+      const hoja = k % 3 === 2
+        ? '<path class="tl-zarcillo" d="M0 0c6-3 11 1 9 7s-8 4-7-1" fill="none"/>'
+        : '<path class="tl-hoja" d="M0 0Q8-7 17 0Q8 7 0 0Z"/>';
+      html += `<g transform="translate(20 ${y}) scale(${lado} 1) rotate(${-34 + (k % 2) * 10})"><g class="tl-deco" data-y="${y}">${hoja}</g></g>`;
+    }
+    svg.innerHTML = html;
+    vineFill = svg.querySelector('.tl-vine-fill');
+    decos = Array.from(svg.querySelectorAll('.tl-deco')).map((el) => ({ el, y: Number(el.dataset.y), lit: false }));
+  }
+  function measure() {
     const y = window.scrollY;
     const rect = wrap.getBoundingClientRect();
     tlTop = rect.top + y;
     tlHeight = rect.height;
-    itemTops = itemEls.map((el) => el.getBoundingClientRect().top + y);
-    fillEl.style.height = Math.max(0, tlHeight - 16) + 'px';
-    updateTimelineFill();
+    tops = litTargets.map((el) => el.getBoundingClientRect().top + y);
+    const h = Math.max(40, Math.round(tlHeight));
+    if (Math.abs(h - lastBuiltH) > 1) buildVine(h);
+    update();
   }
-  function updateTimelineFill() {
+  function update() {
     tlTicking = false;
-    const y = window.scrollY;
-    const markerY = y + window.innerHeight * 0.75;
+    const markerY = window.scrollY + window.innerHeight * 0.75;
     const filled = clamp(markerY - tlTop, 0, tlHeight);
-    fillEl.style.transform = `scaleY(${tlHeight ? filled / tlHeight : 0})`;
-    for (let i = 0; i < itemEls.length; i++) {
-      const lit = itemTops[i] < markerY;
-      if (lit !== itemEls[i].classList.contains('lit')) itemEls[i].classList.toggle('lit', lit);
+    if (vineFill) vineFill.style.strokeDashoffset = String(1 - (tlHeight ? filled / tlHeight : 0));
+    for (let i = 0; i < decos.length; i++) {
+      const lit = decos[i].y < filled;
+      if (lit !== decos[i].lit) { decos[i].lit = lit; decos[i].el.classList.toggle('lit', lit); }
+    }
+    for (let i = 0; i < litTargets.length; i++) {
+      const lit = tops[i] < markerY;
+      if (lit !== litTargets[i].classList.contains('lit')) litTargets[i].classList.toggle('lit', lit);
     }
   }
-  function onTimelineScroll() {
-    if (!tlTicking) { tlTicking = true; requestAnimationFrame(updateTimelineFill); }
+  function onScroll() { if (!tlTicking) { tlTicking = true; requestAnimationFrame(update); } }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', measure);
+  window.addEventListener('load', measure);
+  /* al plegar/desplegar un mes cambia el alto: se vuelve a medir (un solo cuadro por cambio) */
+  if ('ResizeObserver' in window) {
+    let pendiente = false;
+    new ResizeObserver(() => { if (!pendiente) { pendiente = true; requestAnimationFrame(() => { pendiente = false; measure(); }); } }).observe(wrap);
   }
-  window.addEventListener('scroll', onTimelineScroll, { passive: true });
-  window.addEventListener('resize', measureTimeline);
-  window.addEventListener('load', measureTimeline);
-  setTimeout(measureTimeline, 1500);
-  measureTimeline();
+  setTimeout(measure, 1500);
+  measure();
 }
 renderTimeline();
 

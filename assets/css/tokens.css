@@ -62,6 +62,7 @@
   --pergamino-rgb: 253, 251, 247;
   --ciruela-rgb: 9, 1, 18;
   --abismo-rgb: 5, 0, 10;
+  --oliva-rgb: 132, 148, 79; /* hojas y tallos (el verde del lirio) */
 
   /* ---- degradados de la firma ---- */
   --grad-oro: linear-gradient(to right, var(--dorado-500), var(--dorado-400));

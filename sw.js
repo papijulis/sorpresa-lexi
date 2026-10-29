@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v17';
+const CACHE_VERSION = 'v18';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -35,6 +35,7 @@ const SHELL_URLS = [
   './assets/css/portada.css',
   './assets/css/capitulos.css',
   './assets/css/tipografia.css',
+  './assets/css/linea-tiempo.css',
   './assets/css/base.css',
   './assets/css/componentes.css',
   './assets/css/vistas.css',

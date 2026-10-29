@@ -49,8 +49,6 @@
 
   /* ---- línea de tiempo ---- */
   .timeline-wrap { position: relative; max-width: 640px; margin: 0 auto; }
-  .timeline-track { position: absolute; left: 19px; top: 8px; bottom: 8px; width: 2px; background: rgba(255,255,255,.12); }
-  .timeline-fill { position: absolute; left: 19px; top: 8px; width: 2px; height: 0; background: linear-gradient(to bottom, var(--dorado-500), var(--amatista-500)); transform-origin: top; transform: scaleY(0); will-change: transform; }
   .timeline-item { display: flex; gap: 1.1rem; padding-bottom: 2.1rem; }
   .timeline-dot-col { flex: 0 0 40px; display: flex; justify-content: center; }
   .timeline-content { flex: 1; min-width: 0; text-align: left; }
