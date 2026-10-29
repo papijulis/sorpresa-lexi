@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="./assets/css/ornamentos.css">
 <link rel="stylesheet" href="./assets/css/navegacion.css">
 <link rel="stylesheet" href="./assets/css/portada.css">
+<link rel="stylesheet" href="./assets/css/capitulos.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
@@ -47,6 +48,7 @@
   <button id="night-moon" aria-label="La luna" type="button"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-luna-solida"/></svg></button>
 </div>
 <!-- PORTADA EN CAPAS (bloque 2): sol/luna según la hora, colinas, hierba con lirios y lirios grandes al frente -->
+<div id="bg-capitulo" aria-hidden="true"></div>
 <div id="portada" aria-hidden="true">
   <div class="p-sol"></div>
   <div class="p-disco"></div>
@@ -189,6 +191,28 @@
       </div>
 
     </div>
+    <nav class="cap-indice" aria-label="Partes del recorrido">
+      <p class="cap-indice-t font-ui">El recorrido, por partes</p>
+      <div class="cap-indice-lista">
+        <a href="#cap-1" class="cap-indice-item" data-cap="1"><span class="cap-indice-n">I</span><span>Cómo empezó</span></a>
+        <a href="#cap-2" class="cap-indice-item" data-cap="2"><span class="cap-indice-n">II</span><span>Lo que guardo de ti</span></a>
+        <a href="#cap-3" class="cap-indice-item" data-cap="3"><span class="cap-indice-n">III</span><span>Lo que hemos vivido</span></a>
+        <a href="#cap-4" class="cap-indice-item" data-cap="4"><span class="cap-indice-n">IV</span><span>Nuestra música</span></a>
+        <a href="#cap-5" class="cap-indice-item" data-cap="5"><span class="cap-indice-n">V</span><span>Lo que sigue</span></a>
+      </div>
+    </nav>
+  </section>
+
+  <!-- PARTE I -->
+  <div class="capitulo" id="cap-1" data-capitulo="1" data-nombre="I · Cómo empezó">
+  <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-1-t">
+    <p class="cap-num" aria-hidden="true">I</p>
+    <div class="cap-texto">
+      <p class="cap-etiqueta mov-revelar">Parte I</p>
+      <h2 class="cap-titulo mov-revelar" id="cap-1-t">Cómo empezó</h2>
+      <div class="orn-divisor mov-revelar" data-escena="trazo" data-orn-divisor></div>
+      <p class="cap-sub font-hand mov-revelar">28 de mayo de 2026</p>
+    </div>
   </section>
 
   <!-- LOVE CLOCK -->
@@ -241,6 +265,21 @@
     </div>
     <div class="text-center mt-6">
       <button id="random-memory-btn" class="font-ui text-sm px-6 py-3 rounded-full bg-white/5 border border-white/15 text-parchment/80 hover:bg-white/10 hover:text-gold transition-colors">Sorpréndeme con un recuerdo</button>
+    </div>
+  </section>
+
+  </div>
+  <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
+
+  <!-- PARTE II -->
+  <div class="capitulo" id="cap-2" data-capitulo="2" data-nombre="II · Lo que guardo de ti">
+  <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-2-t">
+    <p class="cap-num" aria-hidden="true">II</p>
+    <div class="cap-texto">
+      <p class="cap-etiqueta mov-revelar">Parte II</p>
+      <h2 class="cap-titulo mov-revelar" id="cap-2-t">Lo que guardo de ti</h2>
+      <div class="orn-divisor mov-revelar" data-escena="trazo" data-orn-divisor></div>
+      <p class="cap-sub font-hand mov-revelar">una voz y cien razones</p>
     </div>
   </section>
 
@@ -343,6 +382,21 @@
     <button id="jar-secret-btn" class="hidden mt-6 font-ui text-sm px-6 py-3 rounded-full bg-white/5 border border-white/15 text-gold hover:bg-white/10 transition-colors">Leer la Razón 101 <svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-corazon-lleno"/></svg></button>
   </section>
 
+  </div>
+  <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
+
+  <!-- PARTE III -->
+  <div class="capitulo" id="cap-3" data-capitulo="3" data-nombre="III · Lo que hemos vivido">
+  <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-3-t">
+    <p class="cap-num" aria-hidden="true">III</p>
+    <div class="cap-texto">
+      <p class="cap-etiqueta mov-revelar">Parte III</p>
+      <h2 class="cap-titulo mov-revelar" id="cap-3-t">Lo que hemos vivido</h2>
+      <div class="orn-divisor mov-revelar" data-escena="trazo" data-orn-divisor></div>
+      <p class="cap-sub font-hand mov-revelar">flores, fotos y días que se quedan</p>
+    </div>
+  </section>
+
   <!-- FAVORITE PHOTOS OF US -->
   <section class="reveal py-24 px-6">
     <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Y una de mis fotos favoritas de nosotros</h2></div>
@@ -365,10 +419,40 @@
     </div>
   </section>
 
+  </div>
+  <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
+
+  <!-- PARTE IV -->
+  <div class="capitulo" id="cap-4" data-capitulo="4" data-nombre="IV · Nuestra música">
+  <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-4-t">
+    <p class="cap-num" aria-hidden="true">IV</p>
+    <div class="cap-texto">
+      <p class="cap-etiqueta mov-revelar">Parte IV</p>
+      <h2 class="cap-titulo mov-revelar" id="cap-4-t">Nuestra música</h2>
+      <div class="orn-divisor mov-revelar" data-escena="trazo" data-orn-divisor></div>
+      <p class="cap-sub font-hand mov-revelar">las canciones que ya son nuestras</p>
+    </div>
+  </section>
+
   <!-- NUESTRA BANDA SONORA -->
   <section class="reveal py-24 px-6">
     <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Nuestra banda sonora</h2></div>
     <div id="banda-sonora-list" class="max-w-xl mx-auto flex flex-col gap-4"></div>
+  </section>
+
+  </div>
+  <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
+
+  <!-- PARTE V -->
+  <div class="capitulo" id="cap-5" data-capitulo="5" data-nombre="V · Lo que sigue">
+  <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-5-t">
+    <p class="cap-num" aria-hidden="true">V</p>
+    <div class="cap-texto">
+      <p class="cap-etiqueta mov-revelar">Parte V</p>
+      <h2 class="cap-titulo mov-revelar" id="cap-5-t">Lo que sigue</h2>
+      <div class="orn-divisor mov-revelar" data-escena="trazo" data-orn-divisor></div>
+      <p class="cap-sub font-hand mov-revelar">una carta que no termina</p>
+    </div>
   </section>
 
   <!-- LOVE LETTER -->
@@ -396,6 +480,8 @@
       </div>
     </div>
   </section>
+
+  </div>
 
   <footer class="py-14 text-center text-gold">
     <p class="font-hand text-2xl">te amo, Lexi.</p>
@@ -469,6 +555,8 @@
   </main>
 </div>
 <div id="inf-toast" class="inf-toast" role="status" aria-live="polite"></div>
+
+<div id="cap-indicador" class="cap-indicador" role="status" aria-live="polite"></div>
 
 <!-- ===================== DOCK (punto 9): navegación integrada ===================== -->
 <nav id="dock" class="dock" aria-label="Navegación del jardín">
@@ -545,6 +633,7 @@
 <script src="./js/extras.js"></script>
 <script src="./js/infinito.js"></script>
 <script src="./js/portada.js"></script>
+<script src="./js/capitulos.js"></script>
 <script src="./js/navegacion.js"></script>
 <script src="./js/escenas.js"></script>
 </body>

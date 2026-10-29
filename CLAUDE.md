@@ -216,7 +216,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Componentes** (`assets/css/ornamentos.css`): `.ico`, `.orn-divisor` (el trazo se dibuja con el scroll; se agrega solo bajo cada `.titulo-seccion` o donde pongas `data-orn-divisor`), `.tarjeta-flor` (esquinas de pétalo), `.btn-brillo` (brillo que pasa en botones dorados), flor de precarga, y el lenguaje de movimiento: `.mov-florecer`, `.mov-latido`, `.mov-revelar`, `.mov-halo` (con `prefers-reduced-motion` ya cubierto).
 - **Escenas** (`js/escenas.js`): motor de scroll sin librerías. `data-escena="trazo|pasada"` escribe `--p` (0→1) solo mientras el elemento está en pantalla; `.mov-*`/`data-en-vista` agregan `.en-vista` una vez. `Escenas.registrar(el)` para elementos creados por JS.
 - **Marca** (`node tools/generar-marca.js` + Inkscape, comandos impresos al final): íconos de la app, maskable, favicon y `og.jpg` con la misma flor maestra.
-- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `portada`, `infinito`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `portada`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
+- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `portada`, `capitulos`, `infinito`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `portada`, `capitulos`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
 
 ## Navegación integrada (rediseño, punto 9)
 
@@ -231,6 +231,13 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Luz según cielo y hora de Ciudad de México**: día = arco de 6:00 a 18:00 (x 12→88 %, rosa en los extremos y dorado a mediodía; si eligió "día" fuera de horario, mediodía); atardecer = sol bajo ámbar; noche = resplandor plata en la esquina de la luna, sin disco. Se recalcula cada 5 min. `--sol-rgb`/`--sol-a` están registrados con `@property` y la posición transiciona 2.6 s.
 - **Parallax**: scroll → `--sy`, puntero fino → `--mx/--my` (un rAF por movimiento, `js/portada.js`); cada capa tiene `--vy`/`--px`. Todo se desvanece (`--fade`) y se oculta (`.oculta`) al bajar del inicio. `prefers-reduced-motion` pone `--par:0` (sin parallax ni vaivén). Modo ligero (`body.light-mode`) y <640px: sin desenfoque. El panel del inicio se mueve más lento que el scroll.
 - El canvas principal suma unas pocas luciérnagas de día mientras se ve la portada (`updateFireflies`).
+
+## Partes del recorrido (rediseño, bloque 3)
+
+- El recorrido va en **cinco partes** (`<div class="capitulo" id="cap-N" data-capitulo="N" data-nombre="…">` en `index.html`): I Cómo empezó (contador, mesiversario, calendario) · II Lo que guardo de ti (nota de voz, frasco) · III Lo que hemos vivido (fotos favoritas, polaroids, línea del tiempo) · IV Nuestra música (banda sonora) · V Lo que sigue (pergamino de cartas). Se dice **"Parte"**, no "Capítulo": "Capítulo 1" ya es el nombre de la sorpresa del 21 de septiembre.
+- Cada parte abre con un **portal a pantalla completa** (`.cap-portal`, `data-escena="pasada"`: el número romano gigante en contorno y el texto se mueven con `--p`), y entre partes crece un **puente** (`.cap-puente`, `data-escena="trazo"`: un tallo que se dibuja y un lirio que florece). Estilos en `assets/css/capitulos.css`.
+- `js/capitulos.js`: un `IntersectionObserver` con banda de cero alto en el centro decide la parte actual → `body[data-capitulo]` (tiñe `#bg-capitulo` con `--cap-rgb`/`--cap-a`, registrados con `@property`), resalta la entrada del índice de partes (dentro de "Caminos del jardín", `.cap-indice-item`) y muestra 3.4 s el letrero `#cap-indicador`. Si agregas una sección nueva, ponla dentro de la parte que le toque, no suelta; si agregas una parte, suma su portal, su puente y un tinte `body[data-capitulo="N"]`.
+- Los títulos y subtítulos de las partes son rótulos míos: están listados en `REVISAR.md`.
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 

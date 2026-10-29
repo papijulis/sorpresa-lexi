@@ -65,6 +65,11 @@ los atardeceres dedicados y "hoy / mañana / siempre"), la frase del botón
 "Un abrazo" ("Aquí estoy, abrazándote muy fuerte.") y los mensajes de debajo
 del corazón. Ajústalos en el arreglo `CODE` y en la función del abrazo.
 
+## Rótulos del rediseño (míos, para que los cambies si quieres)
+
+- **Partes del recorrido** (título · subtítulo): I "Cómo empezó" · "28 de mayo de 2026"; II "Lo que guardo de ti" · "una voz y cien razones"; III "Lo que hemos vivido" · "flores, fotos y días que se quedan"; IV "Nuestra música" · "las canciones que ya son nuestras"; V "Lo que sigue" · "una carta que no termina". Están en `index.html` (`.cap-portal`) y en el `data-nombre` de cada `.capitulo`.
+- **Caminos del jardín:** títulos y subtítulos de las 4 escenas ("Cartas que se abren con el tiempo", "Cupones, memorama y más sorpresas", "Nuestro soundtrack", "Día, atardecer o noche") y "Por aquí se llega a cada rincón."
+
 ## Decisiones tomadas (sin texto que revisar)
 
 - Sin botón ni texto para contactar a Julio (WhatsApp eliminado), por tu
