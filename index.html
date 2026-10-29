@@ -527,7 +527,14 @@
   .timeline-text { font-family: 'Playfair Display', serif; font-size: .92rem; color: rgba(253,251,247,.85); line-height: 1.55; }
   .timeline-photo { width: 100%; max-width: 160px; border-radius: .6rem; margin-top: .6rem; box-shadow: 0 8px 18px rgba(0,0,0,.4); display: block; }
 
-  .clock-infinity { color: #FFD700; font-size: 1.05em; margin-left: .15rem; }
+  .clock-infinity {
+    display: inline-block; color: #FFD700; font-size: 1.5em; line-height: 1;
+    padding: .85rem .85rem; margin: -.85rem -.4rem -.85rem -.2rem; text-decoration: none; vertical-align: middle;
+    text-shadow: 0 0 12px rgba(255, 215, 0, .55); animation: infinityGlow 3.4s ease-in-out infinite;
+    transition: transform .25s ease;
+  }
+  .clock-infinity:hover { transform: scale(1.18); }
+  @keyframes infinityGlow { 0%, 100% { text-shadow: 0 0 8px rgba(255, 215, 0, .35); } 50% { text-shadow: 0 0 18px rgba(255, 215, 0, .85); } }
   .clock-dedicatoria { max-width: 28rem; margin: 2.5rem auto 0; font-size: 1.05rem; line-height: 1.7; color: rgba(253,251,247,.82); }
   @media (min-width: 640px) { .clock-dedicatoria { font-size: 1.2rem; } }
 
@@ -736,7 +743,7 @@
   <!-- LOVE CLOCK -->
   <section class="reveal py-24 px-6 flex flex-col items-center text-center">
     <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2">Desde el 28 de mayo de 2026</h2>
-    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <span class="clock-infinity" aria-hidden="true">∞</span></p>
+    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <a id="clock-infinity-link" class="clock-infinity" href="./infinito.html" target="_blank" aria-label="Abrir nuestra página infinita" title="Infinito">∞</a></p>
     <div class="clock-grid grid gap-3 sm:gap-6 max-w-3xl w-full">
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-months" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Meses</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-days" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Días</p></div>
@@ -2019,6 +2026,13 @@ setInterval(() => { if (!document.hidden) tickClock(); }, 1000);
 /* al volver a la pestaña (o a la PWA) se actualiza al instante */
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tickClock(); });
 window.addEventListener('pageshow', tickClock);
+/* el ∞ junto al contador abre la página "Infinito" en otra pestaña (así la música
+   de este Jardín sigue sonando); si el navegador bloquea la ventana, se abre aquí */
+document.getElementById('clock-infinity-link').addEventListener('click', (e) => {
+  e.preventDefault();
+  const w = window.open('./infinito.html', '_blank');
+  if (!w) window.location.href = './infinito.html';
+});
 window.addEventListener('focus', tickClock);
 document.getElementById('badge-1111').addEventListener('click', () => {
   openModal({ icon: '✨', title: '11:11', body: WISH_1111_TEXT });

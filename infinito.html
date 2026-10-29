@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Infinito — Para Lexi</title>
+<meta name="description" content="Un contador que nunca se detiene, y un corazón que sigue floreciendo.">
+<meta name="theme-color" content="#18062B">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png">
+<link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+<link rel="preload" href="./assets/fonts/PlayfairDisplay-latin-400-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="./assets/css/infinito.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true"></div>
+
+<a id="volver" class="btn-volver" href="./index.html" aria-label="Volver al jardín">← Volver al jardín</a>
+
+<main class="inf-wrap">
+  <header class="inf-title">
+    <p class="inf-symbol" aria-hidden="true">∞</p>
+    <h1>Hoy, mañana y siempre</h1>
+  </header>
+
+  <section class="inf-stage" aria-label="Un corazón hecho de flores que se va dibujando">
+    <div class="heart-box" id="heart-box">
+      <canvas id="garden" aria-hidden="true"></canvas>
+    </div>
+
+    <div class="inf-message" id="inf-message">
+      <p class="inf-since">Desde que empezamos a hablar, el 28 de mayo</p>
+      <div class="inf-counter" id="inf-counter" role="timer" aria-live="off" aria-label="Tiempo desde que empezamos a hablar">
+        <div><span id="c-days">0</span><small>días</small></div>
+        <div><span id="c-hours">00</span><small>horas</small></div>
+        <div><span id="c-minutes">00</span><small>minutos</small></div>
+        <div><span id="c-seconds">00</span><small>segundos</small></div>
+      </div>
+      <p class="inf-never">Este contador nunca se va a detener.</p>
+      <p class="inf-love">Te amo por y para siempre.</p>
+      <p class="inf-sign">— Julio</p>
+      <button type="button" id="hug-btn" class="hug-btn" aria-label="Recibir un abrazo">Un abrazo</button>
+    </div>
+  </section>
+
+  <section class="inf-code" aria-label="Un poema escrito como código">
+    <div class="code-panel" id="code-panel" aria-hidden="true"><span id="code-out"></span><span class="code-caret">▍</span></div>
+    <p class="sr-only" id="code-sr"></p>
+  </section>
+</main>
+
+<div id="inf-toast" class="inf-toast" role="status" aria-live="polite"></div>
+
+<script src="./contenido/config.js"></script>
+<script src="./js/infinito.js"></script>
+</body>
+</html>

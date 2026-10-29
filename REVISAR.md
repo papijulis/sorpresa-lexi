@@ -58,6 +58,13 @@ Entradas nuevas: 29 de mayo, 18 de junio (Chapultepec), 1 de julio
 - Dedicatorias de las canciones: Honeybee (Olivia Rodrigo) y So High
   School (con la frase de Lexi).
 
+## Página "Infinito" (`js/infinito.js`, borrador)
+
+El texto tipo código que se escribe solo (usa tu primer mensaje y "La misma",
+los atardeceres dedicados y "hoy / mañana / siempre"), la frase del botón
+"Un abrazo" ("Aquí estoy, abrazándote muy fuerte.") y los mensajes de debajo
+del corazón. Ajústalos en el arreglo `CODE` y en la función del abrazo.
+
 ## Decisiones tomadas (sin texto que revisar)
 
 - Sin botón ni texto para contactar a Julio (WhatsApp eliminado), por tu

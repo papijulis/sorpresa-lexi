@@ -1,0 +1,150 @@
+/* Página "Infinito" — se abre desde el ∞ junto al contador del Jardín.
+   Misma estética del sitio: ciruela / amatista / dorado / rosa, Playfair
+   Display + Inter, paneles de cristal. */
+@font-face {
+  font-family: 'Inter'; font-style: normal; font-weight: 300 700; font-display: swap;
+  src: url('../fonts/Inter-latin-300-700-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display'; font-style: normal; font-weight: 400 900; font-display: swap;
+  src: url('../fonts/PlayfairDisplay-latin-400-900-normal.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Playfair Display'; font-style: italic; font-weight: 400 900; font-display: swap;
+  src: url('../fonts/PlayfairDisplay-latin-400-900-italic.woff2') format('woff2');
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  min-height: 100vh; min-height: 100dvh;
+  font-family: 'Inter', sans-serif; color: #F5EBE1;
+  background: radial-gradient(circle at 50% 12%, #270D42 0%, #18062B 38%, #090112 75%, #05000a 100%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+.aurora {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(40vmax 30vmax at 12% 18%, rgba(168, 85, 247, .16), transparent 70%),
+    radial-gradient(36vmax 28vmax at 88% 78%, rgba(245, 158, 11, .10), transparent 70%),
+    radial-gradient(30vmax 24vmax at 70% 8%, rgba(251, 113, 133, .08), transparent 70%);
+}
+.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; }
+
+a:focus-visible, button:focus-visible { outline: 2px solid #FFD700; outline-offset: 3px; }
+button, a[href] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+.btn-volver {
+  position: fixed; z-index: 10;
+  top: calc(1.1rem + env(safe-area-inset-top, 0px)); left: calc(1.1rem + env(safe-area-inset-left, 0px));
+  display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.1rem;
+  border-radius: 999px; text-decoration: none; font-size: .85rem; color: #F5EBE1;
+  background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .14);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  transition: background .25s ease;
+}
+.btn-volver:hover { background: rgba(255, 255, 255, .14); }
+
+.inf-wrap {
+  position: relative; z-index: 1;
+  max-width: 1120px; margin: 0 auto;
+  padding: calc(5rem + env(safe-area-inset-top, 0px)) 1.25rem calc(3rem + env(safe-area-inset-bottom, 0px));
+  display: grid; grid-template-columns: 1fr; gap: 2rem;
+}
+.inf-title { text-align: center; }
+.inf-symbol {
+  margin: 0; font-family: 'Playfair Display', serif; font-size: 3rem; line-height: 1; color: #FFD700;
+  text-shadow: 0 0 24px rgba(255, 215, 0, .45);
+}
+.inf-title h1 {
+  margin: .35rem 0 0; font-family: 'Playfair Display', serif; font-weight: 600;
+  font-size: clamp(1.8rem, 6vw, 3rem); color: #FDFBF7; text-shadow: 0 2px 16px rgba(5, 0, 10, .8);
+}
+
+/* ---- corazón + mensaje ---- */
+.inf-stage { display: flex; flex-direction: column; align-items: center; }
+.heart-box {
+  width: min(100%, 560px); aspect-ratio: 1 / .96; position: relative;
+  animation: heartbeat 3.2s ease-in-out infinite;
+}
+.heart-box::before {
+  content: ''; position: absolute; inset: 8% 6%; border-radius: 50%; z-index: 0;
+  background: radial-gradient(circle, rgba(168, 85, 247, .22), transparent 68%);
+}
+#garden { position: relative; z-index: 1; display: block; width: 100%; height: 100%; }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.018); } 24% { transform: scale(1); } 36% { transform: scale(1.012); } 48% { transform: scale(1); } }
+
+.inf-message {
+  text-align: center; margin-top: .5rem; max-width: 34rem;
+  opacity: 0; transform: translateY(14px); pointer-events: none;
+  transition: opacity 1.6s ease, transform 1.6s ease;
+}
+.inf-message.shown { opacity: 1; transform: none; pointer-events: auto; }
+.inf-since { margin: 0 0 .9rem; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; color: rgba(233, 213, 255, .75); }
+.inf-counter { display: flex; justify-content: center; flex-wrap: wrap; gap: .6rem; }
+.inf-counter > div {
+  min-width: 4.6rem; padding: .7rem .5rem .55rem; border-radius: 1.1rem;
+  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.inf-counter span {
+  display: block; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.9rem; line-height: 1.1;
+  color: #FFD700; font-variant-numeric: tabular-nums;
+}
+.inf-counter small { display: block; margin-top: .25rem; font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; color: rgba(253, 251, 247, .6); }
+.inf-never { margin: 1.4rem 0 0; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; color: rgba(253, 251, 247, .8); }
+.inf-love { margin: .6rem 0 0; font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 5vw, 2rem); color: #FDFBF7; text-shadow: 0 0 22px rgba(251, 113, 133, .45); }
+.inf-sign { margin: .5rem 0 0; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.15rem; color: rgba(255, 215, 0, .85); }
+.hug-btn {
+  margin-top: 1.4rem; min-height: 2.75rem; padding: 0 1.6rem; border: none; border-radius: 999px;
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: .9rem; color: #090112;
+  background: linear-gradient(to right, #FFD700, #FACC15); box-shadow: 0 6px 22px rgba(255, 215, 0, .25);
+  transition: transform .2s ease;
+}
+.hug-btn:active { transform: scale(.96); }
+
+/* ---- texto tipo código ---- */
+.inf-code { width: 100%; }
+.code-panel {
+  max-width: 34rem; margin: 0 auto; padding: 1.25rem 1.3rem; border-radius: 1.5rem;
+  background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .12);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .86rem; line-height: 1.75;
+  color: rgba(253, 251, 247, .9); white-space: pre-wrap; word-break: break-word; min-height: 20rem;
+}
+.code-panel .c-comment { color: rgba(192, 132, 252, .8); font-style: italic; }
+.code-panel .c-key { color: #FFD700; font-weight: 600; }
+.code-panel .c-str { color: #FB7185; }
+.code-caret { color: #FFD700; animation: caretBlink 1s steps(1) infinite; }
+.code-panel.done .code-caret { animation-duration: 1.6s; }
+@keyframes caretBlink { 50% { opacity: 0; } }
+
+.inf-toast {
+  position: fixed; z-index: 20; left: 50%; transform: translateX(-50%) translateY(10px);
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); max-width: 90%;
+  padding: .8rem 1.3rem; border-radius: 999px; text-align: center;
+  font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: #FDFBF7;
+  background: rgba(24, 6, 43, .9); border: 1px solid rgba(255, 215, 0, .3);
+  opacity: 0; pointer-events: none; transition: opacity .5s ease, transform .5s ease;
+}
+.inf-toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ---- escritorio: código a la izquierda, corazón a la derecha ---- */
+@media (min-width: 900px) {
+  .inf-wrap { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: 3rem; align-items: center; }
+  .inf-title { grid-column: 1 / -1; }
+  .inf-code { grid-column: 1; grid-row: 2; }
+  .inf-stage { grid-column: 2; grid-row: 2; }
+  .code-panel { margin: 0; font-size: .92rem; min-height: 26rem; }
+}
+@media (max-width: 420px) {
+  .inf-counter > div { min-width: 4.1rem; }
+  .inf-counter span { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-box, .code-caret { animation: none; }
+  .inf-message { transition: none; }
+  * { scroll-behavior: auto !important; }
+}
