@@ -39,7 +39,7 @@ Entradas nuevas: 29 de mayo, 18 de junio (Chapultepec), 1 de julio
   final (botón "Leer una carta más") y como sobre del Buzón.
 - Reescritas con citas del banco: "me extrañes", "no puedas dormir",
   "dudes" (antes "insegura") y "día increíble".
-- **"Seis meses" (`mes-6`, se abre el 28 de noviembre de 2026): carta nueva, borrador mío.** Solo usa hechos que ya están en el sitio (calendario, mes-5, cabaña de Navidad), lleva la foto de tu fondo de chat y el botón de «Lover». Léela y edítala en `contenido/cartas.js` antes de publicar.
+- **"Seis meses" (`mes-6`, se abre el 28 de noviembre de 2026): carta nueva, borrador mío.** Abre como "Para Lexi" (Mi niña hermosa, mi Lexi) y usa solo hechos que ya están en el sitio (calendario, mes-5, cabaña de Navidad); sin foto ni botón de canción, como las demás cartas. Ya tiene tus ajustes del 29 de octubre (la frase íntima se dejó tierna y sin detalles por la regla de privacidad del repo público). Léela y edítala en `contenido/cartas.js` antes de publicar.
 - Nuevas: "Cinco meses" (mes-5, reescrita), "La cabaña de Navidad"
   (25 de dic), cápsula del primer año (reescrita) y "Mi healer favorita"
   (se abre ganando Cúrame).

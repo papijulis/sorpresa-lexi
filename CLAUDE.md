@@ -265,7 +265,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 
-- **Mesiversarios en el Buzón:** `mes-5` (28 oct) y `mes-6` "Seis meses" (28 nov, `borrador:true`, con foto `fondo-chat` y botón de «Lover») ya existen; el siguiente mesiversario se agrega igual (`tipo:"mesiversario"`, `apertura` el día 28) y la tarjeta "Próximo mesiversario" lo toma sola. Probar con `?fecha=2026-11-28`.
+- **Mesiversarios en el Buzón:** `mes-5` (28 oct) y `mes-6` "Seis meses" (28 nov, `borrador:true`, sin foto ni canción como las demás) ya existen; el siguiente mesiversario se agrega igual (`tipo:"mesiversario"`, `apertura` el día 28) y la tarjeta "Próximo mesiversario" lo toma sola. Probar con `?fecha=2026-11-28`.
 
 - El pergamino final recorre 3 cartas (`LETTER_SEQ`): `LETTER` (config.js),
   `CARTA_FINAL` ("Para seguir escribiendo") y `CARTA_PARA_LEXI` ("Para Lexi",
