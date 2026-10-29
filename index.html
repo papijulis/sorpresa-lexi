@@ -170,7 +170,7 @@
         <div class="camino-controles">
           <button type="button" id="camino-musica-play" class="camino-boton" aria-label="Reproducir o pausar" aria-pressed="false"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></button>
           <button type="button" id="camino-musica-next" class="camino-boton" aria-label="Cambiar canción"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
-          <button type="button" id="camino-efectos" class="camino-boton" aria-label="Sonidos suaves: activados" aria-pressed="true"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-sonido"/></svg></button>
+          <button type="button" id="camino-efectos" class="camino-boton" aria-label="Sonidos y vibración suaves: activados" aria-pressed="true"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-sonido"/></svg></button>
         </div>
       </div>
 
@@ -607,7 +607,10 @@
 <!-- ===================== LIGHTBOX (Fase 5) ===================== -->
 <div id="lightbox" class="lightbox">
   <button id="lightbox-close" aria-label="Cerrar foto" class="lightbox-close">×</button>
+  <button id="lightbox-prev" aria-label="Foto anterior" class="lightbox-nav lightbox-prev" hidden><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
   <img id="lightbox-img" src="" alt="">
+  <button id="lightbox-next" aria-label="Foto siguiente" class="lightbox-nav lightbox-next" hidden><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
+  <p id="lightbox-count" class="lightbox-count" aria-live="polite" hidden></p>
 </div>
 
 <!-- ===================== TOAST ===================== -->
@@ -639,6 +642,7 @@
 <script src="./js/infinito.js"></script>
 <script src="./js/sonidos.js"></script>
 <script src="./js/micro.js"></script>
+<script src="./js/gestos.js"></script>
 <script src="./js/portada.js"></script>
 <script src="./js/capitulos.js"></script>
 <script src="./js/navegacion.js"></script>

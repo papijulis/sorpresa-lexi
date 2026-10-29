@@ -116,7 +116,9 @@ window.JuegoLluviaLirios = (function () {
         items.splice(i, 1);
         if (it.thorn) {
           shakeUntil = t + 220;
+          if (window.Acierto) window.Acierto('golpe');
         } else if (!finished) {
+          if (window.Acierto) window.Acierto('tic');
           caught++;
           updateHud();
           if (caught >= TARGET) finish();

@@ -147,6 +147,20 @@
   }
   @media (hover: hover) { #modal-close:hover { background: rgba(255,255,255,0.16); } }
 
+  /* ---- navegación entre cartas del Buzón (bloque 9) ---- */
+  .carta-anim { animation: cartaEntra .45s var(--ease-flor) both; }
+  @keyframes cartaEntra { from { opacity: 0; transform: translateX(calc(var(--dir, 0) * 36px)); } to { opacity: 1; transform: none; } }
+  .carta-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.1); }
+  .carta-nav-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50); transition: background .2s ease, transform .2s var(--ease-rebote);
+  }
+  .carta-nav-btn:active { transform: scale(.92); }
+  .carta-nav-btn:disabled { opacity: .3; cursor: default; }
+  .carta-nav-prev .ico { transform: scaleX(-1); }
+  .carta-nav-n { font-family: var(--fuente-ui); font-size: .78rem; color: rgba(var(--pergamino-rgb), .6); min-width: 5rem; text-align: center; }
+  @media (hover: hover) { .carta-nav-btn:not(:disabled):hover { background: rgba(255,255,255,.16); } }
+
   /* ---- screens ---- */
   #preloader {
     position: fixed; inset: 0; z-index: 100; background: var(--ciruela-950);

@@ -111,7 +111,7 @@ const caminoEfectos = document.getElementById('camino-efectos');
 function pintarEfectos() {
   const on = window.Sonidos ? window.Sonidos.activo() : false;
   caminoEfectos.setAttribute('aria-pressed', String(on));
-  caminoEfectos.setAttribute('aria-label', on ? 'Sonidos suaves: activados' : 'Sonidos suaves: apagados');
+  caminoEfectos.setAttribute('aria-label', on ? 'Sonidos y vibración suaves: activados' : 'Sonidos y vibración suaves: apagados');
   caminoEfectos.innerHTML = ico(on ? 'i-sonido' : 'i-sonido-off');
 }
 caminoEfectos.addEventListener('click', () => { if (window.Sonidos) window.Sonidos.activar(!window.Sonidos.activo()); });

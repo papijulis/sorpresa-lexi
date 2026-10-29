@@ -129,6 +129,7 @@ window.JuegoConstelacion = (function () {
     const target = points[connected];
     if (Math.hypot(x - target.x, y - target.y) < TAP_RADIUS) {
       connected++;
+      if (window.Acierto && connected < POINT_COUNT) window.Acierto('tic');
       if (connected >= POINT_COUNT) completeConstellation();
     }
   }

@@ -96,9 +96,17 @@ function irisDesde(vista, origen) {
   vista.style.setProperty('--oy', y);
 }
 
-function showCartaModal(carta) {
+let cartaActualId = null;
+function cartasAbribles() { return window.CARTAS.filter(cartaIsOpenable); }
+function marcarLeida(carta) {
+  if (!buzonState.leidas.includes(carta.id)) { buzonState.leidas.push(carta.id); saveBuzonState(); }
+}
+
+/* dir: -1/+1 al venir de deslizar/flechas (anima desde ese lado y no repite el sonido de abrir) */
+function showCartaModal(carta, dir) {
   const meta = TIPO_META[carta.tipo] || TIPO_META.sorpresa;
-  let html = `<div class="letter-detail-text font-hand text-lg sm:text-xl leading-relaxed">${carta.texto}</div>`;
+  cartaActualId = carta.id;
+  let html = `<div class="carta-anim" style="--dir:${dir || 0}"><div class="letter-detail-text font-hand text-lg sm:text-xl leading-relaxed">${carta.texto}</div>`;
   if (carta.foto) {
     html += pictureHTML(carta.foto, '', 'style="width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:16px;box-shadow:0 14px 30px rgba(0,0,0,.45);"');
   }
@@ -108,19 +116,56 @@ function showCartaModal(carta) {
   if (window.NOTA_CARTA) {
     html += `<p class="font-hand text-sm mt-5" style="color:rgba(253,251,247,.55);">${window.NOTA_CARTA}</p>`;
   }
-  openModal({ icon: meta.icon, title: carta.titulo, bodyHTML: html });
+  html += '</div>';
+  const lista = cartasAbribles();
+  const idx = lista.findIndex((c) => c.id === carta.id);
+  if (lista.length > 1 && idx > -1) {
+    html += `<div class="carta-nav">
+      <button type="button" id="carta-prev" class="carta-nav-btn carta-nav-prev" aria-label="Carta anterior"${idx === 0 ? ' disabled' : ''}>${ico('i-siguiente')}</button>
+      <span class="carta-nav-n">${idx + 1} de ${lista.length}</span>
+      <button type="button" id="carta-next" class="carta-nav-btn" aria-label="Carta siguiente"${idx === lista.length - 1 ? ' disabled' : ''}>${ico('i-siguiente')}</button>
+    </div>`;
+  }
+  openModal({ icon: meta.icon, title: carta.titulo, bodyHTML: html, nav: 'carta', silencioso: !!dir });
   if (carta.cancion) {
     const btn = document.getElementById('carta-play-song');
     if (btn) btn.addEventListener('click', () => playDedicatedSong(carta.cancion));
   }
+  const prev = document.getElementById('carta-prev'), next = document.getElementById('carta-next');
+  if (prev) prev.addEventListener('click', () => irCarta(-1));
+  if (next) next.addEventListener('click', () => irCarta(1));
 }
+/* de una carta a la vecina (solo entre las que ya se pueden abrir) */
+function irCarta(dir) {
+  const lista = cartasAbribles();
+  const idx = lista.findIndex((c) => c.id === cartaActualId);
+  const nueva = lista[idx + dir];
+  if (idx < 0 || !nueva) return;
+  marcarLeida(nueva);
+  showCartaModal(nueva, dir);
+  renderBuzon();
+  if (window.Sonidos) window.Sonidos.play('mes');
+}
+(function () {
+  const panel = document.getElementById('modal-panel');
+  let x0 = null, y0 = null;
+  panel.addEventListener('pointerdown', (e) => { if (panel.dataset.nav === 'carta' && e.pointerType !== 'mouse') { x0 = e.clientX; y0 = e.clientY; } });
+  panel.addEventListener('pointerup', (e) => {
+    if (x0 === null) return;
+    const dx = e.clientX - x0, dy = e.clientY - y0; x0 = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) irCarta(dx < 0 ? 1 : -1);
+  });
+  panel.addEventListener('pointercancel', () => { x0 = null; });
+  document.addEventListener('keydown', (e) => {
+    if (panel.dataset.nav !== 'carta' || !document.getElementById('app-modal').classList.contains('open')) return;
+    if (e.key === 'ArrowRight') { irCarta(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { irCarta(-1); e.preventDefault(); }
+  });
+})();
 
 function openCarta(carta, cardEl) {
   cardEl.classList.add('cracking');
-  if (!buzonState.leidas.includes(carta.id)) {
-    buzonState.leidas.push(carta.id);
-    saveBuzonState();
-  }
+  marcarLeida(carta);
   setTimeout(() => {
     showCartaModal(carta);
     renderBuzon();

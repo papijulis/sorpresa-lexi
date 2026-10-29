@@ -359,7 +359,7 @@ function renderPolaroidGrid(gridEl, photos) {
         const rect = card.getBoundingClientRect();
         if (typeof spawnSparkleBurst === 'function') spawnSparkleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 16, true);
       }
-      openLightbox(p.src, p.caption);
+      openLightbox(p.src, p.caption, photos, i);
     });
     gridEl.appendChild(card);
     revealObserver.observe(card);

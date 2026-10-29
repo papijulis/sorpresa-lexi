@@ -68,6 +68,7 @@ window.JuegoMemorama = (function () {
               a.card.classList.add('matched');
               b.card.classList.add('matched');
               matchedCount++;
+              if (window.Acierto) window.Acierto('pareja');
               statusEl.textContent = a.item.caption || '¡Pareja encontrada!';
               flipped = [];
               lock = false;

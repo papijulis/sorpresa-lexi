@@ -85,6 +85,7 @@ window.JuegoCupones = (function () {
         frameQueued = false;
         if (!cleared && clearedFraction() > 0.55) {
           cleared = true;
+          if (window.Acierto) window.Acierto('exito');
           canvas.classList.add('cleared');
           resizeObserver.disconnect();
           onCleared();

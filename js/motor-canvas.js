@@ -230,7 +230,9 @@ function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1 }) {
    los destellos de premio se dibujan en la capa superior (#cursor-canvas,
    encima de todo) para que se vean al ganar un juego. */
 function spawnSparkleBurst(x, y, count, rising = false) {
-  if (rising && window.Sonidos) window.Sonidos.play('premio'); // los destellos que suben son premios
+  /* los destellos que suben son premios: grandes → arpegio + vibración larga; chicos → notita + toque */
+  if (rising && window.Sonidos) window.Sonidos.play(count >= 12 ? 'premio' : 'corazon');
+  if (rising && window.Haptica) window.Haptica.vibrar(count >= 30 ? [20, 40, 30] : 12);
   const target = (rafId === null && !document.hidden) ? topSparkles : sparkles;
   for (let i = 0; i < count; i++) {
     const angle = rising ? rand(-Math.PI * 0.75, -Math.PI * 0.25) : rand(0, Math.PI * 2);

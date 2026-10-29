@@ -19,16 +19,20 @@ const modalBackdrop = document.getElementById('app-modal');
 const modalIcon = document.getElementById('modal-icon');
 const modalTitle = document.getElementById('modal-title');
 const modalBody = document.getElementById('modal-body');
-function openModal({ icon = 'i-corazon-lleno', title = '', body = '', bodyHTML = null }) {
+const modalPanel = document.getElementById('modal-panel');
+/* nav:'carta' activa deslizar/flechas entre cartas del Buzón; silencioso: no repite el sonido al cambiar de carta */
+function openModal({ icon = 'i-corazon-lleno', title = '', body = '', bodyHTML = null, nav = null, silencioso = false }) {
   modalIcon.innerHTML = iconoHTML(icon, 'ico-xl');
   modalTitle.textContent = title;
   if (bodyHTML) modalBody.innerHTML = bodyHTML; else modalBody.textContent = body;
+  if (nav) modalPanel.dataset.nav = nav; else delete modalPanel.dataset.nav;
   modalBackdrop.classList.add('open');
-  if (window.Sonidos) window.Sonidos.play('abrir');
+  if (!silencioso && window.Sonidos) window.Sonidos.play('abrir');
 }
 function closeModal() {
   if (window.Sonidos && modalBackdrop.classList.contains('open')) window.Sonidos.play('cerrar');
   modalBackdrop.classList.remove('open');
+  delete modalPanel.dataset.nav;
 }
 document.getElementById('modal-close').addEventListener('click', closeModal);
 modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
@@ -40,14 +44,45 @@ modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop)
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
 const lightboxCloseBtn = document.getElementById('lightbox-close');
-let lightboxTouchStartY = null;
+let lightboxTouchStartY = null, lightboxTouchStartX = null;
+let lbGrupo = null, lbIndice = 0; // grupo de fotos navegables [{src, alt}] y la actual
+const lightboxPrev = document.getElementById('lightbox-prev');
+const lightboxNext = document.getElementById('lightbox-next');
+const lightboxCount = document.getElementById('lightbox-count');
 
-function openLightbox(src, alt) {
-  lightboxImg.src = src;
-  lightboxImg.alt = alt || '';
+function pintarLightbox() {
+  const f = lbGrupo ? lbGrupo[lbIndice] : null;
+  if (f) { lightboxImg.src = f.src; lightboxImg.alt = f.alt || ''; }
+  const varias = !!lbGrupo;
+  lightboxPrev.hidden = lightboxNext.hidden = lightboxCount.hidden = !varias;
+  if (varias) {
+    lightboxCount.textContent = (lbIndice + 1) + ' / ' + lbGrupo.length;
+    const vecina = lbGrupo[(lbIndice + 1) % lbGrupo.length];
+    new Image().src = vecina.src; // la siguiente ya queda en caché
+  }
+}
+/* grupo (opcional): arreglo de { src, caption|alt } para navegar con flechas, teclas y deslizando */
+function openLightbox(src, alt, grupo, indice) {
+  if (grupo && grupo.length > 1) {
+    lbGrupo = grupo.map((g) => ({ src: g.src, alt: g.alt || g.caption || '' }));
+    lbIndice = Math.max(0, Math.min(grupo.length - 1, indice || 0));
+    pintarLightbox();
+  } else {
+    lbGrupo = null;
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    pintarLightbox();
+  }
   lightbox.classList.add('open');
   canvasPauseReasons.add('lightbox');
   updateCanvasPauseState();
+}
+function lightboxIr(d) {
+  if (!lbGrupo) return;
+  lbIndice = (lbIndice + d + lbGrupo.length) % lbGrupo.length;
+  lightboxImg.classList.remove('lb-cambia'); void lightboxImg.offsetWidth; lightboxImg.classList.add('lb-cambia');
+  pintarLightbox();
+  if (window.Sonidos) window.Sonidos.play('mes');
 }
 function closeLightbox() {
   lightbox.classList.remove('open');
@@ -56,21 +91,30 @@ function closeLightbox() {
   updateCanvasPauseState();
 }
 lightboxCloseBtn.addEventListener('click', closeLightbox);
+lightboxPrev.addEventListener('click', () => lightboxIr(-1));
+lightboxNext.addEventListener('click', () => lightboxIr(1));
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && lightbox.classList.contains('open')) closeLightbox();
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  else if (e.key === 'ArrowRight') lightboxIr(1);
+  else if (e.key === 'ArrowLeft') lightboxIr(-1);
 });
-lightbox.addEventListener('touchstart', (e) => { lightboxTouchStartY = e.touches[0].clientY; }, { passive: true });
+lightbox.addEventListener('touchstart', (e) => { lightboxTouchStartY = e.touches[0].clientY; lightboxTouchStartX = e.touches[0].clientX; }, { passive: true });
 lightbox.addEventListener('touchmove', (e) => {
   if (lightboxTouchStartY === null) return;
   const dy = e.touches[0].clientY - lightboxTouchStartY;
-  if (dy > 0) lightboxImg.style.transform = `translateY(${dy}px)`;
+  const dx = e.touches[0].clientX - lightboxTouchStartX;
+  if (dy > 0 && Math.abs(dy) > Math.abs(dx)) lightboxImg.style.transform = `translateY(${dy}px)`;
 }, { passive: true });
 lightbox.addEventListener('touchend', (e) => {
   if (lightboxTouchStartY === null) return;
   const dy = e.changedTouches[0].clientY - lightboxTouchStartY;
-  if (dy > 80) closeLightbox(); else lightboxImg.style.transform = '';
-  lightboxTouchStartY = null;
+  const dx = e.changedTouches[0].clientX - lightboxTouchStartX;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) { lightboxImg.style.transform = ''; lightboxIr(dx < 0 ? 1 : -1); }
+  else if (dy > 80) closeLightbox();
+  else lightboxImg.style.transform = '';
+  lightboxTouchStartY = null; lightboxTouchStartX = null;
 });
 
 /* ======================================================================
