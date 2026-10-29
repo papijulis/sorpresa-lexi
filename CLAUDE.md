@@ -44,7 +44,7 @@ https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
 ├─ manifest.webmanifest       # PWA — nombre, íconos, theme_color
 ├─ sw.js                      # Service worker: HTML/JS/CSS network-first (los arreglos llegan de inmediato), contenido/*.js
 │                              # también network-first (con SWR se veía HTML nuevo + contenido viejo), fuentes/fotos cache-first, audio NO se intercepta (Range). Sube CACHE_VERSION
-│                              # (hoy v6) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
+│                              # (hoy v7) si cambias la estrategia o qué se precachea; nunca dejes index.html en cache-first.
 ├─ CLAUDE.md                  # este archivo
 ├─ REVISAR.md                 # lista de textos borrador para que Julio revise/edite
 ├─ contenido/                 # TODO lo que Julio edita, vía <script src> (globals, no ES modules ni fetch — debe funcionar en file:// y GitHub Pages)
@@ -209,12 +209,14 @@ del bloque de "te amo".
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 
-- El pergamino final alterna entre `LETTER` (config.js) y `CARTA_FINAL`
-  (cartas.js, "Para seguir escribiendo") con el botón "Leer una carta más" /
-  "Volver a la primera carta" (`switchLetter()`): la tinta se desvanece y se
+- El pergamino final recorre 3 cartas (`LETTER_SEQ`): `LETTER` (config.js),
+  `CARTA_FINAL` ("Para seguir escribiendo") y `CARTA_PARA_LEXI` ("Para Lexi",
+  texto literal de Julio, última), con "Leer una carta más" y "Volver a…"
+  (`goToLetter()`; "Leer…" se oculta en la última, "Volver…" en la primera): la tinta se desvanece y se
   vuelve a revelar párrafo por párrafo, `aria-live="polite"`, instantáneo con
   `prefers-reduced-motion`. La vela del deseo (`#letter-wish-block`) es solo de
   la primera carta. `CARTA_FINAL` también es un sobre abierto del Buzón.
+- **Contador infinito:** `diffFromStart()` calcula siempre ahora − 28/05/2026 en hora de Ciudad de México (Intl, no la zona del dispositivo) a partir de `Date`, nunca sumando 1 por tic; sin fecha de fin ni `clearInterval`; se actualiza al instante en `visibilitychange`/`pageshow`/`focus`. Debajo va la dedicatoria "Me dijiste que el día que este contador se detenga…". `START_DATE` es el instante fijo `2026-05-28T00:00:00-06:00`.
 - La sección "Lo que nos falta vivir" se eliminó por decisión de Julio (no volver a agregarla).
 - Inicio: `#hero-panel` es un cuadro semitransparente que aparece ~4.5 s después de abrir el sitio (clase `.shown`) para que "Para ti" y el texto se lean sobre los lirios; sin la fecha "21 de septiembre" arriba. En modo ligero (`body.light-mode`) no usa blur.
 - Cursor: cursor nativo siempre visible (nunca `cursor:none`) y la manita (`cursor:pointer`) en todo lo clicable vía regla global `button, [role="button"], a[href]…` (venía del preflight de Tailwind y se había perdido). La capa superior `#cursor-canvas` (z 200) tiene su propio rAF (`topFrame`), independiente del loop principal, y dibuja el rastro de pétalos (por `pointermove` de mouse/lápiz, nunca touch) y los destellos de premio (`spawnSparkleBurst` los manda ahí cuando el canvas principal está pausado, así se ven al ganar un juego). Todo lo que decae lo hace por tiempo (dt), no por cuadro.

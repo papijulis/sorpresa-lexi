@@ -527,6 +527,10 @@
   .timeline-text { font-family: 'Playfair Display', serif; font-size: .92rem; color: rgba(253,251,247,.85); line-height: 1.55; }
   .timeline-photo { width: 100%; max-width: 160px; border-radius: .6rem; margin-top: .6rem; box-shadow: 0 8px 18px rgba(0,0,0,.4); display: block; }
 
+  .clock-infinity { color: #FFD700; font-size: 1.05em; margin-left: .15rem; }
+  .clock-dedicatoria { max-width: 28rem; margin: 2.5rem auto 0; font-size: 1.05rem; line-height: 1.7; color: rgba(253,251,247,.82); }
+  @media (min-width: 640px) { .clock-dedicatoria { font-size: 1.2rem; } }
+
   /* ---- easter egg: Panchito ---- */
   @keyframes panchitoWiggle { 0%, 100% { transform: rotate(0deg) scale(1); } 25% { transform: rotate(-4deg) scale(1.04); } 75% { transform: rotate(4deg) scale(1.04); } }
   .panchito-wiggle { animation: panchitoWiggle .6s ease; }
@@ -594,7 +598,7 @@
     #cal-prev, #cal-next, #mini-player-toggle, #mini-player-next, .banda-play { width: 2.75rem; height: 2.75rem; }
     .app-view-close { width: 2.75rem; height: 2.75rem; }
     #modal-close { top: .35rem; right: .5rem; width: 2.75rem; height: 2.75rem; font-size: 1.75rem; display: flex; align-items: center; justify-content: center; }
-    #letter-switch, #random-memory-btn, .juego-exit-btn { min-height: 2.75rem; }
+    #letter-switch, #letter-back, #random-memory-btn, .juego-exit-btn { min-height: 2.75rem; }
     .cupon-redeem-btn { min-height: 2.5rem; padding-left: 1.1rem; padding-right: 1.1rem; }
     .cupon-card { aspect-ratio: 3 / 4; }
     .cupon-reveal { padding: .5rem; gap: .2rem; }
@@ -732,7 +736,7 @@
   <!-- LOVE CLOCK -->
   <section class="reveal py-24 px-6 flex flex-col items-center text-center">
     <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2">Desde el 28 de mayo de 2026</h2>
-    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar</p>
+    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <span class="clock-infinity" aria-hidden="true">∞</span></p>
     <div class="clock-grid grid gap-3 sm:gap-6 max-w-3xl w-full">
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-months" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Meses</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-days" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Días</p></div>
@@ -740,6 +744,11 @@
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-minutes" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Minutos</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-seconds" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Segundos</p></div>
     </div>
+    <p class="clock-dedicatoria font-hand">
+      Me dijiste que el día que este contador se detenga, lo nuestro se termina.<br>
+      Por eso nunca se va a detener.<br>
+      Te amo por y para siempre.
+    </p>
     <button id="badge-1111" class="mt-14 glass glow-gold rounded-full px-6 py-3 flex items-center gap-3 hover:scale-105 active:scale-95 transition-transform">
       <span class="text-2xl">✨</span>
       <span class="font-hand text-xl sm:text-2xl text-gold">11:11 — Nuestra hora</span>
@@ -923,8 +932,9 @@
         </p>
       </div>
 
-      <div class="mt-10 text-center">
+      <div class="mt-10 flex flex-col items-center gap-1 text-center">
         <button id="letter-switch" type="button" aria-label="Leer una carta más" class="letter-switch-btn font-ui text-sm">Leer una carta más</button>
+        <button id="letter-back" type="button" aria-label="Volver a la primera carta" class="letter-switch-btn font-ui text-sm hidden">Volver a la primera carta</button>
       </div>
     </div>
   </section>
@@ -1969,12 +1979,27 @@ document.getElementById('sunset-toggle').addEventListener('click', () => {
 /* ======================================================================
    LOVE CLOCK
 ====================================================================== */
+/* El contador NUNCA se detiene: siempre se calcula como ahora − 28 de mayo de
+   2026 en hora de Ciudad de México (no en la zona del dispositivo), a partir
+   de Date, no sumando 1 por tic; así no se desfasa si la pestaña estuvo en
+   segundo plano, el teléfono se bloqueó o la PWA estuvo cerrada. Sin fecha de
+   fin ni clearInterval. */
+const MX_WALL_FMT = new Intl.DateTimeFormat('en-GB', {
+  timeZone: 'America/Mexico_City', hourCycle: 'h23',
+  year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit',
+});
+function mexicoWallMs(date) {
+  const p = {};
+  MX_WALL_FMT.formatToParts(date).forEach((x) => { p[x.type] = Number(x.value); });
+  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second);
+}
 function diffFromStart(now) {
-  let months = (now.getFullYear() - START_DATE.getFullYear()) * 12 + (now.getMonth() - START_DATE.getMonth());
-  let anchor = new Date(START_DATE);
-  anchor.setMonth(anchor.getMonth() + months);
-  if (anchor > now) { months -= 1; anchor = new Date(START_DATE); anchor.setMonth(anchor.getMonth() + months); }
-  let ms = now - anchor;
+  const wallNow = mexicoWallMs(now);
+  const n = new Date(wallNow);
+  let months = (n.getUTCFullYear() - 2026) * 12 + (n.getUTCMonth() - 4);
+  let anchor = Date.UTC(2026, 4 + months, 28);
+  if (anchor > wallNow) { months -= 1; anchor = Date.UTC(2026, 4 + months, 28); }
+  let ms = Math.max(0, wallNow - anchor);
   const days = Math.floor(ms / 86400000); ms -= days * 86400000;
   const hours = Math.floor(ms / 3600000); ms -= hours * 3600000;
   const minutes = Math.floor(ms / 60000); ms -= minutes * 60000;
@@ -1982,7 +2007,6 @@ function diffFromStart(now) {
   return { months: Math.max(0, months), days, hours, minutes, seconds };
 }
 function tickClock() {
-  if (document.hidden) return;
   const d = diffFromStart(new Date());
   document.getElementById('clock-months').textContent = d.months;
   document.getElementById('clock-days').textContent = d.days;
@@ -1991,7 +2015,11 @@ function tickClock() {
   document.getElementById('clock-seconds').textContent = d.seconds;
 }
 tickClock();
-setInterval(tickClock, 1000);
+setInterval(() => { if (!document.hidden) tickClock(); }, 1000);
+/* al volver a la pestaña (o a la PWA) se actualiza al instante */
+document.addEventListener('visibilitychange', () => { if (!document.hidden) tickClock(); });
+window.addEventListener('pageshow', tickClock);
+window.addEventListener('focus', tickClock);
 document.getElementById('badge-1111').addEventListener('click', () => {
   openModal({ icon: '✨', title: '11:11', body: WISH_1111_TEXT });
 });
@@ -2321,23 +2349,15 @@ const letterSwitchBtn = document.getElementById('letter-switch');
 /* Pergamino con dos cartas: la original (config.js → LETTER) y
    "Para seguir escribiendo" (cartas.js → CARTA_FINAL). La vela del deseo
    pertenece solo a la primera. */
-const LETTERS = {
-  primera: {
-    label: 'Carta del Capítulo 1 · 21 de septiembre de 2026',
-    texto: LETTER,
-    conVela: true,
-  },
-  final: {
-    label: (window.CARTA_FINAL && window.CARTA_FINAL.titulo) || 'Para seguir escribiendo',
-    texto: (window.CARTA_FINAL && window.CARTA_FINAL.texto) || '',
-    conVela: false,
-  },
-};
-const LETTER_BTN_TEXT = {
-  primera: (window.CARTA_FINAL && window.CARTA_FINAL.botonIda) || 'Leer una carta más',
-  final: (window.CARTA_FINAL && window.CARTA_FINAL.botonVuelta) || 'Volver a la primera carta',
-};
-let letterCurrent = 'primera';
+const letterBackBtn = document.getElementById('letter-back');
+const LETTER_SEQ = [
+  { label: 'Carta del Capítulo 1 · 21 de septiembre de 2026', texto: LETTER, conVela: true },
+  { label: (window.CARTA_FINAL && window.CARTA_FINAL.titulo) || 'Para seguir escribiendo', texto: (window.CARTA_FINAL && window.CARTA_FINAL.texto) || '', conVela: false },
+  { label: (window.CARTA_PARA_LEXI && window.CARTA_PARA_LEXI.titulo) || 'Para Lexi', texto: (window.CARTA_PARA_LEXI && window.CARTA_PARA_LEXI.texto) || '', conVela: false },
+].filter((l) => l.texto);
+const LETTER_NEXT_TEXT = (window.CARTA_FINAL && window.CARTA_FINAL.botonIda) || 'Leer una carta más';
+const LETTER_BACK_FIRST = (window.CARTA_FINAL && window.CARTA_FINAL.botonVuelta) || 'Volver a la primera carta';
+let letterCurrent = 0;
 let letterBusy = false;
 let letterRevealed = false;
 let letterPEls = [];
@@ -2370,10 +2390,22 @@ function revealLetterSequentially() {
   letterRevealed = true;
   playLetterInk();
 }
-function switchLetter() {
-  if (letterBusy) return;
+/* botones: "Leer una carta más" salvo en la última; "Volver…" salvo en la primera */
+function updateLetterButtons() {
+  const last = letterCurrent === LETTER_SEQ.length - 1;
+  letterSwitchBtn.classList.toggle('hidden', last);
+  letterSwitchBtn.textContent = LETTER_NEXT_TEXT;
+  letterSwitchBtn.setAttribute('aria-label', LETTER_NEXT_TEXT);
+  letterBackBtn.classList.toggle('hidden', letterCurrent === 0);
+  const backText = letterCurrent === 1 ? LETTER_BACK_FIRST : 'Volver a la carta anterior';
+  letterBackBtn.textContent = backText;
+  letterBackBtn.setAttribute('aria-label', backText);
+}
+function goToLetter(target) {
+  if (letterBusy || target < 0 || target >= LETTER_SEQ.length) return;
   letterBusy = true;
   letterSwitchBtn.disabled = true;
+  letterBackBtn.disabled = true;
   letterBodyEl.setAttribute('aria-live', 'polite');
   letterRevealed = true;
   letterTimers.forEach(clearTimeout);
@@ -2384,28 +2416,30 @@ function switchLetter() {
   letterWishBlockEl.style.opacity = '0';
 
   setTimeout(() => {
-    letterCurrent = letterCurrent === 'primera' ? 'final' : 'primera';
-    const data = LETTERS[letterCurrent];
+    letterCurrent = target;
+    const data = LETTER_SEQ[letterCurrent];
     letterLabelEl.textContent = data.label;
     buildLetterParagraphs(data.texto);
     letterWishBlockEl.classList.toggle('hidden', !data.conVela);
     if (data.conVela) requestAnimationFrame(() => { letterWishBlockEl.style.opacity = '1'; });
-    letterSwitchBtn.textContent = LETTER_BTN_TEXT[letterCurrent];
-    letterSwitchBtn.setAttribute('aria-label', LETTER_BTN_TEXT[letterCurrent]);
+    updateLetterButtons();
     const rect = letterContainerEl.getBoundingClientRect();
     if (rect.top < 0 || rect.top > window.innerHeight * 0.4) {
       letterContainerEl.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
     }
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       playLetterInk();
       letterSwitchBtn.disabled = false;
+      letterBackBtn.disabled = false;
       letterBusy = false;
-    });
+    }, 30);
   }, reduced ? 50 : 750);
 }
-letterSwitchBtn.addEventListener('click', switchLetter);
+letterSwitchBtn.addEventListener('click', () => goToLetter(letterCurrent + 1));
+letterBackBtn.addEventListener('click', () => goToLetter(letterCurrent - 1));
 
-buildLetterParagraphs(LETTERS.primera.texto);
+buildLetterParagraphs(LETTER_SEQ[0].texto);
+updateLetterButtons();
 const letterObserver = new IntersectionObserver((entries) => {
   entries.forEach((entry) => { if (entry.isIntersecting) { revealLetterSequentially(); letterObserver.disconnect(); } });
 }, { threshold: 0.2 });

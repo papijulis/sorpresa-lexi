@@ -37,6 +37,16 @@ Julio`,
   borrador: true, // solo el cierre mezclado es nuevo; el resto es el texto de CARTA-FINAL.md
 };
 
+
+/* Tercera carta del pergamino ("Leer una carta más" desde "Para seguir
+   escribiendo") y último sobre del Buzón. Texto literal, tal como lo
+   escribió Julio: no se corrige ni se resume. */
+window.CARTA_PARA_LEXI = {
+  titulo: "Para Lexi",
+  texto: "Mi niña hermosa, mi Lexi:\n\nMe dijiste que ya dejara de pedirte perdón, y tienes razón. Así que esta carta la empiezo distinto: con un gracias.\n\nGracias por ser mi lugar seguro desde aquel junio en que me dijiste que yo era el tuyo. Gracias por esperarme, por cuidarme incluso cuando me fui esas dos semanas, y por decirme «vas bien, vas bien» cuando yo no lo creía. Gracias por dormir con Panchito y con mi sudadera, por nunca quitarte la pulsera, y por recordarme que todo fue real: que me besaste, que lloramos juntos, que nos prometimos volver.\n\nTe debo un solo perdón más, y quiero que sea el último por un tiempo, perdón por las veces que te hice llorar, por no saber cuidar tu corazón y por no haber sido fuerte cuando más lo necesitábamos. De aquí en adelante prefiero demostrártelo con hechos que repetirlo con palabras.\n\nYa no somos novios, lo sé. Pero eso no cambia nada de lo importante. Sigues en cada atardecer que veo, desde el primero que te dediqué. Sigues en cada canción que cantamos juntos, en los buldaks, en esa pausa en medio de un beso solo para mirarte a los ojos. Tú me viste como nadie, y yo te vi a ti.\n\nMe dijiste que tú también quieres ser elegida. Entonces que te quede escrito, para que lo guardes donde quieras: te elijo a ti. Te elegí el primer día, te elijo hoy y te voy a seguir eligiendo siempre.\n\nY te prometo algo más, confiar. No necesito saber de nadie más ni hacerte preguntas a medianoche. Confío en lo que me dices y en lo que veo cuando tus ojos brillan. Mis miedos son míos y los voy a trabajar yo, no son algo que tengas que cargar tú.\n\nMientras tanto voy a hacer lo que me pediste: levantarme, trabajar, estudiar, ir al gym, crecer. Como dijiste tú y como diría la Taylor Swift, tenemos que sangrar para crecer. Y quiero que tú también vivas, que estés bien, que te rías y seas feliz, porque como me dijiste: tenemos que estar bien los dos para poder estar juntos.\n\nTengo un sueño muy sencillo que se repite últimamente, despertar contigo, irme a trabajar, regresar y encontrarte terminando de hacer de comer, contarte mi día y acurrucarnos en el sillón a ver una peli. Algún día va a ser así. La vida nos va a volver a unir como lo hizo en mayo, y ese día voy a llegar a decirte: «ya vine por ti».\n\nTe amo, Lexi. Tanto como el primer día, y todavía más. Eres el amor de mi vida.\n\nHasta la luna,\n\nJulio",
+  borrador: false,
+};
+
 window.CARTAS = [
   {
     id: "para-seguir-escribiendo",
@@ -162,5 +172,14 @@ window.CARTAS = [
     sello: "corazon",
     texto: "Si estás leyendo esto es porque encontraste los doce corazones que escondí por todo este pequeño mundo — en la luna, en Panchito, entre las flores, donde se me fueran ocurriendo.\n\nMe gusta pensar que así soy yo contigo: dejando pedacitos de cariño escondidos en todas partes, para que los sigas encontrando incluso cuando no los estás buscando.\n\nGracias por buscar hasta el último. Te amo, Lexi.",
     borrador: true,
+  },
+  {
+    id: "para-lexi",
+    titulo: "Para Lexi",
+    tipo: "sorpresa",
+    apertura: "2026-09-21",
+    sello: "corazon",
+    texto: window.CARTA_PARA_LEXI.texto,
+    borrador: false,
   },
 ];

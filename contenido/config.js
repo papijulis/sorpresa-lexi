@@ -1,6 +1,7 @@
 /* Fechas clave, nombres y textos globales del sitio. */
 
-window.START_DATE = new Date(2026, 4, 28, 0, 0, 0);
+/* 28 de mayo de 2026, 00:00 hora de Ciudad de México (UTC−6 fijo): el mismo instante en cualquier zona del dispositivo */
+window.START_DATE = new Date('2026-05-28T00:00:00-06:00');
 
 window.MONTHS_SEQUENCE = [
   { year: 2026, month: 4, label: 'Mayo 2026' },
