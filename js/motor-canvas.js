@@ -40,6 +40,7 @@ window.addEventListener('resize', () => {
 resizeCanvas();
 
 let isSunset = false;
+let ritmoNivel = 0, ritmoPulso = 0; // el fondo respira con la música (actualizarRitmo, audio.js)
 let isNight = false; // cielo de noche (js/navegacion.js → setCielo)
 let SEASON_PALETTE = null; // set from the current month (Fase 4 — temporadas), see end of script
 
@@ -209,7 +210,7 @@ function updateLily(b, dt) {
   if (b.progress < 1) {
     b.progress += dt / 2200;
   } else {
-    b.pulse = 1 + Math.sin(performance.now() / 1400 + b.hue * 10) * 0.03;
+    b.pulse = 1 + Math.sin(performance.now() / 1400 + b.hue * 10) * 0.03 + ritmoPulso * 0.06; // + el golpe de la música
     b.idleTimer -= dt;
     if (b.idleTimer <= 0) {
       const angle = rand(0, Math.PI * 2);
@@ -554,7 +555,7 @@ function loop(t) {
   heartRain.forEach(drawHeartRainItem);
 
 
-  updateAudioBars();
+  updateAudioBars(t);
 
   rafId = requestAnimationFrame(loop);
 }

@@ -272,8 +272,12 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 
 ## Instalar y juegos en horizontal (rediseño, bloque 10)
 
-- **Instalar** (`js/instalar.js` + `assets/css/instalar.css`): guarda `beforeinstallprompt` (Chrome/Android) y ofrece el diálogo nativo; en Safari de iPhone/iPad explica "Compartir → Añadir a pantalla de inicio". Aviso flotante (`#instalar-aviso`) tras ~60 s de recorrido activo, nunca con una vista/carta/foto abierta, y si se descarta no vuelve en 14 días; además una línea permanente en "Caminos del jardín" (`#instalar-linea`) mientras no esté instalada. Estado en `jardin.instalar.v1` (`{descartado, instalado}`). No se pudo probar el diálogo real aquí (el navegador de pruebas no registra service workers ni dispara el evento): se probó con un evento simulado.
+- **Instalar** (`js/instalar.js`): ya NO hay aviso flotante (Julio lo pidió así); es una tarjeta ancha más del menú "Caminos del jardín" (`#camino-instalar`). Con Chrome/Android abre el diálogo nativo (`beforeinstallprompt`); en Safari de iPhone/iPad y en otros navegadores abre una ventanita con cómo "Añadir a pantalla de inicio". Se esconde si ya está instalada (standalone o `jardin.instalar.v1.instalado`). El diálogo real no se pudo probar aquí: Julio lo probará en su teléfono ya publicado.
 - **Juegos en horizontal**: ya no piden girar el teléfono (se quitó `data-portrait`). Con `max-height: 520px` y horizontal, `#view-juegos.jugando` (clase que ponen `launchJuego`/`exitJuego`) esconde el encabezado, "Salir" flota arriba a la izquierda y el lienzo vertical toma el alto disponible centrado (`movil.css`); los juegos ya se redimensionan con el evento `resize`.
+
+## Fondo con ritmo (rediseño, bloque 11)
+
+- `actualizarRitmo(t)` (audio.js, llamada desde `updateAudioBars` en cada cuadro del loop): lee los 2 primeros bins del analizador (graves), suaviza `ritmoNivel` y dispara `ritmoPulso` en cada golpe (energía > 1.25× el promedio móvil, > 0.32, con 260 ms de espera). Ambas variables viven en motor-canvas.js (cargan antes). Las usan `#bg-ritmo` (resplandor amatista/rosa abajo, solo `opacity`/`transform`), el latido de los lirios (`b.pulse`) y un bokeh que sube en los golpes fuertes. Sin música, en modo ligero o con movimiento reducido todo decae a 0. Probado con datos de graves simulados (el navegador de pruebas no entrega audio real).
 
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 

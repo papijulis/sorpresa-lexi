@@ -40,7 +40,6 @@
 <link rel="stylesheet" href="./assets/css/tipografia.css">
 <link rel="stylesheet" href="./assets/css/linea-tiempo.css">
 <link rel="stylesheet" href="./assets/css/cd.css">
-<link rel="stylesheet" href="./assets/css/instalar.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
@@ -54,6 +53,7 @@
 </div>
 <!-- PORTADA EN CAPAS (bloque 2): sol/luna según la hora, colinas, hierba con lirios y lirios grandes al frente -->
 <div id="bg-capitulo" aria-hidden="true"></div>
+<div id="bg-ritmo" aria-hidden="true"></div>
 <div id="portada" aria-hidden="true">
   <div class="p-sol"></div>
   <div class="p-disco"></div>
@@ -196,6 +196,20 @@
         </div>
       </div>
 
+      <button type="button" id="camino-instalar" class="camino camino-ancho tarjeta-flor mov-revelar" aria-label="Llevar el Jardín en tu pantalla de inicio">
+        <svg class="camino-escena escena-instalar" viewBox="0 0 160 120" aria-hidden="true" focusable="false">
+          <rect class="e-trazo e-relleno" x="52" y="8" width="56" height="104" rx="11"/>
+          <path class="e-trazo e-fino" d="M72 17h16M68 102h24"/>
+          <use href="#lirio-linea" x="62" y="38" width="36" height="36" style="color:var(--dorado-500)"/>
+          <use class="e-chispa" href="#brillo" x="112" y="22" width="14" height="14" style="color:var(--dorado-500)"/>
+          <use class="e-chispa e2" href="#brillo" x="30" y="70" width="10" height="10" style="color:var(--dorado-500)"/>
+        </svg>
+        <span class="camino-ancho-t">
+          <h3>Llevar el Jardín contigo</h3>
+          <span class="camino-sub">Instálalo en tu pantalla de inicio</span>
+          <span class="camino-chip">Instalar</span>
+        </span>
+      </button>
     </div>
     <nav class="cap-indice" aria-label="Partes del recorrido">
       <p class="cap-indice-t font-ui">El recorrido, por partes</p>
@@ -207,7 +221,6 @@
         <a href="#cap-5" class="cap-indice-item" data-cap="5"><span class="cap-indice-n">V</span><span>Lo que sigue</span></a>
       </div>
     </nav>
-    <p id="instalar-linea" class="instalar-linea" hidden><button type="button" id="instalar-linea-btn" class="instalar-linea-btn"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-casa"/></svg> Llevar el Jardín en mi pantalla de inicio</button></p>
   </section>
 
   <!-- PARTE I -->

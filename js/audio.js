@@ -44,12 +44,38 @@ function applyBars(barsEls, dataArr) {
     barsEls[i].style.transform = `scaleY(${Math.max(0.12, v)})`;
   }
 }
-function updateAudioBars() {
-  if (!useRealEq) return;
-  if (bgAnalyser && !bgAudio.paused) {
-    bgAnalyser.getByteFrequencyData(bgDataArr);
-    applyBars(miniEqBars, bgDataArr);
+/* ---- ritmo (bloque 11): el fondo respira con los graves de la canción ----
+   ritmoNivel = energía grave suavizada (0–1) · ritmoPulso = destello que salta en cada
+   golpe y decae solo. Los usan #bg-ritmo (abajo), los lirios (motor-canvas.js) y unos
+   bokeh que suben en los golpes fuertes. Sin movimiento (modo ligero/reducido) no hace nada. */
+let ritmoProm = 0, ritmoUltimoGolpe = 0, ritmoPintado = -1; // ritmoNivel y ritmoPulso viven en motor-canvas.js (carga antes)
+const bgRitmoEl = document.getElementById('bg-ritmo');
+function actualizarRitmo(t) {
+  const suena = bgAnalyser && !bgAudio.paused && !LIGHT_MODE;
+  if (suena) {
+    const e = (bgDataArr[0] + bgDataArr[1]) / 510;
+    ritmoProm += (e - ritmoProm) * 0.04;
+    ritmoNivel += (e - ritmoNivel) * 0.2;
+    if (e > ritmoProm * 1.25 && e > 0.32 && t - ritmoUltimoGolpe > 260) {
+      ritmoPulso = 1; ritmoUltimoGolpe = t;
+      if (e > 0.6 && bokehs.length < 14) spawnBokeh(rand(vw * 0.15, vw * 0.85), rand(vh * 0.45, vh * 0.95), 1);
+    }
+  } else {
+    ritmoNivel *= 0.92; ritmoPulso *= 0.92;
   }
+  ritmoPulso *= 0.9;
+  const v = suena || ritmoNivel > 0.01 ? Math.min(1, 0.18 + ritmoNivel * 0.62 + ritmoPulso * 0.4) : 0;
+  if (Math.abs(v - ritmoPintado) > 0.012) {
+    ritmoPintado = v;
+    bgRitmoEl.style.opacity = v.toFixed(3);
+    bgRitmoEl.style.transform = 'scale(' + (1 + ritmoPulso * 0.06).toFixed(3) + ')';
+  }
+}
+function updateAudioBars(t) {
+  if (useRealEq && bgAnalyser && !bgAudio.paused) bgAnalyser.getByteFrequencyData(bgDataArr);
+  actualizarRitmo(t || 0);
+  if (!useRealEq) return;
+  if (bgAnalyser && !bgAudio.paused) applyBars(miniEqBars, bgDataArr);
   if (voiceAnalyser && !voiceAudio.paused) {
     voiceAnalyser.getByteFrequencyData(voiceDataArr);
     applyBars(voiceWaveBars, voiceDataArr);
