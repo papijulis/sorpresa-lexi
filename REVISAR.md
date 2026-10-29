@@ -69,6 +69,7 @@ del corazón. Ajústalos en el arreglo `CODE` y en la función del abrazo.
 ## Rótulos del rediseño (míos, para que los cambies si quieres)
 
 - **Partes del recorrido** (título · subtítulo): I "Cómo empezó" · "28 de mayo de 2026"; II "Lo que guardo de ti" · "una voz y cien razones"; III "Lo que hemos vivido" · "flores, fotos y días que se quedan"; IV "Nuestra música" · "las canciones que ya son nuestras"; V "Lo que sigue" · "una carta que no termina". Están en `index.html` (`.cap-portal`) y en el `data-nombre` de cada `.capitulo`.
+- **Aviso de instalar** (`js/instalar.js`): "Lleva el Jardín contigo: instálalo en tu pantalla de inicio y ábrelo cuando quieras.", la versión de iPhone ("…en Safari toca Compartir y luego «Añadir a pantalla de inicio».") y el botón "Llevar el Jardín en mi pantalla de inicio".
 - **Caminos del jardín:** títulos y subtítulos de las 4 escenas ("Cartas que se abren con el tiempo", "Cupones, memorama y más sorpresas", "Nuestro soundtrack", "Día, atardecer o noche") y "Por aquí se llega a cada rincón."
 
 ## Decisiones tomadas (sin texto que revisar)

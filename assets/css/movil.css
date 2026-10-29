@@ -64,13 +64,18 @@
     .lightbox img { max-height: 90dvh; }
     .app-view { padding-top: calc(1rem + env(safe-area-inset-top, 0px)); }
     .app-view-header { margin-bottom: 0; }
-    /* los juegos de lienzo necesitan pantalla vertical: aviso para girar el teléfono */
-    #juego-stage[data-portrait="1"] #juego-mount { display: none; }
-    #juego-stage[data-portrait="1"]::before {
-      content: 'Para jugar, gira tu teléfono en vertical.';
-      display: block; text-align: center; padding: 2rem 1rem;
-      font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; color: rgba(var(--pergamino-rgb), .8);
-    }
+    /* juegos en horizontal: el encabezado se esconde, "Salir" flota en la esquina y el lienzo
+       toma el alto disponible (se queda vertical y centrado; antes pedían girar el teléfono) */
+    #view-juegos.jugando { padding-top: calc(.5rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(.5rem + env(safe-area-inset-bottom, 0px)); }
+    #view-juegos.jugando .app-view-header, #view-juegos.jugando #juegos-intro { display: none; }
+    #view-juegos.jugando .juego-exit-btn { position: fixed; top: calc(.5rem + env(safe-area-inset-top, 0px)); left: calc(.75rem + env(safe-area-inset-left, 0px)); z-index: 3; margin: 0; }
+    .lirios-wrap, .constelacion-wrap, .curame-wrap { max-width: none; }
+    .lirios-canvas { display: block; width: auto; height: calc(100dvh - 4.4rem); max-height: 460px; margin: 0 auto; }
+    .constelacion-canvas { display: block; width: auto; height: calc(100dvh - 6.4rem); max-height: 420px; margin: 0 auto; }
+    .lirios-wrap > p.font-ui, .constelacion-wrap > p.font-ui { display: none; }
+    .lirios-hud { margin-bottom: .35rem; }
+    .curame-wrap { max-width: 34rem; margin: 0 auto; }
+    .curame-arena { height: calc(100dvh - 7rem); min-height: 9rem; }
   }
   /* en pantallas táctiles el :hover se queda pegado tras el toque: se anula */
   @media (hover: none) {

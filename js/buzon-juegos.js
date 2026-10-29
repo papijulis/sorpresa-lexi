@@ -350,7 +350,7 @@ function renderJuegosGrid() {
 
 function launchJuego(juego) {
   activeJuego = juego;
-  juegoStage.dataset.portrait = ['lluvia-lirios', 'constelacion', 'curame'].includes(juego.id) ? '1' : '0';
+  viewJuegos.classList.add('jugando'); // en horizontal esconde el encabezado para dejarle alto al juego
   juegosGridEl.classList.add('hidden');
   juegosHeaderTitle.textContent = juego.titulo;
   juegosIntro.classList.add('hidden');
@@ -360,6 +360,7 @@ function launchJuego(juego) {
 function exitJuego() {
   if (activeJuego) { activeJuego.stop(); activeJuego = null; }
   juegoStage.classList.add('hidden');
+  viewJuegos.classList.remove('jugando');
   juegosHeaderTitle.textContent = 'Rincón de Juegos';
   juegosIntro.classList.remove('hidden');
   juegosGridEl.classList.remove('hidden');
