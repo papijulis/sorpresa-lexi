@@ -32,6 +32,7 @@
   position: absolute; top: .45rem; right: .95rem; width: .6rem; height: .6rem; border-radius: 999px;
   background: var(--rosa-400); box-shadow: 0 0 8px rgba(var(--rosa-rgb), .9);
 }
+.dock-dot { animation: latidoSuave 2.6s ease-in-out infinite; }
 .dock-dot.oro { background: var(--dorado-500); box-shadow: 0 0 8px rgba(var(--dorado-rgb), .9); }
 .dock-dot.hidden { display: none; }
 .dock-sep { width: 1px; align-self: stretch; margin: .55rem .3rem; background: rgba(255, 255, 255, .12); }

@@ -24,8 +24,12 @@ function openModal({ icon = 'i-corazon-lleno', title = '', body = '', bodyHTML =
   modalTitle.textContent = title;
   if (bodyHTML) modalBody.innerHTML = bodyHTML; else modalBody.textContent = body;
   modalBackdrop.classList.add('open');
+  if (window.Sonidos) window.Sonidos.play('abrir');
 }
-function closeModal() { modalBackdrop.classList.remove('open'); }
+function closeModal() {
+  if (window.Sonidos && modalBackdrop.classList.contains('open')) window.Sonidos.play('cerrar');
+  modalBackdrop.classList.remove('open');
+}
 document.getElementById('modal-close').addEventListener('click', closeModal);
 modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
 

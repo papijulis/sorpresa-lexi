@@ -292,6 +292,7 @@ function openSecretReason() {
 jarSecretBtn.addEventListener('click', openSecretReason);
 
 jarBtn.addEventListener('click', () => {
+  if (window.Sonidos) window.Sonidos.play('corazon');
   jarEl.classList.remove('shake-anim');
   void jarEl.offsetWidth;
   jarEl.classList.add('shake-anim');

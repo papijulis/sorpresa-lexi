@@ -46,7 +46,8 @@ let SEASON_PALETTE = null; // set from the current month (Fase 4 — temporadas)
 /* Fase 5 — modo ligero automático: si prefiere menos movimiento, o si
    los primeros segundos miden menos de 40fps, se reducen los topes de
    partículas y se apaga el shadowBlur (caro en canvas). */
-let LIGHT_MODE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let LIGHT_MODE = REDUCED_MOTION;
 let PARTICLE_CAP = LIGHT_MODE ? 25 : 55;
 let FIREFLY_CAP = LIGHT_MODE ? 8 : 18;
 if (LIGHT_MODE) document.body.classList.add('light-mode');
@@ -229,6 +230,7 @@ function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1 }) {
    los destellos de premio se dibujan en la capa superior (#cursor-canvas,
    encima de todo) para que se vean al ganar un juego. */
 function spawnSparkleBurst(x, y, count, rising = false) {
+  if (rising && window.Sonidos) window.Sonidos.play('premio'); // los destellos que suben son premios
   const target = (rafId === null && !document.hidden) ? topSparkles : sparkles;
   for (let i = 0; i < count; i++) {
     const angle = rising ? rand(-Math.PI * 0.75, -Math.PI * 0.25) : rand(0, Math.PI * 2);
@@ -397,18 +399,49 @@ function drawBird(b) {
    pointermove (mouse o lápiz), así funciona también en laptops con pantalla
    táctil, donde (pointer: fine) puede dar falso. */
 let cursorTrail = [];
+let topPetals = []; // pétalos que salen al tocar (js/micro.js) — se dibujan en la capa superior
+/* pétalos que brotan al tocar algo (los llama js/micro.js); con movimiento reducido no hacen nada */
+function spawnPetalTouch(x, y, n, colores) {
+  if (REDUCED_MOTION || document.hidden) return;
+  const cuantos = LIGHT_MODE ? Math.ceil(n / 2) : n;
+  for (let i = 0; i < cuantos; i++) {
+    const a = rand(-Math.PI * 0.95, -Math.PI * 0.05);
+    const v = rand(0.7, 2.1);
+    topPetals.push({
+      x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, rot: rand(0, Math.PI * 2), vr: rand(-0.12, 0.12),
+      size: rand(3.6, 7), life: 1, dur: rand(700, 1150), color: colores[Math.floor(rand(0, colores.length))],
+    });
+  }
+  if (topPetals.length > 60) topPetals.splice(0, topPetals.length - 60);
+  startTopLayer();
+}
+
 let topRaf = null;
 let topLast = 0;
 const isDesktopPointer = window.matchMedia('(pointer: fine)').matches;
 const TRAIL_LIFE_MS = 480;
 function drawTopLayer() {
   if (cursorTrail.length) {
-    cursorCtx.fillStyle = isSunset ? '#FB7185' : isNight ? '#DCE3FF' : '#FFD700';
+    const paleta = isSunset ? ['#FB7185', '#F59E0B', '#FFD700'] : isNight ? ['#DCE3FF', '#A9B6FF', '#FBE7A1'] : ['#FFD700', '#FACC15', '#E9D5FF', '#FB7185'];
     cursorTrail.forEach((c) => {
+      cursorCtx.fillStyle = paleta[c.col % paleta.length];
       cursorCtx.globalAlpha = Math.max(0, c.life) * 0.6;
       cursorCtx.beginPath();
       cursorCtx.ellipse(c.x, c.y, 4.2 * c.life + 1, 2 * c.life + 0.6, c.rot, 0, Math.PI * 2);
       cursorCtx.fill();
+    });
+  }
+  if (topPetals.length) {
+    topPetals.forEach((p) => {
+      cursorCtx.save();
+      cursorCtx.translate(p.x, p.y);
+      cursorCtx.rotate(p.rot);
+      cursorCtx.globalAlpha = Math.max(0, Math.min(1, p.life * 1.3)) * 0.9;
+      cursorCtx.fillStyle = p.color;
+      cursorCtx.beginPath();
+      cursorCtx.ellipse(0, 0, p.size, p.size * 0.5, 0, 0, Math.PI * 2);
+      cursorCtx.fill();
+      cursorCtx.restore();
     });
   }
   if (topSparkles.length) {
@@ -429,7 +462,14 @@ function topFrame(t) {
   topLast = t;
   for (let i = cursorTrail.length - 1; i >= 0; i--) {
     cursorTrail[i].life -= dt / TRAIL_LIFE_MS;
+    cursorTrail[i].y += dt * 0.018; // el rastro cae un poquito, como pétalos
     if (cursorTrail[i].life <= 0) cursorTrail.splice(i, 1);
+  }
+  for (let i = topPetals.length - 1; i >= 0; i--) {
+    const p = topPetals[i];
+    p.x += p.vx * dt * 0.06; p.y += p.vy * dt * 0.06; p.vy += 0.0016 * dt; p.vx *= 0.985;
+    p.rot += p.vr * dt * 0.06; p.life -= dt / p.dur;
+    if (p.life <= 0) topPetals.splice(i, 1);
   }
   for (let i = topSparkles.length - 1; i >= 0; i--) {
     const sp = topSparkles[i];
@@ -438,7 +478,7 @@ function topFrame(t) {
     if (sp.life <= 0) topSparkles.splice(i, 1);
   }
   cursorCtx.clearRect(0, 0, vw, vh);
-  if (cursorTrail.length || topSparkles.length) {
+  if (cursorTrail.length || topSparkles.length || topPetals.length) {
     drawTopLayer();
     topRaf = requestAnimationFrame(topFrame);
   } else {
@@ -451,12 +491,12 @@ function startTopLayer() {
 window.addEventListener('pointermove', (e) => {
   if (e.pointerType === 'touch') return;
   if (cursorTrail.length > 40) cursorTrail.shift();
-  cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI) });
+  cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI), col: Math.floor(rand(0, 4)) });
   startTopLayer();
 }, { passive: true });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
-    cursorTrail = []; topSparkles = [];
+    cursorTrail = []; topSparkles = []; topPetals = [];
     if (topRaf) { cancelAnimationFrame(topRaf); topRaf = null; }
     topLast = 0;
     cursorCtx.clearRect(0, 0, vw, vh);

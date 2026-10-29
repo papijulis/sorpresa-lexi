@@ -333,6 +333,7 @@
     if (abierto) return;
     if (typeof irisDesde === 'function') irisDesde(view, origen);
     abierto = true;
+    if (window.Sonidos) window.Sonidos.play('abrir');
     view.classList.add('open');
     history.replaceState(null, '', '#infinito');
     canvasPauseReasons.add('infinito');
@@ -355,6 +356,7 @@
   function cerrar() {
     if (!abierto) return;
     abierto = false;
+    if (window.Sonidos) window.Sonidos.play('cerrar');
     running = false;
     if (raf) { cancelAnimationFrame(raf); raf = null; }
     clearTimeout(idleTimeout); idleTimeout = null;

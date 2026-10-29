@@ -48,6 +48,7 @@ function setCielo(estado, silencioso) {
   if (!isSunset) birds = [];
   actualizarCieloUI();
   if (window.Portada) window.Portada.actualizar(estado);
+  if (!silencioso && window.Sonidos) window.Sonidos.play('cielo', estado);
   if (!silencioso && estado === 'atardecer') showToast(SUNSET_TOAST_TEXT);
 }
 
@@ -104,3 +105,15 @@ bgAudio.addEventListener('loadstart', () => {
   if (currentSongIndex >= 0) notaDeDock('Sonando: ' + SONGS[currentSongIndex].title);
 });
 sincronizarMusica();
+
+/* ---- interruptor de sonidos suaves (tarjeta Tocadiscos) ---- */
+const caminoEfectos = document.getElementById('camino-efectos');
+function pintarEfectos() {
+  const on = window.Sonidos ? window.Sonidos.activo() : false;
+  caminoEfectos.setAttribute('aria-pressed', String(on));
+  caminoEfectos.setAttribute('aria-label', on ? 'Sonidos suaves: activados' : 'Sonidos suaves: apagados');
+  caminoEfectos.innerHTML = ico(on ? 'i-sonido' : 'i-sonido-off');
+}
+caminoEfectos.addEventListener('click', () => { if (window.Sonidos) window.Sonidos.activar(!window.Sonidos.activo()); });
+document.addEventListener('jardin:sonidos', pintarEfectos);
+pintarEfectos();

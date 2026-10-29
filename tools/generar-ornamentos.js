@@ -120,6 +120,8 @@ const ICONOS = {
   dado: L('<rect x="4" y="4" width="16" height="16" rx="3.500"/><circle cx="8.700" cy="8.700" r="1" fill="currentColor"/><circle cx="15.300" cy="15.300" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/>'),
   casa: L('<path d="M3.500 11.500 12 4l8.500 7.500"/><path d="M5.500 10.500V20h13v-9.500"/><path d="M10 20v-5.500h4V20"/>'),
   vela: L('<path d="M8.500 10.500h7V20a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1z"/><path d="M12 10.500V9"/><path d="M12 2.800c2 2 3 3.500 3 5a3 3 0 0 1-6 0c0-1.500 1-3 3-5z" fill="currentColor" stroke="none"/>'),
+  sonido: L('<path d="M4 9.500v5h3.500L12 18.500v-13L7.500 9.500z"/><path d="M15.500 9a4 4 0 0 1 0 6M18 6.500a8 8 0 0 1 0 11"/>'),
+  'sonido-off': L('<path d="M4 9.500v5h3.500L12 18.500v-13L7.500 9.500z"/><path d="M16 9.500l5 5M21 9.500l-5 5"/>'),
   nota: L('<path d="M9 17.500V5.500l10-2v12"/><circle cx="6.500" cy="17.500" r="2.500"/><circle cx="16.500" cy="15.500" r="2.500"/>'),
   siguiente: L('<path d="M5 6v12M9.500 6l9 6-9 6z" />'),
   play: `<path d="M8 5.500v13l11-6.500z" fill="currentColor"/>`,

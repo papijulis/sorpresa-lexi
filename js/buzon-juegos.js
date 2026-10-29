@@ -175,12 +175,14 @@ function renderBuzon() {
 function openBuzonView(origen) {
   renderBuzon();
   irisDesde(viewBuzon, origen);
+  if (window.Sonidos) window.Sonidos.play('abrir');
   viewBuzon.classList.add('open');
   history.replaceState(null, '', '#buzon');
   canvasPauseReasons.add('buzon');
   updateCanvasPauseState();
 }
 function closeBuzonView() {
+  if (window.Sonidos && viewBuzon.classList.contains('open')) window.Sonidos.play('cerrar');
   viewBuzon.classList.remove('open');
   if (location.hash === '#buzon') history.replaceState(null, '', location.pathname + location.search);
   canvasPauseReasons.delete('buzon');
@@ -323,12 +325,14 @@ juegoExitBtn.addEventListener('click', exitJuego);
 function openJuegosView(origen) {
   renderJuegosGrid();
   irisDesde(viewJuegos, origen);
+  if (window.Sonidos) window.Sonidos.play('abrir');
   viewJuegos.classList.add('open');
   history.replaceState(null, '', '#juegos');
   canvasPauseReasons.add('juegos');
   updateCanvasPauseState();
 }
 function closeJuegosView() {
+  if (window.Sonidos && viewJuegos.classList.contains('open')) window.Sonidos.play('cerrar');
   exitJuego();
   viewJuegos.classList.remove('open');
   canvasPauseReasons.delete('juegos');
