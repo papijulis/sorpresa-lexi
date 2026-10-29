@@ -108,9 +108,18 @@
   --z-precarga: 100;
   --z-cursor: 200;
 
-  /* ---- tipografía (se amplía en el punto 4) ---- */
+  /* ---- tipografía (punto 4) ----
+     display = Cormorant Garamond, SOLO para titulares grandes y números (portal de
+     las partes, "Para ti, Lexi", títulos de sección, contadores); titulo = Playfair
+     Display para títulos medianos y todo texto íntimo en itálica (.font-hand);
+     ui = Inter. Cormorant es más chica a igual tamaño: la escala ya lo compensa. */
+  --fuente-display: 'Cormorant Garamond', 'Playfair Display', serif;
   --fuente-titulo: 'Playfair Display', serif;
   --fuente-ui: 'Inter', sans-serif;
+  --t-hero: clamp(3.7rem, 15vw, 7rem);
+  --t-portal: clamp(2.7rem, 11vw, 5.6rem);
+  --t-seccion: clamp(2.3rem, 7vw, 3.7rem);
+  --t-numero: clamp(2.3rem, 7.5vw, 3.2rem);
 }
 
 /* ---- tema NOCHE (punto 8): índigo profundo, plata lunar y un dorado más tenue.

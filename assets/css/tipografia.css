@@ -1,0 +1,33 @@
+/* ======================================================================
+   TIPOGRAFÍA (bloque 4 del rediseño) — jerarquía de tres voces
+   • Cormorant Garamond (display): titulares grandes y números. Fina y elegante;
+     por eso solo se usa grande y con peso 500–600 para que no se pierda sobre
+     el fondo oscuro.
+   • Playfair Display: títulos medianos y todo el texto íntimo en itálica.
+   • Inter: interfaz, etiquetas y párrafos cortos.
+   Autoalojada (subset latin), como las otras dos.
+====================================================================== */
+@font-face {
+  font-family: 'Cormorant Garamond'; font-style: normal; font-weight: 300 700; font-display: swap;
+  src: url('../fonts/CormorantGaramond-latin-300-700-normal.woff2') format('woff2');
+}
+
+/* inicio: "Para ti, Lexi" */
+.hero-panel h1 {
+  font-family: var(--fuente-display); font-weight: 500; font-size: var(--t-hero);
+  line-height: .98; letter-spacing: -.012em; margin-bottom: .6rem;
+}
+
+/* títulos de sección */
+h2.titulo-seccion {
+  font-family: var(--fuente-display); font-weight: 600; font-size: var(--t-seccion);
+  line-height: 1.04; letter-spacing: -.008em; color: var(--pergamino-50);
+}
+
+/* números del contador */
+/* Cormorant trae cifras antiguas por defecto (el 1 parece una I): en contadores, cifras de tabla */
+.clock-grid .font-display { font-family: var(--fuente-display); font-weight: 600; font-size: var(--t-numero); line-height: 1; font-variant-numeric: lining-nums tabular-nums; }
+
+/* portal de cada parte */
+.cap-num { font-family: var(--fuente-display); font-weight: 600; }
+.cap-titulo { font-family: var(--fuente-display); font-weight: 600; font-size: var(--t-portal); line-height: 1; letter-spacing: -.01em; }
