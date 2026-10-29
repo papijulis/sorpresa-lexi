@@ -86,7 +86,11 @@ function irisDesde(vista, origen) {
   let x = '50%', y = '100%';
   if (el && el.getBoundingClientRect) {
     const r = el.getBoundingClientRect();
-    if (r.width) { x = Math.round(r.left + r.width / 2) + 'px'; y = Math.round(r.top + r.height / 2) + 'px'; }
+    /* se limita a la pantalla: si el botón está fuera de vista, el iris nace en el borde */
+    if (r.width) {
+      x = Math.round(Math.max(0, Math.min(window.innerWidth, r.left + r.width / 2))) + 'px';
+      y = Math.round(Math.max(0, Math.min(window.innerHeight, r.top + r.height / 2))) + 'px';
+    }
   }
   vista.style.setProperty('--ox', x);
   vista.style.setProperty('--oy', y);

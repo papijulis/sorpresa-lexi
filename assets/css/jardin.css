@@ -67,16 +67,5 @@
     border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;
   }
 
-  /* ---- easter egg: corazón multilingüe (al escribir "i love you") ---- */
-  .heart-lang-overlay {
-    position: fixed; inset: 0; z-index: 90;
-    background: radial-gradient(circle at 50% 38%, var(--ciruela-700), var(--ciruela-950));
-    display: flex; align-items: center; justify-content: center; flex-direction: column;
-    opacity: 0; pointer-events: none; transition: opacity .5s ease;
-    padding: calc(1.5rem + env(safe-area-inset-top,0px)) calc(1.25rem + env(safe-area-inset-right,0px)) calc(1.5rem + env(safe-area-inset-bottom,0px)) calc(1.25rem + env(safe-area-inset-left,0px));
-  }
-  .heart-lang-overlay.open { opacity: 1; pointer-events: auto; }
-  .heart-lang-canvas { width: 100%; max-width: 480px; aspect-ratio: 10/9; touch-action: none; }
-  .heart-lang-hint { font-family: 'Playfair Display', serif; font-style: italic; font-size: .95rem; color: rgba(var(--pergamino-rgb), .65); margin-top: .5rem; text-align: center; }
 
 

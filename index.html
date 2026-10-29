@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="./assets/css/jardin.css">
 <link rel="stylesheet" href="./assets/css/ornamentos.css">
 <link rel="stylesheet" href="./assets/css/navegacion.css">
+<link rel="stylesheet" href="./assets/css/infinito.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
 <body class="locked">
@@ -180,7 +181,7 @@
   <!-- LOVE CLOCK -->
   <section class="reveal py-24 px-6 flex flex-col items-center text-center">
     <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2 titulo-seccion">Desde el 28 de mayo de 2026</h2>
-    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <a id="clock-infinity-link" class="clock-infinity" href="./infinito.html" target="_blank" aria-label="Abrir nuestra página infinita" title="Infinito"><svg class="ico" aria-hidden="true" focusable="false"><use href="#infinito-flor"/></svg></a></p>
+    <p class="font-ui text-parchment/60 text-sm mb-10">Cada segundo desde que empezamos a hablar, el 28 de mayo <a id="clock-infinity-link" class="clock-infinity" href="#infinito" aria-label="Abrir Infinito" title="Infinito"><svg class="ico" aria-hidden="true" focusable="false"><use href="#infinito-flor"/></svg></a></p>
     <div class="clock-grid grid gap-3 sm:gap-6 max-w-3xl w-full">
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-months" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Meses</p></div>
       <div class="glass rounded-2xl py-5 px-2"><p id="clock-days" class="font-display text-3xl sm:text-4xl text-gold">0</p><p class="font-ui text-[11px] sm:text-xs text-parchment/60 mt-1 uppercase tracking-wide">Días</p></div>
@@ -415,6 +416,47 @@
   </div>
 </div>
 
+<!-- ===================== INFINITO (popup: corazón de flores + corazón de idiomas + contador) ===================== -->
+<div id="view-infinito" class="app-view" aria-label="Infinito">
+  <div class="app-view-header">
+    <h2 class="font-display text-2xl sm:text-3xl text-gold">Hoy, mañana y siempre</h2>
+    <button id="infinito-close" aria-label="Cerrar Infinito" class="app-view-close">×</button>
+  </div>
+  <main class="inf-wrap app-view-body">
+    <header class="inf-title">
+      <p class="inf-symbol" aria-hidden="true"><svg class="ico" focusable="false"><use href="#infinito"/></svg></p>
+      <div class="orn-divisor" data-escena="trazo" data-orn-divisor></div>
+    </header>
+
+    <section class="inf-stage" aria-label="Un corazón hecho de flores que se va dibujando">
+      <div class="heart-box" id="heart-box">
+        <canvas id="garden" aria-hidden="true"></canvas>
+        <canvas id="inf-lang" aria-hidden="true"></canvas>
+      </div>
+
+      <div class="inf-message" id="inf-message">
+        <p class="inf-since">Desde que empezamos a hablar, el 28 de mayo</p>
+        <div class="inf-counter" id="inf-counter" role="timer" aria-live="off" aria-label="Tiempo desde que empezamos a hablar">
+          <div><span id="c-days">0</span><small>días</small></div>
+          <div><span id="c-hours">00</span><small>horas</small></div>
+          <div><span id="c-minutes">00</span><small>minutos</small></div>
+          <div><span id="c-seconds">00</span><small>segundos</small></div>
+        </div>
+        <p class="inf-never">Este contador nunca se va a detener.</p>
+        <p class="inf-love">Te amo por y para siempre.</p>
+        <p class="inf-sign">— Julio</p>
+        <button type="button" id="hug-btn" class="hug-btn btn-brillo" aria-label="Recibir un abrazo">Un abrazo</button>
+      </div>
+    </section>
+
+    <section class="inf-code" aria-label="Un poema escrito como código">
+      <div class="code-panel tarjeta-flor" id="code-panel" aria-hidden="true"><span id="code-out"></span><span class="code-caret">▍</span></div>
+      <p class="sr-only" id="code-sr"></p>
+    </section>
+  </main>
+</div>
+<div id="inf-toast" class="inf-toast" role="status" aria-live="polite"></div>
+
 <!-- ===================== DOCK (punto 9): navegación integrada ===================== -->
 <nav id="dock" class="dock" aria-label="Navegación del jardín">
   <button id="buzon-toggle" class="dock-btn" aria-label="El Buzón">
@@ -449,7 +491,7 @@
 <!-- ===================== REUSABLE MODAL ===================== -->
 <div id="app-modal" class="modal-backdrop">
   <div id="modal-panel" class="modal-panel glass rounded-3xl max-w-md w-[92%] p-7 sm:p-9 relative">
-    <button id="modal-close" aria-label="Cerrar" class="absolute top-3 right-4 text-parchment/60 hover:text-parchment text-2xl leading-none">×</button>
+    <button id="modal-close" aria-label="Cerrar" class="absolute top-3 right-4">×</button>
     <div id="modal-icon" class="text-3xl mb-3"></div>
     <h3 id="modal-title" class="font-display text-xl sm:text-2xl text-gold mb-3"></h3>
     <p id="modal-body" class="font-hand text-lg sm:text-xl leading-relaxed text-parchment"></p>
@@ -460,13 +502,6 @@
 <div id="lightbox" class="lightbox">
   <button id="lightbox-close" aria-label="Cerrar foto" class="lightbox-close">×</button>
   <img id="lightbox-img" src="" alt="">
-</div>
-
-<!-- ===================== EASTER EGG: CORAZÓN MULTILINGÜE ===================== -->
-<div id="heart-languages" class="heart-lang-overlay">
-  <button id="heart-languages-close" aria-label="Cerrar" class="lightbox-close">×</button>
-  <canvas id="heart-languages-canvas" class="heart-lang-canvas"></canvas>
-  <p class="heart-lang-hint">Te amo, en todos los idiomas que encontré.</p>
 </div>
 
 <!-- ===================== TOAST ===================== -->
@@ -495,6 +530,7 @@
 <script src="./js/secciones.js"></script>
 <script src="./js/buzon-juegos.js"></script>
 <script src="./js/extras.js"></script>
+<script src="./js/infinito.js"></script>
 <script src="./js/navegacion.js"></script>
 <script src="./js/escenas.js"></script>
 </body>

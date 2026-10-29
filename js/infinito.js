@@ -1,8 +1,10 @@
-/* Página "Infinito": un corazón hecho de flores que se dibujan solas (idea
-   tomada de ritvikbhatia/LoveProject, reescrita en JS plano con la paleta
-   del sitio), texto tipo código que se escribe solo, y el contador que
-   nunca se detiene. Respeta prefers-reduced-motion, pausa con la pestaña
-   oculta y limita el devicePixelRatio. */
+/* Popup "Infinito" (#view-infinito): un corazón hecho de flores que se dibujan
+   solas (idea tomada de ritvikbhatia/LoveProject, reescrita en JS plano con la
+   paleta del sitio), el corazón de "te amo" en muchos idiomas justo en su
+   centro, texto tipo código que se escribe solo, y el contador que nunca se
+   detiene. Nada corre mientras el popup está cerrado. Respeta
+   prefers-reduced-motion, pausa con la pestaña oculta y limita el
+   devicePixelRatio. API: window.Infinito = { abrir(origen), cerrar() }. */
 (function () {
   'use strict';
 
@@ -12,6 +14,10 @@
   var ctx = canvas.getContext('2d');
   var messageEl = document.getElementById('inf-message');
   var toastEl = document.getElementById('inf-toast');
+  var view = document.getElementById('view-infinito');
+  var langCanvas = document.getElementById('inf-lang');
+  var langCtx = langCanvas.getContext('2d');
+  var abierto = false, iniciado = false, necesitaRehacer = false;
 
   function rand(a, b) { return Math.random() * (b - a) + a; }
   function randInt(a, b) { return Math.floor(rand(a, b + 1)); }
@@ -96,7 +102,7 @@
      Animación
   ------------------------------------------------------------------ */
   var raf = null, lastT = 0, acc = 0, angle = Math.PI, heartDone = false, idleTimeout = null;
-  var running = false, visibleEnough = true;
+  var running = false;
 
   function sizeCanvas() {
     var rect = box.getBoundingClientRect();
@@ -125,7 +131,26 @@
     if (angle >= Math.PI * 3) { heartDone = true; }
   }
 
-  function showMessage() { messageEl.classList.add('shown'); }
+  /* corazón de idiomas: mismo centro que el corazón de flores (H/2) y un poco
+     más chico, para que quede dentro del aro de flores */
+  function dibujarIdiomas() {
+    langCanvas.width = Math.round(W * dpr); langCanvas.height = Math.round(H * dpr);
+    langCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    langCtx.clearRect(0, 0, W, H);
+    if (typeof buildHeartLangWords !== 'function') return;
+    var scale = K * 0.82;
+    var words = buildHeartLangWords(W, H, { cx: W / 2, cy: H / 2 - 2.538 * scale, scale: scale });
+    langCtx.textAlign = 'center';
+    langCtx.textBaseline = 'middle';
+    langCtx.globalAlpha = 0.92;
+    words.forEach(function (w) {
+      langCtx.fillStyle = w.color;
+      langCtx.font = 'italic 600 ' + w.fontSize + "px 'Playfair Display', serif";
+      langCtx.fillText(w.text, w.x, w.y);
+    });
+  }
+
+  function showMessage() { messageEl.classList.add('shown'); langCanvas.classList.add('shown'); }
 
   function frame(t) {
     raf = null;
@@ -169,6 +194,11 @@
     clearTimeout(idleTimeout); idleTimeout = null;
     blooms = []; placed = []; angle = Math.PI; heartDone = false; acc = 0;
     messageEl.classList.remove('shown');
+    langCanvas.classList.remove('shown');
+    if (document.fonts && document.fonts.load) {
+      document.fonts.load("italic 600 12px 'Playfair Display'").then(dibujarIdiomas, dibujarIdiomas);
+    } else { dibujarIdiomas(); }
+    necesitaRehacer = false;
     if (REDUCED) {
       // sin animación: se dibuja el corazón completo de una vez
       while (!heartDone) placeStep();
@@ -186,28 +216,22 @@
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function () {
       var w = window.innerWidth;
-      if (w !== lastW) { lastW = w; restart(); }
+      if (w === lastW) return;
+      lastW = w;
+      if (abierto) restart(); else necesitaRehacer = true;
     }, 250);
   });
 
   document.addEventListener('visibilitychange', function () {
-    if (REDUCED) return;
+    if (REDUCED || !abierto) return;
     if (document.hidden) {
       running = false;
       if (raf) { cancelAnimationFrame(raf); raf = null; }
     } else {
-      running = visibleEnough;
+      running = true;
       start();
     }
   });
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(function (entries) {
-      visibleEnough = entries[0].isIntersecting;
-      if (REDUCED || document.hidden) return;
-      if (visibleEnough) { running = true; start(); }
-      else { running = false; if (raf) { cancelAnimationFrame(raf); raf = null; } }
-    }, { threshold: 0 }).observe(box);
-  }
 
   /* ------------------------------------------------------------------
      Abrazo: una ráfaga de flores nuevas sobre el corazón
@@ -249,7 +273,7 @@
     elH.textContent = pad(h); elM.textContent = pad(m); elS.textContent = pad(s);
   }
   tick();
-  setInterval(function () { if (!document.hidden) tick(); }, 1000);
+  setInterval(function () { if (abierto && !document.hidden) tick(); }, 1000);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
   window.addEventListener('pageshow', tick);
   window.addEventListener('focus', tick);
@@ -303,19 +327,44 @@
   panel.addEventListener('click', finishTyping);
 
   /* ------------------------------------------------------------------
-     Volver: cierra esta pestaña si la abrió el Jardín (así la música
-     sigue sonando allá); si se abrió suelta, va al inicio.
+     Abrir / cerrar el popup (iris desde el botón tocado, como Buzón y Juegos)
   ------------------------------------------------------------------ */
-  document.getElementById('volver').addEventListener('click', function (e) {
-    if (window.opener && !window.opener.closed) {
-      e.preventDefault();
-      window.close();
-      setTimeout(function () { window.location.href = './index.html'; }, 300);
+  function abrir(origen) {
+    if (abierto) return;
+    if (typeof irisDesde === 'function') irisDesde(view, origen);
+    abierto = true;
+    view.classList.add('open');
+    history.replaceState(null, '', '#infinito');
+    canvasPauseReasons.add('infinito');
+    updateCanvasPauseState();
+    tick();
+    if (!iniciado) {
+      iniciado = true;
+      lastW = window.innerWidth;
+      restart();
+      if (REDUCED) finishTyping(); else setTimeout(typeNext, 900);
+    } else {
+      if (necesitaRehacer) restart();
+      else if (!REDUCED) {
+        running = true;
+        start();
+        if (heartDone && !idleTimeout) idleTimeout = setTimeout(reBloom, 1400);
+      }
     }
-  });
-
-  /* ------------------------------------------------------------------ */
-  lastW = window.innerWidth;
-  restart();
-  if (REDUCED) finishTyping(); else setTimeout(typeNext, 700);
+  }
+  function cerrar() {
+    if (!abierto) return;
+    abierto = false;
+    running = false;
+    if (raf) { cancelAnimationFrame(raf); raf = null; }
+    clearTimeout(idleTimeout); idleTimeout = null;
+    view.classList.remove('open');
+    if (location.hash === '#infinito') history.replaceState(null, '', location.pathname + location.search);
+    canvasPauseReasons.delete('infinito');
+    updateCanvasPauseState();
+  }
+  document.getElementById('infinito-close').addEventListener('click', cerrar);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && abierto) cerrar(); });
+  window.Infinito = { abrir: abrir, cerrar: cerrar };
+  if (location.hash === '#infinito') abrir();
 })();

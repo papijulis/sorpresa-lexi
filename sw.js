@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v12';
+const CACHE_VERSION = 'v13';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -26,7 +26,6 @@ const SHELL_URLS = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './infinito.html',
   './assets/css/infinito.css',
   './js/infinito.js',
   './assets/css/utilities.css',

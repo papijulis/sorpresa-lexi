@@ -181,33 +181,21 @@ existente en vez de agregar uno nuevo:
 
 ## Easter egg: corazón multilingüe (pendiente, agregado después)
 
-Al escribir **"i love you"** (en paralelo a "te amo" → lluvia de
-corazones, arriba) se abre `#heart-languages`, un overlay de pantalla
-completa con su propio `<canvas>`. Vive en `index.html`, justo después
-del bloque de "te amo".
+Al escribir **"i love you"** (o "te amo", que además lanza la lluvia de
+corazones) se abre el popup "Infinito" (ver más abajo), donde vive el
+corazón multilingüe. Antes era un overlay propio (`#heart-languages`);
+se quitó por decisión de Julio.
 
-- Arma un corazón relleno de la frase "te amo" en 20 idiomas
-  (`HEART_LANG_PHRASES`, constante fija inline — son traducciones de un
-  hecho público, no voz personal de Julio, así que no llevan `borrador`
-  ni van en `REVISAR.md`). Usa la misma curva paramétrica del corazón que
-  Constelación (`heartLangPoint()`), sin compartir código entre ambas
-  porque viven en archivos distintos con ciclos de vida distintos.
-- El acomodo de palabras (`buildHeartLangWords()`) es "scanline": rasteriza
-  el corazón relleno en un `<canvas>` offscreen, recorre fila por fila con
-  `getImageData` para hallar el ancho disponible en cada renglón, y va
-  empacando frases (cicladas, `ctx.measureText`) centradas en ese ancho.
-  Es el paso caro — se cachea por tamaño de canvas y solo se recalcula si
-  cambia (`heartLangLayoutKey`), nunca en cada cuadro.
-- La animación por cuadro (`drawHeartLang()`) solo mueve opacidad/posición
-  de las palabras ya calculadas: entrada escalonada (`HEART_LANG_STAGGER_MS`
-  por palabra) con un brillo lento después. Con `prefers-reduced-motion`
-  (`LIGHT_MODE`) dibuja una sola vez, sin animar ni seguir en loop.
-- Pausa el canvas principal del Jardín mientras está abierto
-  (`canvasPauseReasons.add('heart-lang')`, igual que el lightbox y
-  Juegos) y pausa/reanuda su propio `requestAnimationFrame` con
-  `visibilitychange`, agregado solo mientras el overlay está abierto y
-  quitado al cerrarlo (mismo patrón de limpieza por arreglo de funciones
-  que usan los módulos de `js/juegos/`).
+- `HEART_LANG_PHRASES` (extras.js): "te amo" en 20 idiomas, constante fija
+  inline — son traducciones de un hecho público, no voz personal de Julio,
+  así que no llevan `borrador` ni van en `REVISAR.md`.
+- `buildHeartLangWords(width, height, opts?)` es "scanline": rasteriza el
+  corazón relleno en un `<canvas>` offscreen, recorre fila por fila con
+  `getImageData` para hallar el ancho disponible y va empacando frases
+  (cicladas, `ctx.measureText`) centradas. `opts {cx, cy, scale}` lo coloca
+  en otro punto/tamaño del lienzo. Los renglones finales de una sola frase
+  (la punta) se reordenan de la más larga a la más corta para que sigan la
+  forma del corazón. Es el paso caro: se calcula una vez por tamaño.
 
 ## Firma visual (rediseño, punto 1)
 
@@ -218,7 +206,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Componentes** (`assets/css/ornamentos.css`): `.ico`, `.orn-divisor` (el trazo se dibuja con el scroll; se agrega solo bajo cada `.titulo-seccion` o donde pongas `data-orn-divisor`), `.tarjeta-flor` (esquinas de pétalo), `.btn-brillo` (brillo que pasa en botones dorados), flor de precarga, y el lenguaje de movimiento: `.mov-florecer`, `.mov-latido`, `.mov-revelar`, `.mov-halo` (con `prefers-reduced-motion` ya cubierto).
 - **Escenas** (`js/escenas.js`): motor de scroll sin librerías. `data-escena="trazo|pasada"` escribe `--p` (0→1) solo mientras el elemento está en pantalla; `.mov-*`/`data-en-vista` agregan `.en-vista` una vez. `Escenas.registrar(el)` para elementos creados por JS.
 - **Marca** (`node tools/generar-marca.js` + Inkscape, comandos impresos al final): íconos de la app, maskable, favicon y `og.jpg` con la misma flor maestra.
-- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
+- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `infinito`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `navegacion`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
 
 ## Navegación integrada (rediseño, punto 9)
 
@@ -235,9 +223,9 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
   (`goToLetter()`; "Leer…" se oculta en la última, "Volver…" en la primera): la tinta se desvanece y se
   vuelve a revelar párrafo por párrafo, `aria-live="polite"`, instantáneo con
   `prefers-reduced-motion`. La vela del deseo (`#letter-wish-block`) es solo de
-  la primera carta. `CARTA_FINAL` también es un sobre abierto del Buzón.
+  la primera carta. `CARTA_FINAL` también es un sobre abierto del Buzón; "Para Lexi" **no** está en el Buzón (solo es la tercera carta del pergamino).
 - **Contador infinito:** `diffFromStart()` calcula siempre ahora − 28/05/2026 en hora de Ciudad de México (Intl, no la zona del dispositivo) a partir de `Date`, nunca sumando 1 por tic; sin fecha de fin ni `clearInterval`; se actualiza al instante en `visibilitychange`/`pageshow`/`focus`. Debajo va la dedicatoria "Me dijiste que el día que este contador se detenga…". `START_DATE` es el instante fijo `2026-05-28T00:00:00-06:00`.
-- **Página "Infinito"** (`infinito.html` + `assets/css/infinito.css` + `js/infinito.js`): se abre desde el ∞ junto al contador (`#clock-infinity-link`, en otra pestaña vía `window.open` para que la música del Jardín siga sonando; "Volver al jardín" cierra la pestaña si la abrió el Jardín). Idea tomada de ritvikbhatia/LoveProject (texto tipo código que se escribe solo + corazón de flores + contador), reescrita en JS plano con la paleta del sitio: flores de pétalos bezier con composición `lighter` sobre canvas (dpr ≤ 2, 1.5 en teléfono), texto en monoespaciado del sistema (única excepción tipográfica, solo para el "código"), contador con la misma regla de siempre (Date, hora de CDMX, nunca se detiene). Respeta reduced-motion (dibuja todo de una vez), pausa si la pestaña está oculta o el corazón fuera de pantalla, y en reposo no corre rAF.
+- **Popup "Infinito"** (`#view-infinito` en index.html + `assets/css/infinito.css` + `js/infinito.js`; ya no existe `infinito.html`): se abre desde el ∞ junto al contador (`#clock-infinity-link`) como una vista más (`.app-view`, iris desde el ∞, `window.Infinito.abrir()/cerrar()`, razón `'infinito'` en `canvasPauseReasons`) — por decisión de Julio, para que no se reinicie el Jardín al volver. Idea tomada de ritvikbhatia/LoveProject (texto tipo código que se escribe solo + corazón de flores + contador), en JS plano con la paleta del sitio: flores de pétalos bezier con composición `lighter` sobre canvas (dpr ≤ 2, 1.5 en teléfono), **el corazón de "te amo" en 20 idiomas justo en el centro del corazón de flores** (`#inf-lang`, mismo centro H/2, escala `K*0.82`, vía `buildHeartLangWords(w, h, {cx, cy, scale})`), texto en monoespaciado del sistema (única excepción tipográfica, solo para el "código"), contador con la misma regla de siempre. Nada corre con el popup cerrado; reduced-motion dibuja todo de una vez.
 - La sección "Lo que nos falta vivir" se eliminó por decisión de Julio (no volver a agregarla).
 - Inicio: `#hero-panel` es un cuadro semitransparente que aparece ~4.5 s después de abrir el sitio (clase `.shown`) para que "Para ti" y el texto se lean sobre los lirios; sin la fecha "21 de septiembre" arriba. En modo ligero (`body.light-mode`) no usa blur.
 - Cursor: cursor nativo siempre visible (nunca `cursor:none`) y la manita (`cursor:pointer`) en todo lo clicable vía regla global `button, [role="button"], a[href]…` (venía del preflight de Tailwind y se había perdido). La capa superior `#cursor-canvas` (z 200) tiene su propio rAF (`topFrame`), independiente del loop principal, y dibuja el rastro de pétalos (por `pointermove` de mouse/lápiz, nunca touch) y los destellos de premio (`spawnSparkleBurst` los manda ahí cuando el canvas principal está pausado, así se ven al ganar un juego). Todo lo que decae lo hace por tiempo (dt), no por cuadro.

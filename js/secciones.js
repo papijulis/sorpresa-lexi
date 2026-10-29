@@ -41,12 +41,10 @@ setInterval(() => { if (!document.hidden) tickClock(); }, 1000);
 /* al volver a la pestaña (o a la PWA) se actualiza al instante */
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tickClock(); });
 window.addEventListener('pageshow', tickClock);
-/* el ∞ junto al contador abre la página "Infinito" en otra pestaña (así la música
-   de este Jardín sigue sonando); si el navegador bloquea la ventana, se abre aquí */
+/* el ∞ junto al contador abre el popup "Infinito" (js/infinito.js), desde donde se tocó */
 document.getElementById('clock-infinity-link').addEventListener('click', (e) => {
   e.preventDefault();
-  const w = window.open('./infinito.html', '_blank');
-  if (!w) window.location.href = './infinito.html';
+  if (window.Infinito) window.Infinito.abrir(e);
 });
 window.addEventListener('focus', tickClock);
 document.getElementById('badge-1111').addEventListener('click', () => {

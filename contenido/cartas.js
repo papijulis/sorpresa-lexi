@@ -173,13 +173,4 @@ window.CARTAS = [
     texto: "Si estás leyendo esto es porque encontraste los doce corazones que escondí por todo este pequeño mundo — en la luna, en Panchito, entre las flores, donde se me fueran ocurriendo.\n\nMe gusta pensar que así soy yo contigo: dejando pedacitos de cariño escondidos en todas partes, para que los sigas encontrando incluso cuando no los estás buscando.\n\nGracias por buscar hasta el último. Te amo, Lexi.",
     borrador: true,
   },
-  {
-    id: "para-lexi",
-    titulo: "Para Lexi",
-    tipo: "sorpresa",
-    apertura: "2026-09-21",
-    sello: "corazon",
-    texto: window.CARTA_PARA_LEXI.texto,
-    borrador: false,
-  },
 ];

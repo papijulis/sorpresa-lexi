@@ -1,79 +1,36 @@
-/* Página "Infinito" — se abre desde el ∞ junto al contador del Jardín.
-   Misma estética del sitio: ciruela / amatista / dorado / rosa, Playfair
-   Display + Inter, paneles de cristal. */
-@font-face {
-  font-family: 'Inter'; font-style: normal; font-weight: 300 700; font-display: swap;
-  src: url('../fonts/Inter-latin-300-700-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Playfair Display'; font-style: normal; font-weight: 400 900; font-display: swap;
-  src: url('../fonts/PlayfairDisplay-latin-400-900-normal.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Playfair Display'; font-style: italic; font-weight: 400 900; font-display: swap;
-  src: url('../fonts/PlayfairDisplay-latin-400-900-italic.woff2') format('woff2');
-}
-
-* { box-sizing: border-box; }
-html, body { margin: 0; padding: 0; }
-body {
-  min-height: 100vh; min-height: 100dvh;
-  font-family: 'Inter', sans-serif; color: var(--pergamino-100);
-  background: radial-gradient(circle at 50% 12%, var(--ciruela-700) 0%, var(--ciruela-800) 38%, var(--ciruela-900) 75%, var(--ciruela-950) 100%);
-  background-attachment: fixed;
-  overflow-x: hidden;
-}
-.aurora {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background:
-    radial-gradient(40vmax 30vmax at 12% 18%, rgba(var(--amatista-rgb), .16), transparent 70%),
-    radial-gradient(36vmax 28vmax at 88% 78%, rgba(245, 158, 11, .10), transparent 70%),
-    radial-gradient(30vmax 24vmax at 70% 8%, rgba(var(--rosa-rgb), .08), transparent 70%);
-}
-.sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; }
-
-a:focus-visible, button:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 3px; }
-button, a[href] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-
-.btn-volver {
-  position: fixed; z-index: 10;
-  top: calc(1.1rem + env(safe-area-inset-top, 0px)); left: calc(1.1rem + env(safe-area-inset-left, 0px));
-  display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0 1.1rem;
-  border-radius: 999px; text-decoration: none; font-size: .85rem; color: var(--pergamino-100);
-  background: rgba(255, 255, 255, .07); border: 1px solid rgba(255, 255, 255, .14);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  transition: background .25s ease;
-}
-.btn-volver:hover { background: rgba(255, 255, 255, .14); }
+/* Popup "Infinito" (#view-infinito) — se abre desde el ∞ junto al contador del
+   Jardín como una vista más (.app-view). Misma estética del sitio: ciruela /
+   amatista / dorado / rosa, Playfair Display + Inter, paneles de cristal. */
+#view-infinito .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; }
+#view-infinito button:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 3px; }
 
 .inf-wrap {
   position: relative; z-index: 1;
-  max-width: 1120px; margin: 0 auto;
-  padding: calc(5rem + env(safe-area-inset-top, 0px)) 1.25rem calc(3rem + env(safe-area-inset-bottom, 0px));
+  max-width: 1120px; margin: 0 auto; padding: 1rem 0 1rem;
   display: grid; grid-template-columns: 1fr; gap: 2rem;
 }
 .inf-title { text-align: center; }
 .inf-symbol { margin: 0; color: var(--dorado-500); line-height: 1; filter: drop-shadow(0 0 14px rgba(var(--dorado-rgb), .5)); }
 .inf-symbol .ico { width: 5.2rem; height: 2.6rem; }
-.inf-symbol use { stroke-dasharray: 100; stroke-dashoffset: 100; animation: trazoInfinito 3.4s var(--ease-flor) .3s forwards; }
+.inf-symbol use { stroke-dasharray: 100; stroke-dashoffset: 100; }
+#view-infinito.open .inf-symbol use { animation: trazoInfinito 3.4s var(--ease-flor) .5s forwards; }
 @keyframes trazoInfinito { to { stroke-dashoffset: 0; } }
-.inf-title h1 {
-  margin: .35rem 0 0; font-family: 'Playfair Display', serif; font-weight: 600;
-  font-size: clamp(1.8rem, 6vw, 3rem); color: var(--pergamino-50); text-shadow: 0 2px 16px rgba(var(--abismo-rgb), .8);
-}
 
 /* ---- corazón + mensaje ---- */
 .inf-stage { display: flex; flex-direction: column; align-items: center; }
 .heart-box {
   width: min(100%, 560px); aspect-ratio: 1 / .96; position: relative;
-  animation: heartbeat 3.2s ease-in-out infinite;
+  animation: latidoInfinito 3.2s ease-in-out infinite;
 }
 .heart-box::before {
   content: ''; position: absolute; inset: 8% 6%; border-radius: 50%; z-index: 0;
   background: radial-gradient(circle, rgba(var(--amatista-rgb), .22), transparent 68%);
 }
 #garden { position: relative; z-index: 1; display: block; width: 100%; height: 100%; }
-@keyframes heartbeat { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.018); } 24% { transform: scale(1); } 36% { transform: scale(1.012); } 48% { transform: scale(1); } }
+/* el corazón de idiomas vive justo en el centro del corazón de flores */
+#inf-lang { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 2.2s ease; }
+#inf-lang.shown { opacity: 1; }
+@keyframes latidoInfinito { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.018); } 24% { transform: scale(1); } 36% { transform: scale(1.012); } 48% { transform: scale(1); } }
 
 .inf-message {
   text-align: center; margin-top: .5rem; max-width: 34rem;
@@ -121,8 +78,8 @@ button, a[href] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 @keyframes caretBlink { 50% { opacity: 0; } }
 
 .inf-toast {
-  position: fixed; z-index: 20; left: 50%; transform: translateX(-50%) translateY(10px);
-  bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); max-width: 90%;
+  position: fixed; z-index: var(--z-modal); left: 50%; transform: translateX(-50%) translateY(10px);
+  bottom: calc(2rem + env(safe-area-inset-bottom, 0px)); max-width: 90%; width: max-content;
   padding: .8rem 1.3rem; border-radius: 999px; text-align: center;
   font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--pergamino-50);
   background: rgba(24, 6, 43, .9); border: 1px solid rgba(var(--dorado-rgb), .3);
@@ -144,8 +101,12 @@ button, a[href] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .inf-symbol use { animation: none; stroke-dashoffset: 0; }
+  .inf-symbol use, #view-infinito.open .inf-symbol use { animation: none; stroke-dashoffset: 0; }
   .heart-box, .code-caret { animation: none; }
+  #inf-lang { transition: none; }
   .inf-message { transition: none; }
-  * { scroll-behavior: auto !important; }
 }
+
+/* título del popup: no se encima con el botón de cerrar en pantallas angostas */
+#view-infinito .app-view-header h2 { margin: 0; padding: 0 3.25rem; text-align: center; }
+@media (max-width: 420px) { #view-infinito .app-view-header h2 { font-size: 1.4rem; } }

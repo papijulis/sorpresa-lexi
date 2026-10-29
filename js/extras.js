@@ -58,26 +58,22 @@ window.addEventListener('keydown', (e) => {
     teAmoBuffer = '';
     spawnHeartRain();
     showToast('Yo también te amo {i-corazon-lleno}');
-    openHeartLanguages();
+    if (window.Infinito) window.Infinito.abrir();
   }
   iLoveYouBuffer = (iLoveYouBuffer + e.key.toLowerCase()).slice(-11);
   if (iLoveYouBuffer.includes('i love you')) {
     iLoveYouBuffer = '';
-    openHeartLanguages();
+    if (window.Infinito) window.Infinito.abrir();
   }
 });
 
 /* ======================================================================
-   EASTER EGG: CORAZÓN MULTILINGÜE — se activa al escribir "i love you"
-   (paralelo a "te amo" → lluvia de corazones, arriba). Arma un corazón
-   relleno de la frase "te amo" en ~20 idiomas, acomodadas en renglones
-   dentro del contorno del corazón (misma curva paramétrica que
-   Constelación — ver js/juegos/constelacion.js). El layout de palabras
-   se calcula una sola vez por apertura/resize (costoso); la animación
-   por cuadro solo actualiza opacidad/posición de cada palabra ya
-   calculada (barato). Pausa su propio requestAnimationFrame al cerrar o
-   si la pestaña se oculta, y con prefers-reduced-motion dibuja una sola
-   vez, sin animar.
+   CORAZÓN MULTILINGÜE — "te amo" en ~20 idiomas, acomodadas en renglones
+   dentro del contorno de un corazón (misma curva paramétrica que
+   Constelación). Ya no es un overlay propio: vive en el centro del corazón
+   de flores del popup "Infinito" (js/infinito.js lo dibuja con
+   buildHeartLangWords) y escribir "i love you" o "te amo" abre ese popup.
+   Su layout se calcula una vez por tamaño (costoso); nada corre por cuadro.
 ====================================================================== */
 const HEART_LANG_PHRASES = [
   { lang: 'Español', text: 'Te amo' },
@@ -102,19 +98,6 @@ const HEART_LANG_PHRASES = [
   { lang: 'Ucraniano', text: 'Я тебе кохаю' },
 ];
 const HEART_LANG_COLORS = ['#FB7185', '#E11D48', '#FFD700', '#C084FC'];
-const HEART_LANG_ENTRANCE_MS = 650;
-const HEART_LANG_STAGGER_MS = 14;
-
-const heartLangOverlay = document.getElementById('heart-languages');
-const heartLangCanvas = document.getElementById('heart-languages-canvas');
-const heartLangCloseBtn = document.getElementById('heart-languages-close');
-const heartLangCtx = heartLangCanvas.getContext('2d');
-let heartLangWords = [];
-let heartLangLayoutKey = '';
-let heartLangW = 0, heartLangH = 0;
-let heartLangRaf = null;
-let heartLangOpenedAt = 0;
-let heartLangListeners = [];
 
 function heartLangPoint(t, scale) {
   const x = 16 * Math.pow(Math.sin(t), 3);
@@ -122,14 +105,16 @@ function heartLangPoint(t, scale) {
   return { x: x * scale, y: -y * scale };
 }
 
-function buildHeartLangWords(width, height) {
+/* opts (opcional): { cx, cy, scale } coloca el corazón en otro punto/tamaño del
+   lienzo (lo usa el popup "Infinito" para centrarlo dentro del corazón de flores) */
+function buildHeartLangWords(width, height, opts) {
   const mask = document.createElement('canvas');
   mask.width = Math.max(1, Math.round(width));
   mask.height = Math.max(1, Math.round(height));
   const mctx = mask.getContext('2d');
-  const cx = width / 2;
-  const cy = height / 2 - height * 0.04;
-  const scale = Math.min(width, height) / 34;
+  const scale = opts ? opts.scale : Math.min(width, height) / 34;
+  const cx = opts ? opts.cx : width / 2;
+  const cy = opts ? opts.cy : height / 2 - height * 0.04;
 
   mctx.fillStyle = '#fff';
   mctx.beginPath();
@@ -154,126 +139,58 @@ function buildHeartLangWords(width, height) {
     return left === -1 ? null : { left, right };
   }
 
-  const lineHeight = Math.max(13, Math.round(height / 20));
+  const refHeight = opts ? scale * 34 * 0.9 : height;
+  const lineHeight = Math.max(13, Math.round(refHeight / 20));
   const fontSize = Math.round(lineHeight * 0.58);
   mctx.font = `italic 600 ${fontSize}px 'Playfair Display', serif`;
 
-  const words = [];
+  const gap = fontSize * 0.55;
+  const rows = [];
   let phraseCursor = 0;
-  let rowIndex = 0;
   for (let y = lineHeight; y < height - 4; y += lineHeight) {
     const ext = rowExtent(y);
     if (!ext) continue;
     const rowWidth = ext.right - ext.left;
     if (rowWidth < lineHeight * 1.6) continue;
 
-    const gap = fontSize * 0.55;
-    const lineItems = [];
+    const items = [];
     let usedWidth = 0;
     let guard = 0;
     while (guard++ < HEART_LANG_PHRASES.length * 2) {
       const phrase = HEART_LANG_PHRASES[phraseCursor % HEART_LANG_PHRASES.length].text;
       const w = mctx.measureText(phrase).width;
-      const extra = (lineItems.length ? gap : 0) + w;
-      if (lineItems.length && usedWidth + extra > rowWidth) break;
-      lineItems.push({ text: phrase, width: w });
+      const extra = (items.length ? gap : 0) + w;
+      if (items.length && usedWidth + extra > rowWidth) break;
+      items.push({ text: phrase, width: w });
       usedWidth += extra;
       phraseCursor++;
     }
-    if (!lineItems.length) continue;
+    if (!items.length) continue;
+    rows.push({ y, ext, rowWidth, items, usedWidth });
+  }
 
+  /* la punta del corazón: los últimos renglones con una sola frase salían en el
+     orden del ciclo (una corta arriba y una larga en lo más angosto). Se reparten
+     de la más larga a la más corta para que sigan la forma del corazón. */
+  let tailStart = rows.length;
+  while (tailStart > 0 && rows[tailStart - 1].items.length === 1) tailStart--;
+  const tail = rows.slice(tailStart);
+  if (tail.length > 1) {
+    const sorted = tail.map((r) => r.items[0]).sort((a, b) => b.width - a.width);
+    tail.forEach((r, i) => { r.items = [sorted[i]]; r.usedWidth = sorted[i].width; });
+  }
+
+  const words = [];
+  rows.forEach((r, rowIndex) => {
     const color = HEART_LANG_COLORS[rowIndex % HEART_LANG_COLORS.length];
-    let x = ext.left + (rowWidth - usedWidth) / 2;
-    lineItems.forEach((item) => {
-      words.push({ x: x + item.width / 2, y, text: item.text, fontSize, color });
+    let x = r.ext.left + (r.rowWidth - r.usedWidth) / 2;
+    r.items.forEach((item) => {
+      words.push({ x: x + item.width / 2, y: r.y, text: item.text, fontSize, color });
       x += item.width + gap;
     });
-    rowIndex++;
-  }
+  });
   return words;
 }
-
-function drawHeartLang(t) {
-  heartLangCtx.clearRect(0, 0, heartLangW, heartLangH);
-  const elapsed = t - heartLangOpenedAt;
-
-  heartLangWords.forEach((w, i) => {
-    const delay = LIGHT_MODE ? 0 : i * HEART_LANG_STAGGER_MS;
-    const entranceDur = LIGHT_MODE ? 1 : HEART_LANG_ENTRANCE_MS;
-    const local = elapsed - delay;
-    if (local < 0) return;
-    const progress = Math.min(1, local / entranceDur);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const shimmer = (LIGHT_MODE || progress < 1) ? 1 : (0.78 + 0.22 * Math.sin(t / 1700 + i));
-    const opacity = eased * shimmer;
-    const lift = (1 - eased) * 9;
-
-    heartLangCtx.save();
-    heartLangCtx.globalAlpha = Math.max(0, Math.min(1, opacity));
-    heartLangCtx.fillStyle = w.color;
-    heartLangCtx.font = `italic 600 ${w.fontSize}px 'Playfair Display', serif`;
-    heartLangCtx.textAlign = 'center';
-    heartLangCtx.textBaseline = 'middle';
-    heartLangCtx.fillText(w.text, w.x, w.y + lift);
-    heartLangCtx.restore();
-  });
-
-  if (LIGHT_MODE) return; // una sola pasada, sin loop continuo
-  heartLangRaf = requestAnimationFrame(drawHeartLang);
-}
-
-function resizeHeartLang() {
-  const rect = heartLangCanvas.getBoundingClientRect();
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  heartLangCanvas.width = Math.max(1, Math.round(rect.width * dpr));
-  heartLangCanvas.height = Math.max(1, Math.round(rect.height * dpr));
-  heartLangCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  heartLangW = rect.width; heartLangH = rect.height;
-
-  const key = Math.round(rect.width) + 'x' + Math.round(rect.height);
-  if (key !== heartLangLayoutKey) {
-    heartLangLayoutKey = key;
-    heartLangWords = buildHeartLangWords(rect.width, rect.height);
-  }
-}
-
-function openHeartLanguages() {
-  heartLangOverlay.classList.add('open');
-  canvasPauseReasons.add('heart-lang');
-  updateCanvasPauseState();
-  resizeHeartLang();
-  heartLangOpenedAt = performance.now();
-
-  if (heartLangRaf) cancelAnimationFrame(heartLangRaf);
-  heartLangRaf = requestAnimationFrame(drawHeartLang);
-
-  const onResize = () => resizeHeartLang();
-  window.addEventListener('resize', onResize);
-  heartLangListeners.push(() => window.removeEventListener('resize', onResize));
-
-  const onVisibility = () => {
-    if (document.hidden) {
-      if (heartLangRaf) { cancelAnimationFrame(heartLangRaf); heartLangRaf = null; }
-    } else if (!heartLangRaf && !LIGHT_MODE) {
-      heartLangRaf = requestAnimationFrame(drawHeartLang);
-    }
-  };
-  document.addEventListener('visibilitychange', onVisibility);
-  heartLangListeners.push(() => document.removeEventListener('visibilitychange', onVisibility));
-}
-
-function closeHeartLanguages() {
-  heartLangOverlay.classList.remove('open');
-  canvasPauseReasons.delete('heart-lang');
-  updateCanvasPauseState();
-  if (heartLangRaf) { cancelAnimationFrame(heartLangRaf); heartLangRaf = null; }
-  heartLangListeners.splice(0).forEach((fn) => fn());
-}
-heartLangCloseBtn.addEventListener('click', closeHeartLanguages);
-heartLangOverlay.addEventListener('click', (e) => { if (e.target === heartLangOverlay) closeHeartLanguages(); });
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && heartLangOverlay.classList.contains('open')) closeHeartLanguages();
-});
 
 /* ---- temporadas (reutiliza el sistema de pétalos y mariposas) ---- */
 function applySeason() {
