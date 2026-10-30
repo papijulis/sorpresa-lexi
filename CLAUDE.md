@@ -279,6 +279,11 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 
 - `actualizarRitmo(t)` (audio.js, llamada desde `updateAudioBars` en cada cuadro del loop): lee los 2 primeros bins del analizador (graves), suaviza `ritmoNivel` y dispara `ritmoPulso` en cada golpe (energía > 1.25× el promedio móvil, > 0.32, con 260 ms de espera). Ambas variables viven en motor-canvas.js (cargan antes). Las usan `#bg-ritmo` (resplandor amatista/rosa abajo, solo `opacity`/`transform`), el latido de los lirios (`b.pulse`) y un bokeh que sube en los golpes fuertes. Sin música, en modo ligero o con movimiento reducido todo decae a 0. Probado con datos de graves simulados (el navegador de pruebas no entrega audio real).
 
+## Botones modernos (pasada de actualización)
+
+- Todos los cierres (`.app-view-close`, `#modal-close`, `.lightbox-close`) son círculos de cristal con el ícono SVG `i-cerrar` (nunca el texto "×"); la flecha de volver de los juegos y las del calendario (`.btn-icono`) usan `i-siguiente` (espejado para "anterior"); botones de texto suaves = `.btn-suave` (`.btn-suave-oro` para el dorado). Ojo: `.btn-suave`/`.btn-icono` fijan `display`, por eso llevan su propio `.hidden`.
+- El pergamino cambia de carta con dos flechas redondas y "Carta N de 3" (`.letter-nav`, `#letter-back`/`#letter-switch`); en la primera/última se **desactiva** (no se esconde) la flecha que no aplica (`updateLetterButtons()`, que se vuelve a llamar al terminar la transición).
+
 ## Pergamino con dos cartas, panel del inicio y ritual 11:11
 
 - **Mesiversarios en el Buzón:** `mes-5` (28 oct) y `mes-6` "Seis meses" (28 nov, `borrador:true`, sin foto ni canción como las demás) ya existen; el siguiente mesiversario se agrega igual (`tipo:"mesiversario"`, `apertura` el día 28) y la tarjeta "Próximo mesiversario" lo toma sola. Probar con `?fecha=2026-11-28`.

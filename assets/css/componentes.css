@@ -38,14 +38,40 @@
     margin-left: auto; margin-top: 1.25rem;
   }
   .flourish { position: absolute; opacity: 0.16; pointer-events: none; }
-  .letter-switch-btn {
-    background: none; border: none; cursor: pointer; padding: .5rem .75rem; border-radius: .5rem;
-    color: var(--sepia-700); text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px;
-    transition: color .2s ease, transform .2s ease;
+  /* navegación del pergamino (sobre papel: tinta sepia) */
+  .letter-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 2.2rem; }
+  .letter-nav-btn {
+    display: inline-flex; align-items: center; justify-content: center; width: 2.9rem; height: 2.9rem; padding: 0; border-radius: 50%; cursor: pointer;
+    color: var(--sepia-700); background: rgba(var(--dorado-rgb), .16); border: 1px solid rgba(180, 83, 9, .35);
+    transition: background .2s ease, transform .2s var(--ease-rebote), box-shadow .2s ease;
   }
-  .letter-switch-btn:hover { color: #7C2D12; }
-  .letter-switch-btn:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 3px; }
-  .letter-switch-btn:disabled { opacity: .5; cursor: default; }
+  .letter-nav-btn .ico { width: 1.25rem; height: 1.25rem; }
+  .letter-nav-prev .ico { transform: scaleX(-1); }
+  .letter-nav-btn:active:not(:disabled) { transform: scale(.92); }
+  .letter-nav-btn:disabled { opacity: .3; cursor: default; }
+  .letter-nav-btn:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 3px; }
+  @media (hover: hover) { .letter-nav-btn:hover:not(:disabled) { background: rgba(var(--dorado-rgb), .32); box-shadow: 0 4px 14px rgba(180, 83, 9, .22); } }
+  .letter-nav-n { min-width: 6.5rem; text-align: center; font-family: var(--fuente-ui); font-size: .78rem; font-weight: 600; letter-spacing: .06em; color: var(--sepia-700); }
+
+  /* botones modernos de la interfaz: icono redondo y píldora suave */
+  .btn-icono {
+    display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;
+    color: var(--pergamino-50); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); transition: background .2s ease, transform .2s var(--ease-rebote);
+  }
+  .btn-icono .ico { width: 1.2rem; height: 1.2rem; }
+  .btn-icono-prev .ico { transform: scaleX(-1); }
+  .btn-icono:active { transform: scale(.92); }
+  @media (hover: hover) { .btn-icono:hover { background: rgba(255,255,255,.16); } }
+  .btn-suave {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.3rem; border-radius: var(--radio-pill); cursor: pointer;
+    font-family: var(--fuente-ui); font-size: .85rem; font-weight: 600; color: var(--pergamino-50);
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); transition: background .2s ease, border-color .2s ease, transform .2s var(--ease-rebote);
+  }
+  .btn-suave .ico { width: 1.1rem; height: 1.1rem; color: var(--dorado-500); }
+  .btn-suave-oro { color: var(--dorado-500); border-color: rgba(var(--dorado-rgb), .35); background: rgba(var(--dorado-rgb), .08); }
+  .btn-suave.hidden, .btn-icono.hidden { display: none; }
+  .btn-suave:active { transform: scale(.97); }
+  @media (hover: hover) { .btn-suave:hover { background: rgba(255,255,255,.14); border-color: rgba(var(--dorado-rgb), .45); } }
 
   /* ---- hero shimmer ---- */
   @keyframes shimmerText { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
@@ -141,10 +167,12 @@
   }
   .modal-backdrop.open .modal-panel { transform: scale(1) translateY(0); }
   #modal-close {
-    width: 2.5rem; height: 2.5rem; border: none; border-radius: 999px; padding: 0;
-    background: rgba(255,255,255,0.08); color: var(--pergamino-50); font-size: 1.5rem; line-height: 1;
-    display: flex; align-items: center; justify-content: center; transition: background .25s ease;
+    width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50);
+    display: flex; align-items: center; justify-content: center; transition: background .25s ease, transform .2s var(--ease-rebote);
   }
+  #modal-close .ico, .app-view-close .ico, .lightbox-close .ico { width: 1.1rem; height: 1.1rem; }
+  #modal-close:active, .app-view-close:active, .lightbox-close:active { transform: scale(.92); }
   @media (hover: hover) { #modal-close:hover { background: rgba(255,255,255,0.16); } }
 
   /* ---- navegación entre cartas del Buzón (bloque 9) ---- */

@@ -422,16 +422,17 @@ function revealLetterSequentially() {
   letterRevealed = true;
   playLetterInk();
 }
-/* botones: "Leer una carta más" salvo en la última; "Volver…" salvo en la primera */
+/* navegación del pergamino: flechas redondas + "Carta N de M"; en la primera/última se desactiva la que no aplica */
 function updateLetterButtons() {
   const last = letterCurrent === LETTER_SEQ.length - 1;
-  letterSwitchBtn.classList.toggle('hidden', last);
-  letterSwitchBtn.textContent = LETTER_NEXT_TEXT;
-  letterSwitchBtn.setAttribute('aria-label', LETTER_NEXT_TEXT);
-  letterBackBtn.classList.toggle('hidden', letterCurrent === 0);
   const backText = letterCurrent === 1 ? LETTER_BACK_FIRST : 'Volver a la carta anterior';
-  letterBackBtn.textContent = backText;
+  letterSwitchBtn.disabled = last;
+  letterSwitchBtn.setAttribute('aria-label', LETTER_NEXT_TEXT);
+  letterSwitchBtn.title = LETTER_NEXT_TEXT;
+  letterBackBtn.disabled = letterCurrent === 0;
   letterBackBtn.setAttribute('aria-label', backText);
+  letterBackBtn.title = backText;
+  document.getElementById('letter-nav-n').textContent = `Carta ${letterCurrent + 1} de ${LETTER_SEQ.length}`;
 }
 function goToLetter(target) {
   if (letterBusy || target < 0 || target >= LETTER_SEQ.length) return;
@@ -461,9 +462,8 @@ function goToLetter(target) {
     }
     setTimeout(() => {
       playLetterInk();
-      letterSwitchBtn.disabled = false;
-      letterBackBtn.disabled = false;
       letterBusy = false;
+      updateLetterButtons();
     }, 30);
   }, reduced ? 50 : 750);
 }

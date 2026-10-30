@@ -13,9 +13,10 @@
   .app-view-close {
     position: absolute; right: 0; top: 50%; transform: translateY(-50%);
     width: 2.5rem; height: 2.5rem; border-radius: 999px;
-    background: rgba(255,255,255,0.08); color: var(--pergamino-50); font-size: 1.5rem; line-height: 1;
-    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50); padding: 0; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: background .25s ease, transform .2s var(--ease-rebote);
   }
+  @media (hover: hover) { .app-view-close:hover { background: rgba(255,255,255,.16); } }
   .app-view-body { max-width: 72rem; margin: 0 auto; width: 100%; }
 
   .buzon-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.25rem; }
@@ -65,13 +66,14 @@
   .juego-card-progress { font-size: .72rem; color: rgba(var(--dorado-rgb), .8); margin-top: .5rem; font-family: 'Inter', sans-serif; }
 
   .juego-exit-btn {
-    display: inline-flex; align-items: center; gap: .4rem;
-    font-family: 'Inter', sans-serif; font-size: .8rem;
-    color: rgba(var(--pergamino-rgb), .7);
-    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
-    border-radius: 999px; padding: .5rem 1rem; margin-bottom: 1.5rem;
+    display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; cursor: pointer;
+    font-family: var(--fuente-ui); font-size: .82rem; font-weight: 600; color: var(--pergamino-50);
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 999px; padding: 0 1.1rem 0 .8rem; margin-bottom: 1.5rem; transition: background .2s ease;
   }
-  .juego-exit-btn:hover { background: rgba(255,255,255,.12); }
+  .juego-exit-ico { display: inline-flex; color: var(--dorado-500); }
+  .juego-exit-ico .ico { width: 1.1rem; height: 1.1rem; transform: scaleX(-1); }
+  @media (hover: hover) { .juego-exit-btn:hover { background: rgba(255,255,255,.16); } }
 
   /* ---- cupones para raspar ---- */
   .cupon-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }

@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v24';
+const CACHE_VERSION = 'v25';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;

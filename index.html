@@ -274,9 +274,9 @@
     </div>
     <div class="cal-card tarjeta-flor max-w-lg mx-auto glass rounded-3xl p-5 sm:p-7">
       <div class="flex items-center justify-between mb-5">
-        <button id="cal-prev" aria-label="Mes anterior" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-parchment">‹</button>
+        <button id="cal-prev" aria-label="Mes anterior" class="btn-icono btn-icono-prev"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
         <h3 id="cal-title" class="font-display text-xl text-gold"></h3>
-        <button id="cal-next" aria-label="Mes siguiente" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 transition-colors flex items-center justify-center text-parchment">›</button>
+        <button id="cal-next" aria-label="Mes siguiente" class="btn-icono"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
       </div>
       <div class="grid grid-cols-7 gap-1.5 mb-1.5 font-ui text-[10px] sm:text-xs text-parchment/50 uppercase text-center">
         <span>D</span><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span>
@@ -284,7 +284,7 @@
       <div id="cal-grid" class="grid grid-cols-7 gap-1.5"></div>
     </div>
     <div class="text-center mt-6">
-      <button id="random-memory-btn" class="font-ui text-sm px-6 py-3 rounded-full bg-white/5 border border-white/15 text-parchment/80 hover:bg-white/10 hover:text-gold transition-colors">Sorpréndeme con un recuerdo</button>
+      <button id="random-memory-btn" class="btn-suave"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-estrella"/></svg> Sorpréndeme con un recuerdo</button>
     </div>
   </section>
 
@@ -399,7 +399,7 @@
       </div>
     </div>
     <p id="jar-counter" class="mt-3 font-ui text-xs text-parchment/50" aria-live="polite"></p>
-    <button id="jar-secret-btn" class="hidden mt-6 font-ui text-sm px-6 py-3 rounded-full bg-white/5 border border-white/15 text-gold hover:bg-white/10 transition-colors">Leer la Razón 101 <svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-corazon-lleno"/></svg></button>
+    <button id="jar-secret-btn" class="btn-suave btn-suave-oro hidden mt-6">Leer la Razón 101 <svg class="ico ico-sm" aria-hidden="true" focusable="false"><use href="#i-corazon-lleno"/></svg></button>
   </section>
 
   </div>
@@ -494,9 +494,10 @@
         </p>
       </div>
 
-      <div class="mt-10 flex flex-col items-center gap-1 text-center">
-        <button id="letter-switch" type="button" aria-label="Leer una carta más" class="letter-switch-btn font-ui text-sm">Leer una carta más</button>
-        <button id="letter-back" type="button" aria-label="Volver a la primera carta" class="letter-switch-btn font-ui text-sm hidden">Volver a la primera carta</button>
+      <div class="letter-nav" role="group" aria-label="Cartas del pergamino">
+        <button id="letter-back" type="button" class="letter-nav-btn letter-nav-prev" aria-label="Volver a la carta anterior" disabled><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
+        <span id="letter-nav-n" class="letter-nav-n" aria-live="polite">Carta 1 de 3</span>
+        <button id="letter-switch" type="button" class="letter-nav-btn" aria-label="Leer una carta más"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
       </div>
     </div>
   </section>
@@ -513,7 +514,7 @@
 <div id="view-buzon" class="app-view">
   <div class="app-view-header">
     <h2 class="font-display text-2xl sm:text-3xl text-gold">El Buzón</h2>
-    <button id="buzon-close" aria-label="Cerrar el Buzón" class="app-view-close">×</button>
+    <button id="buzon-close" aria-label="Cerrar el Buzón" class="app-view-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   </div>
   <p class="font-ui text-xs sm:text-sm text-parchment/60 text-center max-w-md mx-auto mb-8 px-6">Cartas para cuando haga falta, mesiversarios, cápsulas del tiempo y alguna sorpresa escondida.</p>
   <div id="buzon-grid" class="app-view-body buzon-grid"></div>
@@ -523,14 +524,14 @@
 <div id="view-juegos" class="app-view">
   <div class="app-view-header">
     <h2 id="juegos-header-title" class="font-display text-2xl sm:text-3xl text-gold">Rincón de Juegos</h2>
-    <button id="juegos-close" aria-label="Cerrar Juegos" class="app-view-close">×</button>
+    <button id="juegos-close" aria-label="Cerrar Juegos" class="app-view-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   </div>
   <p id="juegos-intro" class="font-ui text-xs sm:text-sm text-parchment/60 text-center max-w-md mx-auto mb-8 px-6">Cada juego te premia con algo de verdad — nunca con un puntaje.</p>
 
   <div id="juegos-grid" class="app-view-body juegos-grid"></div>
 
   <div id="juego-stage" class="hidden app-view-body">
-    <button id="juego-exit" class="juego-exit-btn">← Salir del juego</button>
+    <button id="juego-exit" class="juego-exit-btn"><span class="juego-exit-ico"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></span> Salir del juego</button>
     <div id="juego-mount"></div>
   </div>
 </div>
@@ -539,7 +540,7 @@
 <div id="view-infinito" class="app-view" aria-label="Infinito">
   <div class="app-view-header">
     <h2 class="font-display text-2xl sm:text-3xl text-gold">Hoy, mañana y siempre</h2>
-    <button id="infinito-close" aria-label="Cerrar Infinito" class="app-view-close">×</button>
+    <button id="infinito-close" aria-label="Cerrar Infinito" class="app-view-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   </div>
   <main class="inf-wrap app-view-body">
     <header class="inf-title">
@@ -612,7 +613,7 @@
 <!-- ===================== REUSABLE MODAL ===================== -->
 <div id="app-modal" class="modal-backdrop">
   <div id="modal-panel" class="modal-panel glass rounded-3xl max-w-md w-[92%] p-7 sm:p-9 relative">
-    <button id="modal-close" aria-label="Cerrar" class="absolute top-3 right-4">×</button>
+    <button id="modal-close" aria-label="Cerrar" class="absolute top-3 right-4"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
     <div id="modal-icon" class="text-3xl mb-3"></div>
     <h3 id="modal-title" class="font-display text-xl sm:text-2xl text-gold mb-3"></h3>
     <p id="modal-body" class="font-hand text-lg sm:text-xl leading-relaxed text-parchment"></p>
@@ -621,7 +622,7 @@
 
 <!-- ===================== LIGHTBOX (Fase 5) ===================== -->
 <div id="lightbox" class="lightbox">
-  <button id="lightbox-close" aria-label="Cerrar foto" class="lightbox-close">×</button>
+  <button id="lightbox-close" aria-label="Cerrar foto" class="lightbox-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   <button id="lightbox-prev" aria-label="Foto anterior" class="lightbox-nav lightbox-prev" hidden><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
   <img id="lightbox-img" src="" alt="">
   <button id="lightbox-next" aria-label="Foto siguiente" class="lightbox-nav lightbox-next" hidden><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
