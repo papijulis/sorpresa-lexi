@@ -43,6 +43,7 @@
 <link rel="stylesheet" href="./assets/css/movimiento.css">
 <link rel="stylesheet" href="./assets/css/cartas-final.css">
 <link rel="stylesheet" href="./assets/css/rueda.css">
+<link rel="stylesheet" href="./assets/css/flor-especial.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
@@ -433,6 +434,7 @@
   <section class="reveal py-24 px-6">
     <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Todas las flores que te he dado</h2></div>
     <div id="polaroid-grid" class="polaroid-wrap max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 place-items-center"></div>
+    <div class="flor-esp-wrap"><button type="button" id="flor-especial-btn" class="btn-suave btn-suave-oro" aria-haspopup="dialog"><svg class="ico" aria-hidden="true" focusable="false"><use href="#lirio-linea"/></svg> una flor especial</button></div>
   </section>
 
   <!-- TIMELINE -->
@@ -529,6 +531,17 @@
   <button type="button" id="rueda-repetir" class="btn-suave rueda-repetir"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg> de nuevo</button>
   <p id="rueda-estado" class="sr-only" role="status" aria-live="polite"></p>
   <ol id="rueda-lista" class="sr-only" aria-label="Las cien razones"></ol>
+</div>
+
+<!-- ===================== UNA FLOR ESPECIAL (lirio 3D, pop-up de la galería de flores) ===================== -->
+<div id="flor-especial" class="flor-esp" role="dialog" aria-modal="true" aria-label="Una flor especial" hidden>
+  <div class="flor-esp-caja vidrio">
+    <button type="button" id="flor-esp-cerrar" class="app-view-close flor-esp-cerrar" aria-label="Cerrar"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
+    <div id="flor-lienzo" class="flor-esp-lienzo">
+      <div class="flor-hud" aria-hidden="true"><p id="flor-hud-t" class="flor-hud-t"></p><div class="flor-hud-barra"><i id="flor-hud-b"></i></div></div>
+    </div>
+    <p id="flor-esp-texto" class="flor-esp-texto font-hand">Esta florece igual que nuestro amor y nunca se marchitará.</p>
+  </div>
 </div>
 
 <!-- ===================== RINCÓN DE JUEGOS ===================== -->
@@ -695,6 +708,7 @@
 <script src="./js/extras.js"></script>
 <script src="./js/corazon-palabras.js"></script>
 <script src="./js/rueda.js"></script>
+<script src="./js/flor-especial.js"></script>
 <script src="./js/infinito.js"></script>
 <script src="./js/sonidos.js"></script>
 <script src="./js/micro.js"></script>
