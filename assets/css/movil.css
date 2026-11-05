@@ -20,7 +20,7 @@
     .dock-sep { margin-left: .1rem; margin-right: .1rem; }
     .clock-grid > div { padding-top: 1rem; padding-bottom: 1rem; }
     /* botones largos de texto: una sola línea cómoda en el teléfono */
-    #jar-btn { font-size: .9rem; padding: .8rem 1.4rem; max-width: 100%; }
+    #jar-btn { font-size: .84rem; letter-spacing: 0; padding: .7rem 1rem; min-width: 0; }
     /* calendario: casillas de ~43px para tocar cómodo */
     .cal-section { padding-left: .75rem; padding-right: .75rem; }
     .cal-card { padding: .75rem; }

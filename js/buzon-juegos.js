@@ -111,7 +111,7 @@ function showCartaModal(carta, dir) {
     html += pictureHTML(carta.foto, '', 'style="width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:16px;box-shadow:0 14px 30px rgba(0,0,0,.45);"');
   }
   if (carta.cancion) {
-    html += `<button id="carta-play-song" class="font-ui text-xs mt-4 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" style="color:${meta.color};">${ico('i-nota', 'ico-sm')} Escuchar «${carta.cancion}»</button>`;
+    html += `<button id="carta-play-song" class="btn-suave mt-4" style="color:${meta.color};">${ico('i-nota', 'ico-sm')} Escuchar «${carta.cancion}»</button>`;
   }
   if (window.NOTA_CARTA) {
     html += `<p class="font-hand text-sm mt-5" style="color:rgba(253,251,247,.55);">${window.NOTA_CARTA}</p>`;

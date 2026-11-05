@@ -121,8 +121,6 @@ body.sin-flujo #flujo-estatico {
 .tilt-brillo { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: 2; mix-blend-mode: screen; }
 
 /* ---- botones: presión, brillo que recorre el borde ---- */
-.btn-suave, .camino-boton, .btn-icono, .hug-btn, #jar-btn, .tl-todo, .cd-btn { transition-duration: var(--dur-2); }
-.btn-suave:active, .camino-boton:active, .btn-icono:active, .tl-todo:active { transform: scale(.97); }
 .btn-suave { position: relative; overflow: hidden; }
 .btn-suave::after, .tl-todo::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;

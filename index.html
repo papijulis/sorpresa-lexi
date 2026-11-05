@@ -45,6 +45,7 @@
 <link rel="stylesheet" href="./assets/css/rueda.css">
 <link rel="stylesheet" href="./assets/css/flor-especial.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
+<link rel="stylesheet" href="./assets/css/botones.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
 <body class="locked">
@@ -94,8 +95,8 @@
     <p class="font-hand text-gold text-3xl mb-2">Antes de continuar...</p>
     <h1 class="font-display text-4xl sm:text-5xl text-parchment mb-8">¿Me amas?</h1>
     <div class="relative flex items-center justify-center gap-6 h-16">
-      <button id="btn-si" class="btn-brillo font-ui font-semibold px-8 py-3 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold-amber text-plum-dark shadow-lg shadow-gold/30 hover:scale-105 active:scale-95 transition-transform">Sí</button>
-      <button id="btn-no" class="font-ui font-semibold px-8 py-3 rounded-full bg-white/10 border border-white/20 text-parchment">No</button>
+      <button id="btn-si" class="btn-oro btn-grande btn-brillo">Sí</button>
+      <button id="btn-no" class="btn-suave btn-grande">No</button>
     </div>
   </div>
 </div>
@@ -302,7 +303,7 @@
       <p class="font-ui text-parchment/60 text-sm">Para los días difíciles, para cuando estés cansada, o cuando simplemente me extrañes...</p>
     </div>
     <div class="voice-card max-w-md mx-auto glass glow-rose rounded-3xl p-6 flex items-center gap-5">
-      <button id="voice-play" aria-label="Reproducir nota de voz" class="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-rose to-rose-deep flex items-center justify-center text-2xl shadow-lg shadow-rose/40 hover:scale-105 active:scale-95 transition-transform">
+      <button id="voice-play" aria-label="Reproducir nota de voz" class="btn-play shrink-0">
         <span id="voice-play-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></span>
       </button>
       <div class="flex-1 min-w-0">
@@ -378,7 +379,7 @@
       </svg>
       <div class="jar-shine-wrap"><div class="jar-shine"></div><div class="jar-shine-2"></div></div>
     </div>
-    <button id="jar-btn" class="btn-brillo font-ui font-semibold px-8 py-4 rounded-full bg-gradient-to-r from-gold via-gold-soft to-gold-amber text-plum-dark shadow-lg shadow-gold/30 hover:scale-105 active:scale-95 transition-transform">
+    <button id="jar-btn" class="btn-oro btn-grande btn-brillo">
       Tomar una razón de por qué eres mi todo
     </button>
     <div class="jar-progress-wrap mt-6">
@@ -425,7 +426,7 @@
   <!-- TIMELINE -->
   <section class="reveal py-24 px-6">
     <div class="max-w-3xl mx-auto text-center mb-14"><h2 class="font-display text-3xl sm:text-4xl text-parchment titulo-seccion">Nuestra línea del tiempo</h2></div>
-    <div class="tl-controles"><button type="button" id="tl-toggle-todo" class="tl-todo">Abrir todos los meses</button></div>
+    <div class="tl-controles"><button type="button" id="tl-toggle-todo" class="btn-suave btn-suave-oro tl-todo">Abrir todos los meses</button></div>
     <div class="timeline-wrap">
       <svg id="timeline-vine" class="tl-vine" aria-hidden="true" focusable="false"></svg>
       <div id="timeline-items"></div>
@@ -540,7 +541,7 @@
   <div id="juegos-grid" class="app-view-body juegos-grid"></div>
 
   <div id="juego-stage" class="hidden app-view-body">
-    <button id="juego-exit" class="juego-exit-btn"><span class="juego-exit-ico"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></span> Salir del juego</button>
+    <button id="juego-exit" class="btn-suave juego-exit-btn"><span class="juego-exit-ico"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></span> Salir del juego</button>
     <div id="juego-mount"></div>
   </div>
 </div>
@@ -574,7 +575,7 @@
         <p class="inf-never">Este contador nunca se va a detener.</p>
         <p class="inf-love">Te amo por y para siempre.</p>
         <p class="inf-sign">— Julio</p>
-        <button type="button" id="hug-btn" class="hug-btn btn-brillo" aria-label="Recibir un abrazo">Un abrazo</button>
+        <button type="button" id="hug-btn" class="btn-oro hug-btn btn-brillo" aria-label="Recibir un abrazo">Un abrazo</button>
       </div>
     </section>
 
@@ -647,7 +648,7 @@
 <!-- ===================== REUSABLE MODAL ===================== -->
 <div id="app-modal" class="modal-backdrop" inert>
   <div id="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title" class="modal-panel glass rounded-3xl max-w-md w-[92%] p-7 sm:p-9 relative">
-    <button id="modal-close" aria-label="Cerrar" class="absolute top-3 right-4"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
+    <button id="modal-close" aria-label="Cerrar" class="btn-redondo absolute top-3 right-4"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
     <div id="modal-icon" class="text-3xl mb-3"></div>
     <h3 id="modal-title" class="font-display text-xl sm:text-2xl text-gold mb-3"></h3>
     <p id="modal-body" class="font-hand text-lg sm:text-xl leading-relaxed text-parchment"></p>

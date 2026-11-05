@@ -61,7 +61,6 @@
   transition: transform var(--dur-rapida) var(--ease-rebote), background var(--dur-rapida) ease;
 }
 .cd-btn .ico { width: 1.3rem; height: 1.3rem; }
-.cd-btn:active { transform: scale(.92); }
 .cd-btn:disabled { opacity: .35; cursor: default; }
 .cd-prev .ico { transform: scaleX(-1); }
 .cd-play { width: 3.8rem; height: 3.8rem; border: none; background: var(--grad-oro-diagonal); color: var(--ciruela-900); box-shadow: var(--brillo-oro); }

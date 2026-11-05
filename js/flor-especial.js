@@ -325,9 +325,12 @@
         f.tepalos.push({ inc: inc, sol: sol, wire: wire, interno: interno });
       }
       if (!esBoton) {
+        /* los 6 filamentos son la misma curva girada: suben, se abren y la punta cae un poco
+           por el peso de la antera (arco suave, como con gravedad) */
+        var ARCO = [[0, .04], [.045, .24], [.11, .43], [.18, .55], [.235, .59], [.275, .575]];
         for (var s = 0; s < 6; s++) {
           var a = s * Math.PI / 3 + Math.PI / 6, ca = Math.cos(a), sa = Math.sin(a);
-          var c = new T.CatmullRomCurve3([V(0, .04, 0), V(ca * .06, .32, sa * .06), V(ca * .15, .6, sa * .15), V(ca * .25, .8, sa * .25)]);
+          var c = new T.CatmullRomCurve3(ARCO.map(function (q) { return V(ca * q[0], q[1], sa * q[0]); }));
           var fil = new T.Mesh(geoTubo(c, 20, 6, .011, .007), matFil);
           var tip = c.getPointAt(1), tan = c.getTangentAt(1);
           var ant = new T.Mesh(g(new T.CapsuleGeometry(.026, .11, 4, 10)), matAntera);   // antera versátil, de lado
@@ -337,7 +340,7 @@
           var est = new T.Group(); est.add(fil, ant); est.scale.setScalar(.001); bal.add(est);
           f.estambres.push({ g: est, a: a });
         }
-        var ce = new T.CatmullRomCurve3([V(0, .04, 0), V(.02, .36, .01), V(.05, .7, .03), V(.1, .9, .05)]);
+        var ce = new T.CatmullRomCurve3([V(0, .04, 0), V(.02, .3, .01), V(.045, .56, .025), V(.08, .7, .04)]);
         var estilo = new T.Mesh(geoTubo(ce, 24, 8, .02, .017), matEstilo);
         var est2 = new T.Group(); est2.add(estilo);
         var cima = ce.getPointAt(1);
@@ -400,7 +403,8 @@
           var e = sm(.6, .84, f) * o;
           fl.estambres.forEach(function (es, k) {
             es.g.scale.setScalar(Math.max(.001, e));
-            es.g.rotation.x = .04 * Math.sin(tt * 1.1 + es.a + fl.fase) * e; es.g.rotation.z = .04 * Math.cos(tt * .9 + k + fl.fase) * e;
+            /* vaivén común a los 6 (misma fase), para que se vean iguales */
+            es.g.rotation.x = .03 * Math.sin(tt * 1.1 + fl.fase) * e; es.g.rotation.z = .03 * Math.cos(tt * .9 + fl.fase) * e;
           });
           fl.pistilo.scale.setScalar(Math.max(.001, e));
         }

@@ -58,7 +58,6 @@
   background: linear-gradient(to right, var(--dorado-500), var(--dorado-400)); box-shadow: 0 6px 22px rgba(var(--dorado-rgb), .25);
   transition: transform .2s ease;
 }
-.hug-btn:active { transform: scale(.96); }
 
 /* ---- texto tipo código ---- */
 .inf-code { width: 100%; }

@@ -1,0 +1,114 @@
+/* ======================================================================
+   BOTONES — un solo sistema para todo el sitio (2026-11-05)
+   Tres familias, mismas medidas, misma tipografía, mismo "apretón":
+     1. .btn-oro      acción principal (degradado dorado, texto ciruela)
+     2. .btn-suave    acción secundaria (vidrio; .btn-suave-oro = dorado suave)
+     3. redondos      solo ícono: cerrar, flechas, anterior/siguiente
+        (+ .btn-play, el círculo grande de reproducir)
+   Alto mínimo 44 px (--btn-alto) en todos. El apretón usa la propiedad
+   `scale`, no `transform`, para no pelear con los que se centran con
+   translate (cierres, flechas del visor, "de nuevo" de la rueda) ni con el
+   efecto magnético de tarjetas.js (que usa `translate`).
+   Carga antes de movil.css, después de todas las hojas de cada sección.
+====================================================================== */
+
+/* ---- comunes ---- */
+.btn-oro, .cupon-redeem-btn,
+.btn-suave, .camino-boton,
+.btn-redondo, .btn-icono, .carta-nav-btn, .cd-btn, .lightbox-nav, .lightbox-close,
+.app-view-close, #modal-close, .letter-nav-btn, .carta-lector-cerrar, .btn-play {
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color var(--dur-2) var(--ease-std), border-color var(--dur-2) var(--ease-std),
+              box-shadow var(--dur-2) var(--ease-std), color var(--dur-2) var(--ease-std),
+              opacity var(--dur-2) ease, scale var(--dur-1) var(--ease-std), filter var(--dur-2) ease;
+}
+.btn-oro:active:not(:disabled), .cupon-redeem-btn:active:not(:disabled),
+.btn-suave:active:not(:disabled), .camino-boton:active:not(:disabled),
+.btn-redondo:active:not(:disabled), .btn-icono:active:not(:disabled), .carta-nav-btn:active:not(:disabled),
+.cd-btn:active:not(:disabled), .lightbox-nav:active, .lightbox-close:active, .app-view-close:active,
+#modal-close:active, .letter-nav-btn:active:not(:disabled), .carta-lector-cerrar:active, .btn-play:active {
+  scale: var(--btn-presion);
+}
+.btn-oro:disabled, .cupon-redeem-btn:disabled, .btn-suave:disabled, .btn-icono:disabled,
+.carta-nav-btn:disabled, .cd-btn:disabled, .letter-nav-btn:disabled { opacity: .35; cursor: default; }
+
+/* ---- 1. principal dorado ---- */
+.btn-oro, .cupon-redeem-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: var(--btn-alto); padding: .55rem 1.5rem; max-width: 100%;
+  border: 0; border-radius: var(--radio-pill);
+  font-family: var(--fuente-ui); font-size: .92rem; font-weight: 600; letter-spacing: .01em; line-height: 1.25; text-align: center;
+  color: var(--ciruela-900); background: var(--grad-oro); box-shadow: var(--btn-sombra-oro);
+}
+.btn-oro .ico, .cupon-redeem-btn .ico { width: var(--btn-ico-tam); height: var(--btn-ico-tam); }
+@media (hover: hover) {
+  .btn-oro:hover:not(:disabled), .cupon-redeem-btn:hover:not(:disabled) { filter: brightness(1.06); box-shadow: var(--btn-sombra-oro), var(--brillo-oro); }
+}
+/* "Canjear" dentro de la tarjeta raspada: misma pastilla, un poco más compacta */
+.cupon-reveal .cupon-redeem-btn { min-height: 2.4rem; padding: .4rem 1rem; font-size: .76rem; box-shadow: none; }
+
+/* ---- 2. suave (vidrio) ---- */
+.btn-suave {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  min-height: var(--btn-alto); padding: .55rem 1.3rem; max-width: 100%;
+  border-radius: var(--radio-pill); border: 1px solid var(--btn-borde); background: var(--btn-vidrio);
+  font-family: var(--fuente-ui); font-size: .88rem; font-weight: 600; letter-spacing: .01em; line-height: 1.25; text-align: center;
+  color: var(--pergamino-50);
+}
+.btn-suave .ico { width: var(--btn-ico-tam); height: var(--btn-ico-tam); color: var(--dorado-500); }
+.btn-suave-oro { color: var(--dorado-500); border-color: rgba(var(--dorado-rgb), .35); background: rgba(var(--dorado-rgb), .08); }
+@media (hover: hover) {
+  .btn-suave:hover:not(:disabled) { background: var(--btn-vidrio-hover); border-color: rgba(var(--dorado-rgb), .45); }
+  .btn-suave-oro:hover:not(:disabled) { background: rgba(var(--dorado-rgb), .16); }
+}
+/* tamaño grande: Sí/No de la entrada y el frasco */
+.btn-grande { min-height: var(--btn-alto-grande); padding: .7rem 1.9rem; font-size: 1rem; min-width: 7.5rem; }
+.tl-todo { font-size: .82rem; }
+.juego-exit-btn { padding-left: .9rem; }
+
+/* píldoras de Caminos (música y cielo): mismo vidrio, más compactas por estar en tarjetas */
+.camino-boton { border-color: var(--btn-borde); background: var(--btn-vidrio); }
+.camino-boton .ico { width: var(--btn-ico-tam); height: var(--btn-ico-tam); }
+@media (hover: hover) { .camino-boton:hover { background: var(--btn-vidrio-hover); } }
+
+/* ---- 3. redondos de ícono ---- */
+.btn-redondo, .btn-icono, .carta-nav-btn, .cd-btn, .lightbox-nav, .lightbox-close,
+.app-view-close, #modal-close, .letter-nav-btn, .carta-lector-cerrar {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: var(--btn-alto); height: var(--btn-alto); padding: 0; border-radius: 50%;
+  color: var(--pergamino-50); background: var(--btn-vidrio); border: 1px solid var(--btn-borde);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.btn-redondo .ico, .btn-icono .ico, .carta-nav-btn .ico, .cd-btn .ico, .lightbox-nav .ico, .lightbox-close .ico,
+.app-view-close .ico, #modal-close .ico, .letter-nav-btn .ico, .carta-lector-cerrar .ico { width: var(--btn-ico-tam); height: var(--btn-ico-tam); }
+@media (hover: hover) {
+  .btn-redondo:hover, .btn-icono:hover:not(:disabled), .carta-nav-btn:hover:not(:disabled), .cd-btn:not(.cd-play):hover:not(:disabled),
+  .lightbox-nav:hover, .lightbox-close:hover, .app-view-close:hover, #modal-close:hover { background: var(--btn-vidrio-hover); border-color: rgba(var(--dorado-rgb), .45); }
+}
+#modal-close { position: absolute; }
+/* sobre el pergamino: mismos círculos, en tinta sepia */
+.letter-nav-btn, .carta-lector-cerrar {
+  color: var(--sepia-700); background: rgba(var(--dorado-rgb), .16); border-color: rgba(var(--sepia-rgb), .35);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+@media (hover: hover) {
+  .letter-nav-btn:hover:not(:disabled), .carta-lector-cerrar:hover { background: rgba(var(--dorado-rgb), .32); box-shadow: 0 4px 14px rgba(var(--sepia-rgb), .22); }
+}
+
+/* ---- círculo grande de reproducir (CD y nota de voz) ---- */
+.btn-play, .cd-btn.cd-play {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: var(--btn-redondo-grande); height: var(--btn-redondo-grande); padding: 0; border: 0; border-radius: 50%;
+  color: var(--ciruela-900); background: var(--grad-oro-diagonal); box-shadow: var(--btn-sombra-oro);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.btn-play .ico, .cd-btn.cd-play .ico { width: 1.55rem; height: 1.55rem; }
+@media (hover: hover) { .btn-play:hover, .cd-btn.cd-play:hover:not(:disabled) { filter: brightness(1.06); box-shadow: var(--btn-sombra-oro), var(--brillo-oro); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-oro, .cupon-redeem-btn, .btn-suave, .camino-boton, .btn-redondo, .btn-icono, .carta-nav-btn, .cd-btn,
+  .lightbox-nav, .lightbox-close, .app-view-close, #modal-close, .letter-nav-btn, .carta-lector-cerrar, .btn-play { scale: none !important; }
+}
+
+/* el título de cada vista deja libre el hueco del ✕ (antes "Cupones para raspar" quedaba debajo) */
+.app-view-header > h2 { padding: 0 calc(var(--btn-alto) + .5rem); text-align: center; line-height: 1.15; }

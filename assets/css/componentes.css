@@ -33,7 +33,6 @@
   }
   .btn-icono .ico { width: 1.2rem; height: 1.2rem; }
   .btn-icono-prev .ico { transform: scaleX(-1); }
-  .btn-icono:active { transform: scale(.92); }
   @media (hover: hover) { .btn-icono:hover { background: rgba(255,255,255,.16); } }
   .btn-suave {
     display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.3rem; border-radius: var(--radio-pill); cursor: pointer;
@@ -43,7 +42,6 @@
   .btn-suave .ico { width: 1.1rem; height: 1.1rem; color: var(--dorado-500); }
   .btn-suave-oro { color: var(--dorado-500); border-color: rgba(var(--dorado-rgb), .35); background: rgba(var(--dorado-rgb), .08); }
   .btn-suave.hidden, .btn-icono.hidden { display: none; }
-  .btn-suave:active { transform: scale(.97); }
   @media (hover: hover) { .btn-suave:hover { background: rgba(255,255,255,.14); border-color: rgba(var(--dorado-rgb), .45); } }
 
   /* ---- hero shimmer ---- */
@@ -145,7 +143,6 @@
     display: flex; align-items: center; justify-content: center; transition: background .25s ease, transform .2s var(--ease-rebote);
   }
   #modal-close .ico, .app-view-close .ico, .lightbox-close .ico { width: 1.1rem; height: 1.1rem; }
-  #modal-close:active, .app-view-close:active, .lightbox-close:active { transform: scale(.92); }
   @media (hover: hover) { #modal-close:hover { background: rgba(255,255,255,0.16); } }
 
   /* ---- navegación entre cartas del Buzón (bloque 9) ---- */
@@ -156,7 +153,6 @@
     display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;
     background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50); transition: background .2s ease, transform .2s var(--ease-rebote);
   }
-  .carta-nav-btn:active { transform: scale(.92); }
   .carta-nav-btn:disabled { opacity: .3; cursor: default; }
   .carta-nav-prev .ico { transform: scaleX(-1); }
   .carta-nav-n { font-family: var(--fuente-ui); font-size: .78rem; color: rgba(var(--pergamino-rgb), .6); min-width: 5rem; text-align: center; }

@@ -29,5 +29,4 @@
 .rueda-lienzo canvas:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 4px; }
 .rueda-cerrar { top: calc(1rem + env(safe-area-inset-top, 0px)); right: calc(1rem + env(safe-area-inset-right, 0px)); transform: none; z-index: 2; }
 .rueda-repetir { position: absolute; bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); z-index: 2; }
-.rueda-repetir:active { transform: translateX(-50%) scale(.97); }
 @media (prefers-reduced-motion: reduce) { .rueda { transition: opacity .2s ease; clip-path: none; opacity: 0; } .rueda.abierta { opacity: 1; } .rueda-circulo { animation: none; } }

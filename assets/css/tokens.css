@@ -82,6 +82,16 @@
   --radio-lg: 1.5rem;
   --radio-xl: 2rem;
   --radio-pill: 999px;
+  /* botones (botones.css): un solo sistema de tamaños y superficies */
+  --btn-alto: 2.75rem;            /* 44 px: mínimo táctil, igual para todos */
+  --btn-alto-grande: 3.1rem;      /* acción principal de una sección */
+  --btn-ico-tam: 1.2rem;          /* ícono dentro de un botón */
+  --btn-redondo-grande: 3.75rem;  /* reproducir (CD, nota de voz) */
+  --btn-vidrio: rgba(255, 255, 255, .08);
+  --btn-vidrio-hover: rgba(255, 255, 255, .15);
+  --btn-borde: rgba(255, 255, 255, .18);
+  --btn-sombra-oro: 0 6px 20px rgba(var(--dorado-rgb), .28);
+  --btn-presion: .94;
 
   /* ---- sombras y brillos ---- */
   --sombra-suave: 0 14px 30px rgba(0, 0, 0, .45);
