@@ -1,0 +1,74 @@
+/* ======================================================================
+   LAS CARTAS DEL FINAL — pistas de scroll con escenario fijo (js/cartas-final.js)
+   La carta es UN solo elemento: .carta-marco se recorta con clip-path (rectángulo
+   pequeño lila → casi pantalla completa → sobre). Márgenes: arriba deja pasar la
+   barra superior y abajo el dock; a los lados 16 px en móvil, 6 vw en escritorio.
+====================================================================== */
+.cartas-final { position: relative; padding-top: 5rem; }
+.cartas-final-cab { text-align: center; padding: 0 1.5rem 2.5rem; }
+.cartas-final-cab p { margin: .5rem 0 0; }
+
+.carta-pista { position: relative; height: 350vh; height: 350svh; }
+.carta-escena { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.carta-marco {
+  position: absolute; top: 5rem; bottom: calc(6.2rem + env(safe-area-inset-bottom, 0px)); left: 16px; right: 16px;
+  will-change: clip-path;
+}
+@media (min-width: 900px) { .carta-marco { left: 6vw; right: 6vw; top: 5.2rem; } }
+.carta-glow { position: absolute; inset: 0; }
+.carta-glow.con-brillo { filter: drop-shadow(0 0 22px rgba(var(--orquidea-rgb), .55)); }
+.carta-panel { position: absolute; inset: 0; border-radius: var(--radius-lg); overflow: hidden; background: rgba(var(--ciruela-rgb), .86); border: 1px solid var(--glass-border); }
+.carta-color { position: absolute; inset: 0; background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .9)); opacity: 1; pointer-events: none; }
+.carta-cuerpo { position: relative; display: flex; flex-direction: column; height: 100%; padding: 1.6rem 1.3rem 1rem; opacity: 0; }
+@media (min-width: 900px) { .carta-cuerpo { padding: 2.2rem 3.2rem 1.4rem; max-width: 52rem; margin: 0 auto; } }
+.carta-cab { text-align: center; margin-bottom: 1rem; }
+.carta-etiqueta { margin: 0; font-family: var(--fuente-ui); font-size: .72rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: rgba(var(--dorado-rgb), .85); }
+.carta-titulo { margin: .35rem 0 0; font-size: clamp(1.7rem, 5vw, 2.6rem); line-height: 1.12; color: var(--pergamino-50); text-shadow: var(--texto-sombra); }
+.carta-sub { margin: .3rem 0 0; font-family: var(--fuente-ui); font-size: .8rem; color: rgba(var(--pergamino-rgb), .6); }
+.carta-texto {
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: auto; padding: .4rem .3rem 1.2rem; text-align: left;
+  user-select: text; -webkit-user-select: text; scrollbar-width: thin;
+  font-family: var(--fuente-titulo); font-size: clamp(1rem, 2.6vw, 1.18rem); line-height: 1.75; color: rgba(var(--pergamino-rgb), .92);
+}
+.carta-texto:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 2px; border-radius: var(--radius-md); }
+.carta-parrafo { margin: 0 0 1.1rem; white-space: pre-line; }
+.carta-firma { margin: 1.6rem 0 .4rem; text-align: right; font-size: clamp(1.4rem, 4vw, 1.9rem); line-height: 1.4; white-space: pre-line; color: var(--dorado-500); }
+.carta-icono { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; color: var(--ciruela-900); }
+.carta-icono .ico { width: 2.1rem; height: 2.1rem; }
+
+/* fila de sobres guardados */
+.carta-slots { position: absolute; left: 50%; top: 72%; transform: translate(-50%, -50%); display: flex; gap: 1.4rem; }
+.carta-slot {
+  width: 3.6rem; height: 3.6rem; padding: 0; border-radius: 18px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--ciruela-900); background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .9)); border: 1px solid rgba(255,255,255,.35);
+  box-shadow: 0 0 18px rgba(var(--orquidea-rgb), .5); opacity: 0; transform: scale(.6); pointer-events: none;
+  transition: opacity var(--dur-3) var(--ease-out-soft), transform var(--dur-3) var(--ease-out-soft);
+}
+.carta-slot .ico { width: 2.1rem; height: 2.1rem; }
+.carta-slot.guardado { opacity: 1; transform: none; pointer-events: auto; }
+@media (hover: hover) { .carta-slot.guardado:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 26px rgba(var(--orquidea-rgb), .7); } }
+.carta-slot:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 3px; }
+/* mientras la carta se lee, el sobre en turno no estorba */
+.carta-slot:not(.guardado) { visibility: hidden; }
+
+/* cierre: la vela del deseo */
+.cartas-cierre { display: flex; justify-content: center; padding: 3rem 1.5rem 4rem; }
+.cartas-deseo { max-width: 34rem; width: 100%; padding: 2rem 1.5rem; text-align: center; color: var(--pergamino-50); background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+/* lector: reabre una carta guardada */
+.carta-lector { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)); background: rgba(var(--abismo-rgb), .78); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity var(--dur-3) ease; }
+.carta-lector.abierto { opacity: 1; pointer-events: auto; }
+.carta-lector-caja { position: relative; display: flex; flex-direction: column; width: min(100%, 46rem); max-height: 100%; padding: 1.6rem 1.3rem 1rem; border-radius: var(--radius-lg); background: rgba(var(--ciruela-rgb), .9); transform: scale(.94) translateY(12px); transition: transform var(--dur-4) var(--ease-out-soft); }
+.carta-lector.abierto .carta-lector-caja { transform: none; }
+.carta-lector-cerrar { top: .8rem; right: .8rem; transform: none; }
+.carta-lector-texto { max-height: calc(100svh - 11rem); }
+
+/* sin movimiento: tarjetas apiladas, sin scrub */
+.cartas-final.estatica .carta-pista { height: auto; padding: 0 16px 1.5rem; }
+.cartas-final.estatica .carta-escena { position: static; height: auto; overflow: visible; }
+.cartas-final.estatica .carta-marco { position: static; clip-path: none !important; max-width: 52rem; margin: 0 auto; }
+.cartas-final.estatica .carta-glow, .cartas-final.estatica .carta-panel { position: static; }
+.cartas-final.estatica .carta-color, .cartas-final.estatica .carta-icono, .cartas-final.estatica .carta-slots { display: none; }
+.cartas-final.estatica .carta-cuerpo { opacity: 1; height: auto; }
+.cartas-final.estatica .carta-texto { overflow: visible; }
+@media (prefers-reduced-motion: reduce) { .carta-lector, .carta-lector-caja, .carta-slot { transition: opacity .2s ease; } }

@@ -370,112 +370,12 @@ renderPolaroidGrid(document.getElementById('favorite-photos-grid'), FAVORITE_PHO
 renderPolaroidGrid(document.getElementById('polaroid-grid'), POLAROIDS);
 
 /* ======================================================================
-   LOVE LETTER — sequential "ink appearing" reveal
+   LAS CARTAS DEL FINAL — viven en js/cartas-final.js (scrub por scroll). La vela
+   del deseo ya no depende de ninguna carta: ver "11:11 WISH RITUAL" abajo.
 ====================================================================== */
-const letterContainerEl = document.getElementById('letter-container');
-const letterBodyEl = document.getElementById('letter-body');
-const letterLabelEl = document.getElementById('letter-label');
-const letterWishBlockEl = document.getElementById('letter-wish-block');
-const letterSwitchBtn = document.getElementById('letter-switch');
-
-/* Pergamino con dos cartas: la original (config.js → LETTER) y
-   "Para seguir escribiendo" (cartas.js → CARTA_FINAL). La vela del deseo
-   pertenece solo a la primera. */
-const letterBackBtn = document.getElementById('letter-back');
-const LETTER_SEQ = [
-  { label: 'Carta del Capítulo 1 · 21 de septiembre de 2026', texto: LETTER, conVela: true },
-  { label: (window.CARTA_FINAL && window.CARTA_FINAL.titulo) || 'Para seguir escribiendo', texto: (window.CARTA_FINAL && window.CARTA_FINAL.texto) || '', conVela: false },
-  { label: (window.CARTA_PARA_LEXI && window.CARTA_PARA_LEXI.titulo) || 'Para Lexi', texto: (window.CARTA_PARA_LEXI && window.CARTA_PARA_LEXI.texto) || '', conVela: false },
-].filter((l) => l.texto);
-const LETTER_NEXT_TEXT = (window.CARTA_FINAL && window.CARTA_FINAL.botonIda) || 'Leer una carta más';
-const LETTER_BACK_FIRST = (window.CARTA_FINAL && window.CARTA_FINAL.botonVuelta) || 'Volver a la primera carta';
-let letterCurrent = 0;
-let letterBusy = false;
-let letterRevealed = false;
-let letterPEls = [];
-let letterTimers = [];
-
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
-function buildLetterParagraphs(texto) {
-  letterBodyEl.innerHTML = '';
-  letterPEls = [];
-  const paragraphs = texto.split('\n\n');
-  paragraphs.forEach((para, i) => {
-    const p = document.createElement('p');
-    const isLast = i === paragraphs.length - 1;
-    p.className = (isLast ? 'font-hand text-2xl sm:text-3xl mt-8 text-right ' : 'mb-5 whitespace-pre-line ') + 'ink-hidden';
-    p.textContent = para;
-    letterBodyEl.appendChild(p);
-    letterPEls.push(p);
-  });
-}
-function playLetterInk() {
-  letterTimers.forEach(clearTimeout);
-  letterTimers = [];
-  if (prefersReducedMotion()) { letterPEls.forEach((p) => p.classList.add('ink-in')); return; }
-  letterPEls.forEach((p, i) => letterTimers.push(setTimeout(() => p.classList.add('ink-in'), i * 380)));
-}
-function revealLetterSequentially() {
-  if (letterRevealed) return;
-  letterRevealed = true;
-  playLetterInk();
-}
-/* navegación del pergamino: flechas redondas + "Carta N de M"; en la primera/última se desactiva la que no aplica */
-function updateLetterButtons() {
-  const last = letterCurrent === LETTER_SEQ.length - 1;
-  const backText = letterCurrent === 1 ? LETTER_BACK_FIRST : 'Volver a la carta anterior';
-  letterSwitchBtn.disabled = last;
-  letterSwitchBtn.setAttribute('aria-label', LETTER_NEXT_TEXT);
-  letterSwitchBtn.title = LETTER_NEXT_TEXT;
-  letterBackBtn.disabled = letterCurrent === 0;
-  letterBackBtn.setAttribute('aria-label', backText);
-  letterBackBtn.title = backText;
-  document.getElementById('letter-nav-n').textContent = `Carta ${letterCurrent + 1} de ${LETTER_SEQ.length}`;
-}
-function goToLetter(target) {
-  if (letterBusy || target < 0 || target >= LETTER_SEQ.length) return;
-  letterBusy = true;
-  letterSwitchBtn.disabled = true;
-  letterBackBtn.disabled = true;
-  letterBodyEl.setAttribute('aria-live', 'polite');
-  letterRevealed = true;
-  letterTimers.forEach(clearTimeout);
-  letterTimers = [];
-  const reduced = prefersReducedMotion();
-  letterPEls.forEach((p) => p.classList.remove('ink-in'));
-  letterWishBlockEl.style.transition = reduced ? 'none' : 'opacity .6s ease';
-  letterWishBlockEl.style.opacity = '0';
-
-  setTimeout(() => {
-    letterCurrent = target;
-    const data = LETTER_SEQ[letterCurrent];
-    letterLabelEl.textContent = data.label;
-    buildLetterParagraphs(data.texto);
-    letterWishBlockEl.classList.toggle('hidden', !data.conVela);
-    if (data.conVela) requestAnimationFrame(() => { letterWishBlockEl.style.opacity = '1'; });
-    updateLetterButtons();
-    const rect = letterContainerEl.getBoundingClientRect();
-    if (rect.top < 0 || rect.top > window.innerHeight * 0.4) {
-      letterContainerEl.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    }
-    setTimeout(() => {
-      playLetterInk();
-      letterBusy = false;
-      updateLetterButtons();
-    }, 30);
-  }, reduced ? 50 : 750);
-}
-letterSwitchBtn.addEventListener('click', () => goToLetter(letterCurrent + 1));
-letterBackBtn.addEventListener('click', () => goToLetter(letterCurrent - 1));
-
-buildLetterParagraphs(LETTER_SEQ[0].texto);
-updateLetterButtons();
-const letterObserver = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => { if (entry.isIntersecting) { revealLetterSequentially(); letterObserver.disconnect(); } });
-}, { threshold: 0.2 });
-letterObserver.observe(letterContainerEl);
 
 /* ======================================================================
    HERO TITLE — letter-by-letter reveal (fires once journey unlocks)

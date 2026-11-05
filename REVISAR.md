@@ -72,6 +72,11 @@ del corazón. Ajústalos en el arreglo `CODE` y en la función del abrazo.
 - **Tarjeta "Instalar"** (Caminos del jardín): "Llevar el Jardín contigo", "Instálalo en tu pantalla de inicio" y la ventanita de instrucciones (`js/instalar.js`).
 - **Caminos del jardín:** títulos y subtítulos de las 4 escenas ("Cartas que se abren con el tiempo", "Cupones, memorama y más sorpresas", "Nuestro soundtrack", "Día, atardecer o noche") y "Por aquí se llega a cada rincón."
 
+## Rediseño de movimiento (rótulos míos, sin publicar)
+
+- **Las cartas del final:** título "Las cartas del final" y subtítulo "Baja despacio: cada una se abre, se lee y se guarda como un sobre."; etiquetas "Carta N de 3". Los textos de las cartas son los de siempre (no se tocaron).
+- **Barra superior:** "Caminos", "Cómo empezó", "Lo que guardo de ti", "Lo que hemos vivido", "Nuestra música", "Lo que sigue", "Cartas".
+
 ## Decisiones tomadas (sin texto que revisar)
 
 - Sin botón ni texto para contactar a Julio (WhatsApp eliminado), por tu

@@ -396,7 +396,9 @@ function updateJuegosDot() {
 }
 
 if (window.JuegoCaceria) {
-  window.JuegoCaceria.init();
+  /* tras cargar todos los scripts: algunos anclas (#letter-container en las cartas del final) se crean en scripts posteriores */
+  const iniciarCaceria = () => window.JuegoCaceria.init();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciarCaceria); else iniciarCaceria();
   updateJuegosDot();
   // Re-check periodically instead of patching internals — cheap (every 4s),
   // and only runs while the page is open, not inside the render loop.

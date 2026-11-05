@@ -49,15 +49,6 @@ window.CARTA_PARA_LEXI = {
 
 window.CARTAS = [
   {
-    id: "para-seguir-escribiendo",
-    titulo: "Para seguir escribiendo",
-    tipo: "sorpresa",
-    apertura: "2026-09-21",
-    sello: "lirio",
-    texto: window.CARTA_FINAL.texto,
-    borrador: true,
-  },
-  {
     id: "mes-5",
     titulo: "Cinco meses",
     tipo: "mesiversario",

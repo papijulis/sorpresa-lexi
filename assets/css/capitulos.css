@@ -59,18 +59,6 @@ body[data-capitulo="5"] { --cap-rgb: var(--dorado-rgb); --cap-a: .16; }
   opacity: calc((var(--p) - .6) * 2.5); transform: scale(calc(.4 + var(--p) * .6)) rotate(calc(var(--p) * 60deg));
 }
 
-/* ---- letrero de la parte actual ---- */
-.cap-indicador {
-  position: fixed; top: calc(.85rem + env(safe-area-inset-top, 0px)); left: 50%; z-index: var(--z-flotante);
-  transform: translate(-50%, -10px); opacity: 0; pointer-events: none; white-space: nowrap;
-  padding: .45rem 1.15rem; border-radius: var(--radio-pill);
-  background: rgba(var(--ciruela-rgb), .76); border: 1px solid rgba(var(--dorado-rgb), .26);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  font-family: var(--fuente-titulo); font-style: italic; font-size: .95rem; color: var(--pergamino-50);
-  transition: opacity .6s ease, transform .6s var(--ease-flor);
-}
-.cap-indicador.on { opacity: 1; transform: translate(-50%, 0); }
-
 /* ---- índice de partes (dentro de "Caminos del jardín") ---- */
 .cap-indice { max-width: 44rem; margin: 3rem auto 0; }
 .cap-indice-t { margin: 0 0 .9rem; font-size: .75rem; letter-spacing: .24em; text-transform: uppercase; color: rgba(var(--pergamino-rgb), .55); }
@@ -91,5 +79,4 @@ body[data-capitulo="5"] { --cap-rgb: var(--dorado-rgb); --cap-a: .16; }
 @media (prefers-reduced-motion: reduce) {
   .cap-num { transform: translate(-50%, -50%); opacity: .6; }
   .cap-texto { transform: none; }
-  .cap-indicador { transition: opacity .2s ease; transform: translate(-50%, 0); }
 }

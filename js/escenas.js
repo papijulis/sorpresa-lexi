@@ -53,7 +53,17 @@
 
   /* inserta el divisor ornamental bajo cada título de sección y en los
      contenedores marcados con data-orn-divisor */
+  /* la última palabra de cada título lleva el acento en serif cursiva */
+  function acentuar(h) {
+    if (h.querySelector('.acento') || h.children.length) return;
+    var t = h.textContent.trim().split(/\s+/);
+    if (t.length < 2) return;
+    var ult = t.pop();
+    h.textContent = t.join(' ') + ' ';
+    var em = document.createElement('em'); em.className = 'acento'; em.textContent = ult; h.appendChild(em);
+  }
   function decorar() {
+    document.querySelectorAll('h2.titulo-seccion, .cap-titulo').forEach(acentuar);
     document.querySelectorAll('.titulo-seccion').forEach(function (h) {
       if (h.nextElementSibling && h.nextElementSibling.classList.contains('orn-divisor')) return;
       var d = document.createElement('div');

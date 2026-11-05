@@ -38,21 +38,6 @@
     margin-left: auto; margin-top: 1.25rem;
   }
   .flourish { position: absolute; opacity: 0.16; pointer-events: none; }
-  /* navegación del pergamino (sobre papel: tinta sepia) */
-  .letter-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 2.2rem; }
-  .letter-nav-btn {
-    display: inline-flex; align-items: center; justify-content: center; width: 2.9rem; height: 2.9rem; padding: 0; border-radius: 50%; cursor: pointer;
-    color: var(--sepia-700); background: rgba(var(--dorado-rgb), .16); border: 1px solid rgba(180, 83, 9, .35);
-    transition: background .2s ease, transform .2s var(--ease-rebote), box-shadow .2s ease;
-  }
-  .letter-nav-btn .ico { width: 1.25rem; height: 1.25rem; }
-  .letter-nav-prev .ico { transform: scaleX(-1); }
-  .letter-nav-btn:active:not(:disabled) { transform: scale(.92); }
-  .letter-nav-btn:disabled { opacity: .3; cursor: default; }
-  .letter-nav-btn:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 3px; }
-  @media (hover: hover) { .letter-nav-btn:hover:not(:disabled) { background: rgba(var(--dorado-rgb), .32); box-shadow: 0 4px 14px rgba(180, 83, 9, .22); } }
-  .letter-nav-n { min-width: 6.5rem; text-align: center; font-family: var(--fuente-ui); font-size: .78rem; font-weight: 600; letter-spacing: .06em; color: var(--sepia-700); }
-
   /* botones modernos de la interfaz: icono redondo y píldora suave */
   .btn-icono {
     display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;

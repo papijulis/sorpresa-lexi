@@ -32,6 +32,8 @@
     scroll-behavior: smooth;
     overflow-x: hidden;
   }
+  /* overflow-x:hidden convierte a body en contenedor de scroll y rompe position:sticky (las cartas del final); clip recorta igual sin eso */
+  @supports (overflow: clip) { html, body { overflow-x: clip; } }
   body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
   button, a { -webkit-tap-highlight-color: transparent; }
   /* la regla button{cursor:pointer} venía del preflight de Tailwind; al quitar el CDN se perdió */

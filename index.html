@@ -40,6 +40,8 @@
 <link rel="stylesheet" href="./assets/css/tipografia.css">
 <link rel="stylesheet" href="./assets/css/linea-tiempo.css">
 <link rel="stylesheet" href="./assets/css/cd.css">
+<link rel="stylesheet" href="./assets/css/movimiento.css">
+<link rel="stylesheet" href="./assets/css/cartas-final.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
@@ -54,6 +56,9 @@
 <!-- PORTADA EN CAPAS (bloque 2): sol/luna según la hora, colinas, hierba con lirios y lirios grandes al frente -->
 <div id="bg-capitulo" aria-hidden="true"></div>
 <div id="bg-ritmo" aria-hidden="true"></div>
+<div id="flujo-estatico" aria-hidden="true"></div>
+<canvas id="flujo-luz" aria-hidden="true"></canvas>
+<div id="grano" aria-hidden="true"></div>
 <div id="portada" aria-hidden="true">
   <div class="p-sol"></div>
   <div class="p-disco"></div>
@@ -309,7 +314,7 @@
       <h2 class="font-display text-2xl sm:text-3xl text-parchment mb-2 titulo-seccion">Escucha esto solo cuando me extrañes</h2>
       <p class="font-ui text-parchment/60 text-sm">Para los días difíciles, para cuando estés cansada, o cuando simplemente me extrañes...</p>
     </div>
-    <div class="max-w-md mx-auto glass glow-rose rounded-3xl p-6 flex items-center gap-5">
+    <div class="voice-card max-w-md mx-auto glass glow-rose rounded-3xl p-6 flex items-center gap-5">
       <button id="voice-play" aria-label="Reproducir nota de voz" class="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-rose to-rose-deep flex items-center justify-center text-2xl shadow-lg shadow-rose/40 hover:scale-105 active:scale-95 transition-transform">
         <span id="voice-play-icon"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-play"/></svg></span>
       </button>
@@ -475,16 +480,15 @@
     </div>
   </section>
 
-  <!-- LOVE LETTER -->
-  <section class="reveal py-24 px-6">
-    <div id="letter-container" class="max-w-2xl mx-auto letter-scroll rounded-2xl shadow-2xl p-8 sm:p-14 relative">
-      <svg class="flourish top-3 left-3 w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M32 4 C36 16 48 20 58 18 C48 26 44 38 48 50 C38 44 26 44 18 52 C22 40 16 28 6 22 C18 22 28 14 32 4Z" fill="#B45309"/></svg>
-      <svg class="flourish top-3 right-3 w-14 h-14" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style="transform:scaleX(-1)"><path d="M32 4 C36 16 48 20 58 18 C48 26 44 38 48 50 C38 44 26 44 18 52 C22 40 16 28 6 22 C18 22 28 14 32 4Z" fill="#B45309"/></svg>
-      <p id="letter-label" class="font-ui text-xs uppercase tracking-wide text-center mb-6" style="color:#B45309;">Carta del Capítulo 1 · 21 de septiembre de 2026</p>
-      <div id="letter-body" class="font-display text-[15px] sm:text-lg leading-relaxed sm:leading-loose relative"></div>
-      <div class="wax-seal">J</div>
-
-      <div id="letter-wish-block" class="mt-14 pt-10 border-t border-black/10 text-center">
+  <!-- LAS CARTAS DEL FINAL: tres cartas que se expanden, se leen y se guardan como sobres (js/cartas-final.js) -->
+  <section id="cartas-final" class="cartas-final" aria-labelledby="cartas-final-t">
+    <header class="cartas-final-cab reveal">
+      <h2 id="cartas-final-t" class="font-display text-parchment titulo-seccion">Las cartas del final</h2>
+      <p class="font-ui text-parchment/60 text-sm">Baja despacio: cada una se abre, se lee y se guarda como un sobre.</p>
+    </header>
+    <div id="cartas-pistas"></div>
+    <div class="cartas-cierre reveal">
+      <div class="cartas-deseo">
         <p class="font-hand text-xl sm:text-2xl mb-6">Cierra los ojos, piensa en nuestro deseo y tócalo...</p>
         <button id="wish-candle" aria-label="Pedir un deseo" class="hover:scale-110 active:scale-95 transition-transform">
           <span class="flame-flicker text-5xl sm:text-6xl" style="color:var(--ambar-500);"><svg class="ico ico-2xl" aria-hidden="true" focusable="false"><use href="#i-vela"/></svg></span>
@@ -492,12 +496,6 @@
         <p id="wish-final" class="hidden font-hand text-xl sm:text-2xl mt-8 opacity-0 transition-opacity duration-1000">
           Guardado en mi corazón. Te prometo que haré todo lo que esté en mis manos para cumplirlo contigo.
         </p>
-      </div>
-
-      <div class="letter-nav" role="group" aria-label="Cartas del pergamino">
-        <button id="letter-back" type="button" class="letter-nav-btn letter-nav-prev" aria-label="Volver a la carta anterior" disabled><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
-        <span id="letter-nav-n" class="letter-nav-n" aria-live="polite">Carta 1 de 3</span>
-        <button id="letter-switch" type="button" class="letter-nav-btn" aria-label="Leer una carta más"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
       </div>
     </div>
   </section>
@@ -577,7 +575,32 @@
 </div>
 <div id="inf-toast" class="inf-toast" role="status" aria-live="polite"></div>
 
-<div id="cap-indicador" class="cap-indicador" role="status" aria-live="polite"></div>
+<!-- BARRA SUPERIOR: aparece con la fusión del inicio (js/barra.js) -->
+<header id="barra-sup" class="barra-sup" inert>
+  <nav class="barra-nav" aria-label="Secciones del jardín">
+    <a class="barra-marca" href="#" aria-label="Volver al inicio"><svg class="ico" aria-hidden="true" focusable="false"><use href="#lirio-mini"/></svg></a>
+    <div class="barra-enlaces">
+      <span class="barra-pastilla" aria-hidden="true"></span>
+      <a class="barra-enlace" href="#caminos"><span class="barra-txt">Caminos</span><svg class="ico barra-ico" aria-hidden="true" focusable="false"><use href="#i-casa"/></svg></a>
+      <a class="barra-enlace" href="#cap-1"><b>I</b><span class="barra-txt">Cómo empezó</span></a>
+      <a class="barra-enlace" href="#cap-2"><b>II</b><span class="barra-txt">Lo que guardo de ti</span></a>
+      <a class="barra-enlace" href="#cap-3"><b>III</b><span class="barra-txt">Lo que hemos vivido</span></a>
+      <a class="barra-enlace" href="#cap-4"><b>IV</b><span class="barra-txt">Nuestra música</span></a>
+      <a class="barra-enlace" href="#cap-5"><b>V</b><span class="barra-txt">Lo que sigue</span></a>
+      <a class="barra-enlace" href="#cartas-final"><span class="barra-txt">Cartas</span><svg class="ico barra-ico" aria-hidden="true" focusable="false"><use href="#i-sobre-carta"/></svg></a>
+    </div>
+    <button type="button" id="barra-menu" class="barra-menu" aria-label="Abrir el menú de secciones" aria-expanded="false" aria-controls="barra-hoja"><span class="barra-menu-lineas" aria-hidden="true"></span></button>
+  </nav>
+  <div id="barra-hoja" class="barra-hoja" aria-label="Secciones">
+    <a href="#caminos">Caminos del jardín</a>
+    <a href="#cap-1"><b>I</b> Cómo empezó</a>
+    <a href="#cap-2"><b>II</b> Lo que guardo de ti</a>
+    <a href="#cap-3"><b>III</b> Lo que hemos vivido</a>
+    <a href="#cap-4"><b>IV</b> Nuestra música</a>
+    <a href="#cap-5"><b>V</b> Lo que sigue</a>
+    <a href="#cartas-final">Las cartas del final</a>
+  </div>
+</header>
 
 <!-- ===================== DOCK (punto 9): navegación integrada ===================== -->
 <nav id="dock" class="dock" aria-label="Navegación del jardín">
@@ -660,9 +683,14 @@
 <script src="./js/micro.js"></script>
 <script src="./js/gestos.js"></script>
 <script src="./js/instalar.js"></script>
+<script src="./js/motor.js"></script>
 <script src="./js/portada.js"></script>
 <script src="./js/capitulos.js"></script>
 <script src="./js/navegacion.js"></script>
+<script src="./js/flujo.js"></script>
+<script src="./js/barra.js"></script>
+<script src="./js/cartas-final.js"></script>
+<script src="./js/tarjetas.js"></script>
 <script src="./js/escenas.js"></script>
 </body>
 </html>

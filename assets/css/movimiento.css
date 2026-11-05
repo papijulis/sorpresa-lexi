@@ -1,0 +1,138 @@
+/* ======================================================================
+   MOVIMIENTO (rediseño de luz): flujo de listones, barra superior, tarjetas
+   vivas, entradas al bajar y botones. Todo con los tokens de movimiento y vidrio
+   de tokens.css (--dur-*, --ease-*, --stagger, --glass, --accent…).
+====================================================================== */
+
+/* ---- fondo de luz ---- */
+#flujo-luz {
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0;
+  mix-blend-mode: screen;
+}
+/* con movimiento reducido (o sin canvas): degradado estático lila, sin fusión */
+#flujo-estatico { display: none; position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+body.sin-flujo #flujo-estatico {
+  display: block;
+  background:
+    radial-gradient(ellipse 70% 38% at 30% 30%, rgba(var(--orquidea-rgb), .20), transparent 70%),
+    radial-gradient(ellipse 60% 34% at 72% 70%, rgba(var(--amatista-rgb), .22), transparent 72%);
+}
+#grano {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .035; background-size: 128px 128px; mix-blend-mode: overlay;
+}
+/* el inicio se funde con scrub desde flujo.js: que no parpadee al empezar */
+.hero-section { will-change: opacity, transform; transform-origin: 50% 40%; }
+
+/* ---- barra superior de vidrio ---- */
+.barra-sup {
+  position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: 50%; z-index: var(--z-flotante);
+  width: min(calc(100% - 24px), 62rem);
+  transform: translate(-50%, -140%); opacity: 0; filter: blur(8px); visibility: hidden;
+  transition: transform var(--dur-4) var(--ease-out-soft), opacity var(--dur-4) var(--ease-out-soft), filter var(--dur-4) var(--ease-out-soft), visibility 0s linear var(--dur-4);
+}
+.barra-sup.visible { transform: translate(-50%, 0); opacity: 1; filter: blur(0); visibility: visible; transition-delay: 0s; }
+.barra-nav {
+  position: relative; display: flex; align-items: center; gap: .5rem; height: 56px; padding: 0 .5rem 0 .6rem;
+  background: rgba(var(--ciruela-rgb), .66); border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: var(--sombra-suave);
+}
+.barra-marca { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 50%; color: var(--dorado-500); flex: none; }
+.barra-marca .ico { width: 1.6rem; height: 1.6rem; --lirio-centro: var(--ciruela-900); filter: drop-shadow(0 0 8px rgba(var(--dorado-rgb), .45)); transition: transform var(--dur-3) var(--ease-std); }
+@media (hover: hover) { .barra-marca:hover .ico { transform: rotate(60deg) scale(1.1); } }
+.barra-enlaces { position: relative; display: flex; align-items: center; gap: .15rem; margin-left: auto; padding: .25rem; }
+.barra-pastilla {
+  position: absolute; left: 0; top: .25rem; bottom: .25rem; width: 0; border-radius: var(--radio-pill); opacity: 0; pointer-events: none;
+  background: rgba(var(--orquidea-rgb), .22); border: 1px solid rgba(var(--orquidea-rgb), .5); box-shadow: 0 0 16px rgba(var(--orquidea-rgb), .25);
+  transition: transform var(--dur-3) var(--ease-std), width var(--dur-3) var(--ease-std), opacity var(--dur-2) ease;
+}
+.barra-enlace {
+  position: relative; z-index: 1; display: inline-flex; align-items: center; gap: .4rem; min-height: 2.75rem; padding: 0 .85rem; border-radius: var(--radio-pill);
+  font-family: var(--fuente-ui); font-size: .8rem; font-weight: 500; color: rgba(var(--pergamino-rgb), .72); text-decoration: none; white-space: nowrap;
+  transition: color var(--dur-2) ease;
+}
+.barra-enlace b { font-family: var(--fuente-display); font-weight: 700; font-size: 1rem; color: var(--dorado-500); }
+.barra-enlace[aria-current="true"] { color: var(--pergamino-50); }
+.barra-ico { display: none; width: 1.1rem; height: 1.1rem; color: var(--dorado-500); }
+@media (hover: hover) { .barra-enlace:hover { color: var(--pergamino-50); } }
+.barra-menu { display: none; margin-left: auto; width: 2.75rem; height: 2.75rem; border-radius: 50%; padding: 0; cursor: pointer; background: rgba(255,255,255,.08); border: 1px solid var(--glass-border); position: relative; }
+.barra-menu-lineas, .barra-menu-lineas::before, .barra-menu-lineas::after { position: absolute; left: 50%; width: 1.1rem; height: 1.5px; background: var(--pergamino-50); transform: translateX(-50%); transition: transform var(--dur-3) var(--ease-std), opacity var(--dur-2) ease; }
+.barra-menu-lineas { top: 50%; }
+.barra-menu-lineas::before, .barra-menu-lineas::after { content: ''; left: 0; transform: none; }
+.barra-menu-lineas::before { top: -6px; } .barra-menu-lineas::after { top: 6px; }
+.barra-menu[aria-expanded="true"] .barra-menu-lineas { background: transparent; }
+.barra-menu[aria-expanded="true"] .barra-menu-lineas::before { transform: translateY(6px) rotate(45deg); }
+.barra-menu[aria-expanded="true"] .barra-menu-lineas::after { transform: translateY(-6px) rotate(-45deg); }
+/* entrada escalonada de los elementos de la barra */
+.barra-sup .barra-marca, .barra-sup .barra-enlace, .barra-sup .barra-menu { opacity: 0; transform: translateY(-8px); transition: opacity var(--dur-3) var(--ease-out-soft), transform var(--dur-3) var(--ease-out-soft); }
+.barra-sup.visible .barra-marca, .barra-sup.visible .barra-enlace, .barra-sup.visible .barra-menu { opacity: 1; transform: none; }
+.barra-sup.visible .barra-marca { transition-delay: calc(var(--stagger) * 1); }
+.barra-sup.visible .barra-enlace:nth-of-type(1) { transition-delay: calc(var(--stagger) * 2); }
+.barra-sup.visible .barra-enlace:nth-of-type(2) { transition-delay: calc(var(--stagger) * 3); }
+.barra-sup.visible .barra-enlace:nth-of-type(3) { transition-delay: calc(var(--stagger) * 4); }
+.barra-sup.visible .barra-enlace:nth-of-type(4) { transition-delay: calc(var(--stagger) * 5); }
+.barra-sup.visible .barra-enlace:nth-of-type(5) { transition-delay: calc(var(--stagger) * 6); }
+.barra-sup.visible .barra-enlace:nth-of-type(6) { transition-delay: calc(var(--stagger) * 7); }
+.barra-sup.visible .barra-enlace:nth-of-type(7) { transition-delay: calc(var(--stagger) * 8); }
+.barra-sup.visible .barra-menu { transition-delay: calc(var(--stagger) * 2); }
+/* hoja de menú (móvil) */
+.barra-hoja { display: none; }
+@media (max-width: 1060px) { .barra-txt { display: none; } .barra-enlace b + .barra-txt { display: none; } .barra-ico { display: inline-block; } .barra-enlace { padding: 0 .7rem; } }
+@media (max-width: 768px) {
+  .barra-enlaces { display: none; }
+  .barra-menu { display: block; }
+  .barra-hoja {
+    display: flex; flex-direction: column; gap: .15rem; position: absolute; left: 0; right: 0; top: calc(100% + 8px); padding: .6rem;
+    background: rgba(var(--ciruela-rgb), .86); border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: var(--sombra-honda);
+    opacity: 0; transform: translateY(-8px) scale(.98); transform-origin: 50% 0; visibility: hidden; pointer-events: none;
+    transition: opacity var(--dur-3) var(--ease-out-soft), transform var(--dur-3) var(--ease-out-soft), visibility 0s linear var(--dur-3);
+  }
+  .barra-hoja.abierta { opacity: 1; transform: none; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+  .barra-hoja a {
+    display: flex; align-items: center; gap: .7rem; min-height: 2.9rem; padding: 0 1rem; border-radius: var(--radius-md);
+    font-family: var(--fuente-ui); font-size: .92rem; font-weight: 500; color: var(--pergamino-50); text-decoration: none;
+  }
+  .barra-hoja a b { min-width: 1.8rem; font-family: var(--fuente-display); font-size: 1.05rem; color: var(--dorado-500); }
+  .barra-hoja a[aria-current="true"] { background: rgba(var(--orquidea-rgb), .2); }
+}
+/* los títulos de sección no quedan tapados al saltar con la barra */
+.capitulo, #caminos, #cartas-final { scroll-margin-top: 4.5rem; }
+
+/* ---- entradas al bajar: fade + translateY(24px) + blur que se aclara ---- */
+.reveal {
+  opacity: 0; transform: translateY(24px); filter: blur(6px);
+  transition: opacity var(--dur-4) var(--ease-out-soft), transform var(--dur-4) var(--ease-out-soft), filter var(--dur-4) var(--ease-out-soft);
+}
+.reveal.in-view { opacity: 1; transform: none; filter: none; }
+/* una palabra del título en serif cursiva (acento) */
+.acento { font-family: var(--fuente-titulo); font-style: italic; font-weight: 500; color: var(--accent); letter-spacing: 0; }
+
+/* ---- vidrio de los contenedores de sección ---- */
+.vidrio { background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.timeline-wrap { padding: 1.1rem .9rem .5rem .6rem; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+
+/* ---- tarjetas vivas (js/tarjetas.js) ---- */
+.tilt { position: relative; transform-style: preserve-3d; }
+.tilt-vivo { transition-property: box-shadow, border-color, background !important; will-change: transform; }
+.tilt-brillo { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; z-index: 2; mix-blend-mode: screen; }
+
+/* ---- botones: presión, brillo que recorre el borde ---- */
+.btn-suave, .camino-boton, .btn-icono, .hug-btn, #jar-btn, .tl-todo, .cd-btn { transition-duration: var(--dur-2); }
+.btn-suave:active, .camino-boton:active, .btn-icono:active, .tl-todo:active { transform: scale(.97); }
+.btn-suave { position: relative; overflow: hidden; }
+.btn-suave::after, .tl-todo::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(var(--orquidea-rgb), .95) 50%, transparent 62%) 160% 0 / 220% 100% no-repeat;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  transition: background-position var(--dur-5) var(--ease-std);
+}
+.tl-todo { position: relative; overflow: hidden; }
+@media (hover: hover) { .btn-suave:hover::after, .tl-todo:hover::after { background-position: -60% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { transform: none; filter: none; transition: opacity .2s ease; }
+  .barra-sup { filter: none; transition: opacity .2s ease, visibility 0s linear .2s; transform: translate(-50%, 0); }
+  .barra-sup .barra-marca, .barra-sup .barra-enlace, .barra-sup .barra-menu { transform: none; transition: opacity .2s ease; }
+  .barra-pastilla { transition: none; }
+  .hero-section { will-change: auto; }
+}
