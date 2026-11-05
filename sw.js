@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v26';
+const CACHE_VERSION = 'v27';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -27,6 +27,7 @@ const SHELL_URLS = [
   './index.html',
   './manifest.webmanifest',
   './assets/css/infinito.css',
+  './js/corazon-palabras.js',
   './js/infinito.js',
   './assets/css/utilities.css',
   './assets/css/tokens.css',
@@ -86,6 +87,7 @@ const CONTENIDO_URLS = [
   './contenido/cartas.js',
   './contenido/frases.js',
   './contenido/cupones.js',
+  './contenido/idiomas.js',
 ];
 
 self.addEventListener('install', (event) => {

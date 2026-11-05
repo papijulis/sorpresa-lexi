@@ -196,16 +196,7 @@ corazones) se abre el popup "Infinito" (ver más abajo), donde vive el
 corazón multilingüe. Antes era un overlay propio (`#heart-languages`);
 se quitó por decisión de Julio.
 
-- `HEART_LANG_PHRASES` (extras.js): "te amo" en 20 idiomas, constante fija
-  inline — son traducciones de un hecho público, no voz personal de Julio,
-  así que no llevan `borrador` ni van en `REVISAR.md`.
-- `buildHeartLangWords(width, height, opts?)` es "scanline": rasteriza el
-  corazón relleno en un `<canvas>` offscreen, recorre fila por fila con
-  `getImageData` para hallar el ancho disponible y va empacando frases
-  (cicladas, `ctx.measureText`) centradas. `opts {cx, cy, scale}` lo coloca
-  en otro punto/tamaño del lienzo. Los renglones finales de una sola frase
-  (la punta) se reordenan de la más larga a la más corta para que sigan la
-  forma del corazón. Es el paso caro: se calcula una vez por tamaño.
+- **Corazón de palabras** (`js/corazon-palabras.js`, `window.CorazonPalabras.crear(canvas)`; contenido en `contenido/idiomas.js`: `IDIOMAS` ≥ 80 formas de "te amo" en su alfabeto nativo + `IDIOMAS_GRANDES` = "Te amo" y "Hasta la luna"): reemplazó al corazón de idiomas por renglones (se borró `buildHeartLangWords` y sus constantes). Es un mosaico lleno de texto (8–20 px, sin rotación ni solapes, empaquetado por rechazo con `measureText`, color del borde oscuro al centro claro tomado de las variables CSS del sitio) que se calcula **una vez por tamaño** (`medir(W,H,K,dpr)`, lo llama `restart()` de infinito.js) y aparece palabra por palabra siguiendo un recorrido angular desde arriba (lóbulo derecho → punta → lado izquierdo → interior). **Sincronía con las flores:** `infinito.js` publica `window.heartProgress` (0–1; 92 % por la colocación de flores, 8 % por el cierre de los últimos pétalos; solo sube hasta el próximo `restart()`) y las palabras visibles son `floor(p · total)` con ese mismo `p`; ambas terminan juntas. Dos capas (estática + animada con fade-in ~420 ms), destello de 1–3 palabras cada ~260 ms al completarse y al tocar/pasar el cursor (radio ≈ 80 px). Un solo rAF, pausa con `visibilitychange`, `destruir()` limpia. Reduced-motion: dibuja todo de una vez. Fuente: `'Noto Sans', 'Segoe UI', system-ui…` para cubrir alfabetos no latinos.
 
 ## Firma visual (rediseño, punto 1)
 

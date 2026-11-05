@@ -16,7 +16,9 @@
   var toastEl = document.getElementById('inf-toast');
   var view = document.getElementById('view-infinito');
   var langCanvas = document.getElementById('inf-lang');
-  var langCtx = langCanvas.getContext('2d');
+  var palabras = window.CorazonPalabras ? window.CorazonPalabras.crear(langCanvas) : null;   // corazón de palabras (js/corazon-palabras.js)
+  window.heartProgress = 0;
+  var pico = 1;
   var abierto = false, iniciado = false, necesitaRehacer = false;
 
   function rand(a, b) { return Math.random() * (b - a) + a; }
@@ -131,26 +133,16 @@
     if (angle >= Math.PI * 3) { heartDone = true; }
   }
 
-  /* corazón de idiomas: mismo centro que el corazón de flores (H/2) y un poco
-     más chico, para que quede dentro del aro de flores */
-  function dibujarIdiomas() {
-    langCanvas.width = Math.round(W * dpr); langCanvas.height = Math.round(H * dpr);
-    langCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    langCtx.clearRect(0, 0, W, H);
-    if (typeof buildHeartLangWords !== 'function') return;
-    var scale = K * 0.82;
-    var words = buildHeartLangWords(W, H, { cx: W / 2, cy: H / 2 - 2.538 * scale, scale: scale });
-    langCtx.textAlign = 'center';
-    langCtx.textBaseline = 'middle';
-    langCtx.globalAlpha = 0.92;
-    words.forEach(function (w) {
-      langCtx.fillStyle = w.color;
-      langCtx.font = 'italic 600 ' + w.fontSize + "px 'Playfair Display', serif";
-      langCtx.fillText(w.text, w.x, w.y);
-    });
+  /* corazón de palabras: mismo centro (H/2) y un poco más chico que el de flores, para quedar dentro del aro.
+     Su progreso es el MISMO que el de las flores (window.heartProgress, 0–1): 92 % lo da la colocación de flores
+     a lo largo del contorno y el 8 % final el cierre de los últimos pétalos. */
+  function progresoCorazon() {
+    if (heartDone) { pico = Math.max(pico, blooms.length); return blooms.length ? 0.92 + 0.08 * (1 - blooms.length / pico) : 1; }
+    return Math.max(0, Math.min(1, (angle - Math.PI) / (Math.PI * 2))) * 0.92;
   }
+  function medirPalabras() { if (palabras) palabras.medir(W, H, K, dpr); }
 
-  function showMessage() { messageEl.classList.add('shown'); langCanvas.classList.add('shown'); }
+  function showMessage() { messageEl.classList.add('shown'); }
 
   function frame(t) {
     raf = null;
@@ -163,6 +155,7 @@
       while (acc >= 32 && !heartDone) { placeStep(); acc -= 32; }
     }
     var finished = stepBlooms();
+    var pr = progresoCorazon(); if (pr > window.heartProgress) window.heartProgress = pr;   // solo sube hasta el próximo reinicio
 
     if (heartDone && finished) {
       showMessage();
@@ -194,16 +187,15 @@
     clearTimeout(idleTimeout); idleTimeout = null;
     blooms = []; placed = []; angle = Math.PI; heartDone = false; acc = 0;
     messageEl.classList.remove('shown');
-    langCanvas.classList.remove('shown');
-    if (document.fonts && document.fonts.load) {
-      document.fonts.load("italic 600 12px 'Playfair Display'").then(dibujarIdiomas, dibujarIdiomas);
-    } else { dibujarIdiomas(); }
+    pico = 1; window.heartProgress = 0;
+    medirPalabras();
     necesitaRehacer = false;
     if (REDUCED) {
       // sin animación: se dibuja el corazón completo de una vez
       while (!heartDone) placeStep();
       var guard = 0;
       while (!stepBlooms() && guard++ < 4000) { /* crece hasta terminar */ }
+      window.heartProgress = 1;
       showMessage();
       return;
     }
@@ -352,10 +344,12 @@
         if (heartDone && !idleTimeout) idleTimeout = setTimeout(reBloom, 1400);
       }
     }
+    if (palabras) palabras.iniciar();
   }
   function cerrar() {
     if (!abierto) return;
     abierto = false;
+    if (palabras) palabras.detener();
     if (window.Sonidos) window.Sonidos.play('cerrar');
     running = false;
     if (raf) { cancelAnimationFrame(raf); raf = null; }
@@ -365,6 +359,18 @@
     canvasPauseReasons.delete('infinito');
     updateCanvasPauseState();
   }
+  /* al tocar o pasar el cursor, las palabras cercanas destellan */
+  var ultimoToque = 0;
+  function destello(e) {
+    if (!palabras) return;
+    var ahora = performance.now();
+    if (e.type === 'pointermove' && ahora - ultimoToque < 70) return;
+    ultimoToque = ahora;
+    var r = box.getBoundingClientRect();
+    palabras.toque((e.clientX - r.left) * (W / r.width), (e.clientY - r.top) * (H / r.height));
+  }
+  box.addEventListener('pointerdown', destello);
+  box.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse') destello(e); });
   document.getElementById('infinito-close').addEventListener('click', cerrar);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && abierto) cerrar(); });
   window.Infinito = { abrir: abrir, cerrar: cerrar };

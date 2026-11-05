@@ -28,8 +28,7 @@
 }
 #garden { position: relative; z-index: 1; display: block; width: 100%; height: 100%; }
 /* el corazón de idiomas vive justo en el centro del corazón de flores */
-#inf-lang { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; opacity: 0; transition: opacity 2.2s ease; }
-#inf-lang.shown { opacity: 1; }
+#inf-lang { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
 @keyframes latidoInfinito { 0%, 100% { transform: scale(1); } 12% { transform: scale(1.018); } 24% { transform: scale(1); } 36% { transform: scale(1.012); } 48% { transform: scale(1); } }
 
 .inf-message {
@@ -103,7 +102,6 @@
 @media (prefers-reduced-motion: reduce) {
   .inf-symbol use, #view-infinito.open .inf-symbol use { animation: none; stroke-dashoffset: 0; }
   .heart-box, .code-caret { animation: none; }
-  #inf-lang { transition: none; }
   .inf-message { transition: none; }
 }
 
