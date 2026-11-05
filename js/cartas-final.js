@@ -1,17 +1,22 @@
 /* ======================================================================
-   LAS CARTAS DEL FINAL (rediseño de movimiento)
-   Las tres cartas largas del recorrido —la carta del Capítulo 1, "Para seguir
-   escribiendo" y "Para Lexi"— ya no viven en el Buzón ni en un pergamino: cada una
-   tiene una pista de scroll alta con un escenario fijo (sticky) y un progreso p∈[0,1]:
-     0 – 0.20  un rectángulo lila pequeño (con anticipación) se expande hasta casi toda
-               la pantalla (un solo elemento: clip-path inset + radio, ease-emph)
-     0.20–0.80 se queda fija para leer con calma: texto seleccionable, con scroll
-               interno que encadena con la página al llegar al final
-     0.80–1    se encoge hasta volverse un sobre (ícono i-sobre-carta) que queda en la
-               fila de sobres, con un brillo suave
-   Todo es scrub (reversible, sin saltos). Tocar un sobre reabre la carta como panel
-   grande (✕, Esc, clic fuera). La vela del deseo quedó como remate (#wish-candle).
-   Con prefers-reduced-motion: tarjetas apiladas, sin scrub.
+   LAS CARTAS DEL FINAL (2026-11-05: vuelta al pergamino, con un solo sobre)
+   Las tres cartas largas —la carta del Capítulo 1 (LETTER), "Para seguir
+   escribiendo" (CARTA_FINAL) y "Para Lexi" (CARTA_PARA_LEXI)— viven detrás de UN
+   solo sobre:
+     • Al bajar, el sobre (un cuadrito lila) crece con el scroll hasta ocupar la
+       pantalla y en ese momento se vuelve un pop-up fijo (#carta-lector) con la
+       carta en papel de pergamino, como la versión anterior: texto con scroll
+       propio, tinta que aparece párrafo por párrafo y las flechas redondas con
+       "Carta N de 3" para cambiar entre las tres (←/→ y deslizar también).
+     • Al cerrar (✕, Esc o tocar fuera) el pop-up se encoge de nuevo hasta el
+       sobre, que queda quieto al centro; la página se queda justo al final de la
+       pista, así que para volver a abrirlo basta tocarlo o subir con el scroll
+       (el sobre vuelve a crecer al regresar hacia el centro de la pista).
+   El crecimiento es simétrico respecto al centro de la pista: entrar desde arriba
+   o desde abajo lo abre igual. Mientras el pop-up está abierto la página no se
+   mueve (html.carta-abierta) y el canvas principal se pausa.
+   #letter-container (ancla de un corazón de la Cacería) es el propio sobre.
+   Con prefers-reduced-motion: sin pista; el sobre es un botón que abre el pop-up.
    Un solo bucle: motor.js.
 ====================================================================== */
 (function () {
@@ -31,175 +36,257 @@
   var estatica = E.reducido;
   if (estatica) seccion.classList.add('estatica');
 
-  function parrafos(contenedor, texto, conTinta) {
-    var ps = texto.split('\n\n'), lista = [];
-    ps.forEach(function (t, i) {
-      var p = document.createElement('p');
-      p.className = (i === ps.length - 1 ? 'carta-firma font-hand' : 'carta-parrafo') + (conTinta ? ' ink-hidden' : '');
-      p.textContent = t;
-      contenedor.appendChild(p); lista.push(p);
-    });
-    return lista;
-  }
-  function sobre(extra) { return ico('i-sobre-carta', extra || ''); }
+  var LADO = 128;            // lado del sobre en px
+  var R_SOBRE = 26, R_CARTA = 22;
+  var flor = '<svg class="carta-flourish" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 4 C36 16 48 20 58 18 C48 26 44 38 48 50 C38 44 26 44 18 52 C22 40 16 28 6 22 C18 22 28 14 32 4Z"/></svg>';
 
-  /* ---- pistas ---- */
-  var pistas = datos.map(function (c, k) {
-    var pista = document.createElement('div');
-    pista.className = 'carta-pista';
-    var slots = '';
-    for (var s = 0; s < N; s++) slots += '<button type="button" class="carta-slot" data-s="' + s + '" tabindex="-1" aria-label="Abrir carta: ' + datos[s].titulo.replace(/"/g, '') + '" title="' + datos[s].titulo.replace(/"/g, '') + '">' + sobre() + '</button>';
-    pista.innerHTML =
+  /* ---- la pista con el sobre ---- */
+  host.innerHTML =
+    '<div class="carta-pista">' +
       '<div class="carta-escena">' +
-        '<div class="carta-marco"><div class="carta-glow">' +
-          '<article class="carta-panel"' + (k === 0 ? ' id="letter-container"' : '') + ' aria-label="' + c.titulo.replace(/"/g, '') + '">' +
-            '<div class="carta-color" aria-hidden="true"></div>' +
-            '<div class="carta-cuerpo">' +
-              '<header class="carta-cab"><p class="carta-etiqueta">Carta ' + (k + 1) + ' de ' + N + '</p>' +
-              '<h3 class="carta-titulo font-hand">' + c.titulo + '</h3>' + (c.sub ? '<p class="carta-sub">' + c.sub + '</p>' : '') + '</header>' +
-              '<div class="carta-texto" tabindex="0" role="region" aria-label="Texto de la carta"></div>' +
-            '</div>' +
-            '<div class="carta-icono" aria-hidden="true">' + sobre() + '</div>' +
-          '</article>' +
-        '</div></div>' +
-        '<div class="carta-slots" role="group" aria-label="Cartas guardadas">' + slots + '</div>' +
-      '</div>';
-    host.appendChild(pista);
-    var texto = pista.querySelector('.carta-texto');
-    var ps = parrafos(texto, c.texto, true);
-    return {
-      el: pista, k: k, marco: pista.querySelector('.carta-marco'), glow: pista.querySelector('.carta-glow'), panel: pista.querySelector('.carta-panel'),
-      color: pista.querySelector('.carta-color'), cuerpo: pista.querySelector('.carta-cuerpo'), icono: pista.querySelector('.carta-icono'),
-      slots: Array.prototype.slice.call(pista.querySelectorAll('.carta-slot')), ps: ps, texto: texto,
-      top: 0, h: 0, mw: 0, mh: 0, sx: 0, sy: 0, ultimoP: -1, tinta: false,
-    };
-  });
+        '<div class="carta-marco" aria-hidden="true">' +
+          '<div class="carta-papel">' + flor + flor.replace('carta-flourish', 'carta-flourish der') +
+            '<p class="carta-etiqueta">Carta 1 de ' + N + '</p><p class="carta-titulo font-hand">' + datos[0].titulo + '</p>' +
+          '</div>' +
+          '<div class="carta-cara"></div>' +
+        '</div>' +
+        '<div class="carta-sobre" id="letter-container">' +
+          '<button type="button" class="carta-sobre-btn" aria-label="Abrir las cartas del final (' + N + ' cartas)">' + ico('i-sobre-carta') + '</button>' +
+        '</div>' +
+        '<p class="carta-pista-nota font-hand">' + N + ' cartas para ti · toca el sobre o desliza para abrirlo</p>' +
+      '</div>' +
+    '</div>';
+  var pista = host.querySelector('.carta-pista');
+  var marco = host.querySelector('.carta-marco');
+  var papel = host.querySelector('.carta-papel');
+  var cara = host.querySelector('.carta-cara');
+  var sobre = host.querySelector('.carta-sobre');
+  var sobreBtn = host.querySelector('.carta-sobre-btn');
+  var nota = host.querySelector('.carta-pista-nota');
 
-  /* ---- lector: un sobre guardado reabre la carta como panel grande ---- */
+  /* ---- el pop-up: la carta en pergamino ---- */
   var lector = document.createElement('div');
   lector.id = 'carta-lector';
   lector.className = 'carta-lector';
   lector.setAttribute('role', 'dialog');
   lector.setAttribute('aria-modal', 'true');
-  lector.setAttribute('aria-label', 'Carta');
-  lector.innerHTML = '<div class="carta-lector-caja vidrio"><button type="button" class="app-view-close carta-lector-cerrar" aria-label="Cerrar carta">' + ico('i-cerrar') + '</button><header class="carta-cab"><p class="carta-etiqueta"></p><h3 class="carta-titulo font-hand"></h3><p class="carta-sub"></p></header><div class="carta-texto carta-lector-texto" tabindex="0"></div></div>';
+  lector.setAttribute('aria-labelledby', 'carta-lector-titulo');
+  lector.inert = true;
+  lector.innerHTML =
+    '<div class="carta-lector-caja">' +
+      '<div class="carta-lector-papel">' + flor + flor.replace('carta-flourish', 'carta-flourish der') +
+        '<button type="button" class="carta-lector-cerrar" aria-label="Cerrar la carta">' + ico('i-cerrar') + '</button>' +
+        '<header class="carta-cab"><p class="carta-etiqueta" id="carta-lector-n"></p><h3 class="carta-titulo font-hand" id="carta-lector-titulo"></h3><p class="carta-sub"></p></header>' +
+        '<div class="carta-texto" tabindex="0" role="region" aria-label="Texto de la carta" aria-live="polite"></div>' +
+        '<div class="letter-nav" role="group" aria-label="Cambiar de carta">' +
+          '<button type="button" id="letter-back" class="letter-nav-btn letter-nav-prev" aria-label="Carta anterior">' + ico('i-siguiente') + '</button>' +
+          '<span id="letter-nav-n" class="letter-nav-n"></span>' +
+          '<button type="button" id="letter-switch" class="letter-nav-btn" aria-label="Siguiente carta">' + ico('i-siguiente') + '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
   document.body.appendChild(lector);
-  var lectorAbierto = false, lectorOrigen = null;
-  var lcCaja = lector.querySelector('.carta-lector-caja'), lcTexto = lector.querySelector('.carta-lector-texto'), lcCerrar = lector.querySelector('.carta-lector-cerrar');
-  function abrirLector(i, origen) {
+  var caja = lector.querySelector('.carta-lector-caja');
+  var lcTexto = lector.querySelector('.carta-texto');
+  var lcCerrar = lector.querySelector('.carta-lector-cerrar');
+  var btnAnt = lector.querySelector('#letter-back');
+  var btnSig = lector.querySelector('#letter-switch');
+  var lcN = lector.querySelector('#letter-nav-n');
+
+  var actual = 0, abierto = false, animando = false, origen = null, timers = [], bloqueoHasta = 0;
+
+  function limpiarTinta() { timers.forEach(clearTimeout); timers = []; }
+  function pintarCarta(i, conTinta) {
     var c = datos[i];
-    lector.querySelector('.carta-etiqueta').textContent = 'Carta ' + (i + 1) + ' de ' + N;
+    actual = i;
+    lector.querySelector('#carta-lector-n').textContent = 'Carta ' + (i + 1) + ' de ' + N;
     lector.querySelector('.carta-titulo').textContent = c.titulo;
     var sub = lector.querySelector('.carta-sub'); sub.textContent = c.sub || ''; sub.hidden = !c.sub;
-    lcTexto.innerHTML = ''; parrafos(lcTexto, c.texto, false); lcTexto.scrollTop = 0;
-    lector.classList.add('abierto'); lectorAbierto = true; lectorOrigen = origen || null;
+    limpiarTinta();
+    lcTexto.innerHTML = '';
+    var ps = c.texto.split('\n\n');
+    var els = ps.map(function (t, k) {
+      var p = document.createElement('p');
+      p.className = (k === ps.length - 1 ? 'carta-firma font-hand' : 'carta-parrafo') + (conTinta ? ' ink-hidden' : '');
+      p.textContent = t;
+      lcTexto.appendChild(p);
+      return p;
+    });
+    var sello = document.createElement('div'); sello.className = 'wax-seal'; sello.setAttribute('aria-hidden', 'true'); sello.textContent = 'J';
+    lcTexto.appendChild(sello);
+    lcTexto.scrollTop = 0;
+    if (conTinta) els.forEach(function (p, k) { timers.push(setTimeout(function () { p.classList.add('ink-in'); }, 120 + Math.min(k, 7) * 300)); });
+    lcN.textContent = 'Carta ' + (i + 1) + ' de ' + N;
+    btnAnt.disabled = i === 0;
+    btnSig.disabled = i === N - 1;
+    var t = papel.querySelector('.carta-titulo'); if (t) t.textContent = c.titulo;
+    var e = papel.querySelector('.carta-etiqueta'); if (e) e.textContent = 'Carta ' + (i + 1) + ' de ' + N;
+  }
+  function irCarta(d) {
+    var j = actual + d;
+    if (!abierto || j < 0 || j >= N) return;
+    lcTexto.classList.add('cambiando');
+    setTimeout(function () { lcTexto.classList.remove('cambiando'); pintarCarta(j, !E.reducido); }, E.reducido ? 0 : 260);
+    if (window.Sonidos) window.Sonidos.play('mes');
+  }
+  btnAnt.addEventListener('click', function () { irCarta(-1); });
+  btnSig.addEventListener('click', function () { irCarta(1); });
+
+  /* rectángulo del sobre dentro de la caja del pop-up, como clip-path inset */
+  function insetDesde(r, cr, radio) {
+    return 'inset(' + (r.top - cr.top).toFixed(1) + 'px ' + (cr.right - r.right).toFixed(1) + 'px ' + (cr.bottom - r.bottom).toFixed(1) + 'px ' + (r.left - cr.left).toFixed(1) + 'px round ' + radio + 'px)';
+  }
+  function rectSobreCentrado() {
+    var w = window.innerWidth, h = window.innerHeight;
+    return { left: w / 2 - LADO / 2, right: w / 2 + LADO / 2, top: h / 2 - LADO / 2, bottom: h / 2 + LADO / 2 };
+  }
+
+  /* desde: 'scroll' (el marco ya ocupa la pantalla) o el rect del sobre (al tocarlo) */
+  function abrir(desdeRect) {
+    if (abierto || animando) return;
+    abierto = true;
+    origen = desdeRect ? document.activeElement : sobreBtn;   // abierta con el scroll: al cerrar el foco queda en el sobre
+    pintarCarta(actual, !E.reducido);
+    lector.inert = false;
+    document.documentElement.classList.add('carta-abierta');
     canvasPauseReasons.add('carta-lector'); updateCanvasPauseState();
     if (window.Sonidos) window.Sonidos.play('abrir');
+    if (E.reducido || !desdeRect) {
+      caja.style.clipPath = '';
+      lector.classList.add('abierto', 'sin-anim');
+      requestAnimationFrame(function () { lector.classList.remove('sin-anim'); });
+    } else {
+      var cr = caja.getBoundingClientRect();
+      lector.classList.add('sin-anim', 'desde-sobre');
+      caja.style.clipPath = insetDesde(desdeRect, cr, R_SOBRE);
+      void caja.offsetWidth;
+      lector.classList.remove('sin-anim');
+      lector.classList.add('abierto');
+      animando = true;
+      caja.style.clipPath = 'inset(0px 0px 0px 0px round ' + R_CARTA + 'px)';
+      setTimeout(function () { animando = false; lector.classList.remove('desde-sobre'); }, 760);
+    }
     lcCerrar.focus({ preventScroll: true });
   }
-  function cerrarLector() {
-    if (!lectorAbierto) return;
-    lectorAbierto = false; lector.classList.remove('abierto');
-    canvasPauseReasons.delete('carta-lector'); updateCanvasPauseState();
+
+  function cerrar() {
+    if (!abierto || animando) return;
+    abierto = false;
+    limpiarTinta();
     if (window.Sonidos) window.Sonidos.play('cerrar');
-    if (lectorOrigen) lectorOrigen.focus({ preventScroll: true });
+    document.documentElement.classList.remove('carta-abierta');
+    canvasPauseReasons.delete('carta-lector'); updateCanvasPauseState();
+    if (!estatica) {
+      /* la página se acomoda al final de la pista: ahí el sobre está chico y al centro,
+         justo donde termina de encogerse el pop-up */
+      bloqueoHasta = performance.now() + 900;
+      window.scrollTo({ top: Math.round(medidas.top + medidas.rec), behavior: 'instant' });
+    }
+    if (E.reducido) {
+      lector.classList.remove('abierto');
+      finCerrar();
+      return;
+    }
+    var cr = caja.getBoundingClientRect();
+    animando = true;
+    lector.classList.add('hacia-sobre');
+    caja.style.clipPath = insetDesde(rectSobreCentrado(), cr, R_SOBRE);
+    setTimeout(function () {
+      lector.classList.add('sin-anim');
+      lector.classList.remove('abierto', 'hacia-sobre');
+      caja.style.clipPath = '';
+      void caja.offsetWidth;
+      lector.classList.remove('sin-anim');
+      animando = false;
+      finCerrar();
+    }, 720);
   }
-  lcCerrar.addEventListener('click', cerrarLector);
-  lector.addEventListener('pointerdown', function (e) { if (e.target === lector) cerrarLector(); });
+  function finCerrar() {
+    lector.inert = true;
+    var a = origen && document.contains(origen) && origen !== document.body ? origen : sobreBtn;
+    a.focus({ preventScroll: true });
+    origen = null;
+  }
+
+  lcCerrar.addEventListener('click', cerrar);
+  lector.addEventListener('pointerdown', function (e) { if (e.target === lector) cerrar(); });
   document.addEventListener('keydown', function (e) {
-    if (!lectorAbierto) return;
-    if (e.key === 'Escape') { cerrarLector(); e.preventDefault(); }
-    else if (e.key === 'Tab') {   // foco atrapado entre ✕ y el texto
-      var f = [lcCerrar, lcTexto], pos = f.indexOf(document.activeElement);
-      if (e.shiftKey && pos <= 0) { f[1].focus(); e.preventDefault(); }
-      else if (!e.shiftKey && pos === 1) { f[0].focus(); e.preventDefault(); }
+    if (!abierto) return;
+    if (e.key === 'Escape') { cerrar(); e.preventDefault(); }
+    else if (e.key === 'ArrowRight' && document.activeElement !== lcTexto) { irCarta(1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' && document.activeElement !== lcTexto) { irCarta(-1); e.preventDefault(); }
+    else if (e.key === 'Tab') {
+      var f = Array.prototype.filter.call(caja.querySelectorAll('button, [tabindex="0"]'), function (x) { return !x.disabled; });
+      var pos = f.indexOf(document.activeElement);
+      if (e.shiftKey && pos <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
+      else if (!e.shiftKey && pos === f.length - 1) { f[0].focus(); e.preventDefault(); }
     }
   });
-  pistas.forEach(function (t) {
-    t.slots.forEach(function (b) { b.addEventListener('click', function () { abrirLector(Number(b.dataset.s), b); }); });
+  /* deslizar entre cartas (solo táctil; con el mouse se selecciona texto) */
+  var tx = null, ty = 0;
+  caja.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  caja.addEventListener('touchend', function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    tx = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) irCarta(dx < 0 ? 1 : -1);
   });
 
-  if (estatica) {
-    pistas.forEach(function (t) { t.ps.forEach(function (p) { p.classList.add('ink-in'); }); t.slots.forEach(function (b) { b.hidden = true; }); });
-    return;
-  }
+  sobreBtn.addEventListener('click', function () {
+    if (estatica) { abrir(null); return; }
+    abrir(sobre.getBoundingClientRect());
+  });
 
-  /* ---- medidas (fuera del cuadro) ---- */
+  if (estatica) return;
+
+  /* ---- la pista: el sobre crece con el scroll (simétrico respecto al centro) ---- */
+  var medidas = { top: 0, h: 0, rec: 1, mw: 0, mh: 0 };
   function medir() {
-    var y = window.scrollY || 0;
-    pistas.forEach(function (t) {
-      var r = t.el.getBoundingClientRect();
-      t.top = r.top + y; t.h = t.el.offsetHeight;
-      var mr = t.marco.getBoundingClientRect();
-      t.mw = mr.width; t.mh = mr.height;
-      var sl = t.slots[t.k];
-      if (sl) { var sr = sl.getBoundingClientRect(); t.sx = sr.left + sr.width / 2 - mr.left; t.sy = sr.top + sr.height / 2 - mr.top; }
-      t.ultimoP = -1;
-    });
+    var r = pista.getBoundingClientRect();
+    medidas.top = r.top + (window.scrollY || 0);
+    medidas.h = pista.offsetHeight;
+    medidas.rec = Math.max(1, medidas.h - window.innerHeight);
+    medidas.mw = marco.offsetWidth; medidas.mh = marco.offsetHeight;
+    ultimoX = -1;
   }
   var mt = 0;
   window.addEventListener('resize', function () { clearTimeout(mt); mt = setTimeout(medir, 160); });
   window.addEventListener('load', function () { setTimeout(medir, 300); });
   if ('ResizeObserver' in window) new ResizeObserver(function () { clearTimeout(mt); mt = setTimeout(medir, 160); }).observe(document.getElementById('main-content') || document.body);
   setTimeout(medir, 1500);
-  medir();
 
-  var emph = M.ease(.7, 0, .2, 1);
-  var lerp = M.lerp, clamp = M.clamp;
-  var R_GRANDE = 26, R_CHICO = 20, R_SOBRE = 18;
+  var emph = M.ease(.7, 0, .2, 1), lerp = M.lerp, clamp = M.clamp, suave = M.suave;
+  var ultimoX = -1;
 
-  function inset(cx, cy, w, h, r, mw, mh) {
-    var t = cy - h / 2, l = cx - w / 2, ri = mw - (cx + w / 2), b = mh - (cy + h / 2);
-    return 'inset(' + t.toFixed(1) + 'px ' + ri.toFixed(1) + 'px ' + b.toFixed(1) + 'px ' + l.toFixed(1) + 'px round ' + r.toFixed(1) + 'px)';
-  }
-
-  function aplicar(t, p) {
-    var mw = t.mw, mh = t.mh, cx, cy, w, h, r, color, textoOp, icono = 0, glow = 0;
-    if (p < .2) {                       // expandir
-      var x = p / .2, a = emph(x);
-      var ant = 1 - .07 * Math.sin(Math.PI * clamp(x / .28, 0, 1));   // anticipación: se contrae un poco antes de crecer
-      w = lerp(96 * ant, mw, a); h = lerp(64 * ant, mh, a); cx = mw / 2; cy = mh / 2; r = lerp(R_CHICO, R_GRANDE, a);
-      color = 1 - M.suave((x - .25) / .6); textoOp = M.suave((x - .72) / .28); glow = 1 - a;
-    } else if (p < .8) {                // leer
-      w = mw; h = mh; cx = mw / 2; cy = mh / 2; r = R_GRANDE; color = 0; textoOp = 1;
-    } else {                            // encoger hasta el sobre
-      var xs = (p - .8) / .2, b = emph(xs);
-      w = lerp(mw, 58, b); h = lerp(mh, 58, b); cx = lerp(mw / 2, t.sx, b); cy = lerp(mh / 2, t.sy, b); r = lerp(R_GRANDE, R_SOBRE, b);
-      color = M.suave(xs / .45); textoOp = 1 - M.suave(xs / .4); icono = M.suave((xs - .6) / .4); glow = b;
-    }
-    t.marco.style.clipPath = inset(cx, cy, w, h, r, mw, mh);
-    t.glow.classList.toggle('con-brillo', glow > .02);
-    t.color.style.opacity = color.toFixed(3);
-    t.cuerpo.style.opacity = textoOp.toFixed(3);
-    t.icono.style.opacity = icono.toFixed(3);
-    t.panel.style.pointerEvents = p > .86 || p < .06 ? 'none' : '';
-    /* tinta: los párrafos aparecen en cascada al leer, y se esconden al volver */
-    var leyendo = p > .14 && p < .9;
-    if (leyendo !== t.tinta) {
-      t.tinta = leyendo;
-      t.ps.forEach(function (el, i) { el.style.transitionDelay = leyendo ? (i * .32) + 's' : '0s'; el.classList.toggle('ink-in', leyendo); });
-    }
-    /* sobres guardados: los anteriores y, al terminar, esta misma */
-    t.slots.forEach(function (b, s) {
-      var guardado = s < t.k || (s === t.k && p >= .975);
-      if (s > t.k) guardado = false;
-      var estaba = b.classList.contains('guardado');
-      if (guardado !== estaba) { b.classList.toggle('guardado', guardado); b.tabIndex = guardado ? 0 : -1; }
-    });
+  function aplicar(x) {
+    var mw = medidas.mw, mh = medidas.mh;
+    var a = emph(x);
+    var w = lerp(LADO, mw, a), h = lerp(LADO, mh, a), r = lerp(R_SOBRE, R_CARTA, a);
+    var t = (mh - h) / 2, l = (mw - w) / 2;
+    marco.style.clipPath = 'inset(' + t.toFixed(1) + 'px ' + l.toFixed(1) + 'px ' + t.toFixed(1) + 'px ' + l.toFixed(1) + 'px round ' + r.toFixed(1) + 'px)';
+    cara.style.opacity = (1 - suave((x - .15) / .55)).toFixed(3);
+    papel.style.opacity = suave((x - .1) / .5).toFixed(3);
+    papel.classList.toggle('con-titulo', x > .72);
+    var icono = 1 - suave(x / .22);
+    sobre.style.opacity = icono.toFixed(3);
+    sobre.style.transform = 'scale(' + (1 + a * .6).toFixed(3) + ')';
+    sobre.classList.toggle('apagado', icono < .5);
+    nota.style.opacity = (1 - suave(x / .18)).toFixed(3);
+    marco.classList.toggle('con-brillo', x > .02 && x < .9);
   }
 
   function cuadro(E) {
-    var vh = E.vh;
-    for (var i = 0; i < pistas.length; i++) {
-      var t = pistas[i];
-      var recorrido = Math.max(1, t.h - vh);
-      var p = clamp((E.y - t.top) / recorrido, 0, 1);
-      if (p === t.ultimoP) continue;
-      if ((E.y + vh < t.top - vh * .5 || E.y > t.top + t.h + vh * .5) && (t.ultimoP === 0 || t.ultimoP === 1) && p === (E.y > t.top ? 1 : 0)) { t.ultimoP = p; continue; }
-      t.ultimoP = p;
-      aplicar(t, p);
-    }
+    if (abierto || animando) return;
+    var p = clamp((E.y - medidas.top) / medidas.rec, 0, 1);
+    var d = Math.min(p, 1 - p) * 2;                 // 0 en los extremos de la pista, 1 en el centro
+    var x = clamp((d - .12) / .82, 0, 1);
+    if (x === ultimoX) return;
+    var subiendo = x > ultimoX;
+    ultimoX = x;
+    aplicar(x);
+    if (x >= .985 && subiendo && performance.now() > bloqueoHasta) abrir(null);
   }
-  pistas.forEach(function (t) { aplicar(t, 0); t.ultimoP = 0; });
+  medir();
+  aplicar(0);
   M.suscribir(cuadro);
 })();

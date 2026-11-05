@@ -218,13 +218,17 @@ checkAusencia();
 function spawnMonthlyFlowers() {
   const meses = Math.max(0, diffFromStart(new Date()).months);
   const count = Math.min(10, meses);
+  /* en el teléfono el texto ocupa casi todo el ancho: los lirios del mes van a las orillas
+     y más tenues, para que no compitan con los títulos ni con las tarjetas */
+  const angosta = vw < 640;
   for (let i = 0; i < count; i++) {
+    const rx = angosta ? (i % 2 ? rand(0.86, 0.96) : rand(0.04, 0.14)) : rand(0.08, 0.92);
+    const ry = rand(0.15, 0.85), rs = rand(0.05, 0.09);
     spawnLily({
-      x: rand(vw * 0.08, vw * 0.92),
-      y: rand(vh * 0.15, vh * 0.85),
-      size: Math.min(vw, vh) * rand(0.05, 0.09),
+      x: vw * rx, y: vh * ry, size: Math.min(vw, vh) * rs, rx, ry, rs,
       delay: 1500 + i * 260,
       parallax: rand(0.02, 0.06),
+      alpha: angosta ? 0.62 : 0.85,
     });
   }
 }

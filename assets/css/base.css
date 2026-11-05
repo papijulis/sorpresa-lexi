@@ -35,6 +35,17 @@
   /* overflow-x:hidden convierte a body en contenedor de scroll y rompe position:sticky (las cartas del final); clip recorta igual sin eso */
   @supports (overflow: clip) { html, body { overflow-x: clip; } }
   body.locked { overflow: hidden; height: 100vh; height: 100dvh; }
+  /* Lo mínimo del "preflight" de Tailwind, que se perdió al quitar el CDN: el marcado usa
+     clases tipo mb-2 / mt-1 / py-5 pensando en márgenes en cero. Sin esto cada <p> y <h*>
+     traía 1em arriba y abajo (las tarjetas del contador medían el doble en el teléfono) y
+     Safari de iPhone pintaba sus botones con fondo blanco y borde (la vela del deseo).
+     :where() = especificidad cero: cualquier regla con clase o id gana. */
+  :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd) { margin: 0; }
+  :where(button) {
+    font: inherit; color: inherit; line-height: inherit; letter-spacing: inherit;
+    background-color: transparent; background-image: none; border: 0 solid; padding: 0; margin: 0;
+    -webkit-appearance: none; appearance: none;
+  }
   button, a { -webkit-tap-highlight-color: transparent; }
   /* la regla button{cursor:pointer} venía del preflight de Tailwind; al quitar el CDN se perdió */
   button, [role="button"], [role="checkbox"], a[href], summary, select, label[for] { cursor: pointer; }

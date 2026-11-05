@@ -53,6 +53,11 @@
   --pergamino-50: #FDFBF7;
   --pergamino-100: #F5EBE1;
   --tinta: #3B2A1A;
+  --tinta-rgb: 59, 42, 26;
+  --sepia-rgb: 180, 83, 9;
+  --ambar-rgb: 245, 158, 11;
+  --lacre-500: #C0374F;
+  --lacre-800: #7F1D2E;
 
   /* canales RGB, para rgba(var(--dorado-rgb), .4) */
   --dorado-rgb: 255, 215, 0;

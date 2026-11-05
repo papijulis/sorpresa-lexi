@@ -7,10 +7,23 @@ const cursorCanvas = document.getElementById('cursor-canvas');
 const cursorCtx = cursorCanvas.getContext('2d', { alpha: true });
 let vw = 0, vh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 
+/* En iPhone la barra de Safari se esconde/aparece al hacer scroll y cambia innerHeight
+   unos 80–120 px: antes eso disparaba resize → canvas.width = … (que BORRA el lienzo y
+   suelta su memoria) varias veces por gesto, y los lirios y pétalos desaparecían un rato.
+   Ahora el lienzo se rehace solo si cambia el ancho (girar el teléfono) o el alto cambia
+   de verdad; para el vaivén de la barra se queda con el alto mayor y no se toca. */
+let altoLienzo = 0;
+function cambioDePantallaReal() {
+  const w = window.innerWidth, h = window.innerHeight;
+  if (w !== vw) return true;
+  return h > altoLienzo || altoLienzo - h > 160;
+}
 function resizeCanvas() {
   dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.5 : 2);
+  const mismoAncho = window.innerWidth === vw;
   vw = window.innerWidth;
-  vh = window.innerHeight;
+  vh = (mismoAncho && altoLienzo && altoLienzo - window.innerHeight <= 160) ? Math.max(altoLienzo, window.innerHeight) : window.innerHeight;
+  altoLienzo = vh;
   canvas.width = vw * dpr;
   canvas.height = vh * dpr;
   canvas.style.width = vw + 'px';
@@ -34,7 +47,7 @@ window.addEventListener('resize', () => {
   resizeQueued = true;
   requestAnimationFrame(() => {
     resizeQueued = false;
-    if (window.innerWidth !== vw || window.innerHeight !== vh) { resizeCanvas(); reacomodarLirios(); }
+    if (cambioDePantallaReal()) { resizeCanvas(); reacomodarLirios(); }
   });
 });
 resizeCanvas();
@@ -186,7 +199,10 @@ function drawLily(b) {
   if (b.progress <= 0) return;
   const p = Math.min(1, b.progress);
   const y = b.renderY !== undefined ? b.renderY : b.y;
-  const baseAlpha = (b.alpha !== undefined ? b.alpha : 1) * (isNight ? 0.8 : 1); // de noche los lirios brillan menos
+  let baseAlpha = (b.alpha !== undefined ? b.alpha : 1) * (isNight ? 0.8 : 1); // de noche los lirios brillan menos
+  /* el lirio del inicio está en el centro exacto de la pantalla: al bajar se desvanece para no
+     quedar detrás de cada tarjeta y título del recorrido (se veía así en el teléfono) */
+  if (b.hero) { baseAlpha *= 1 - clamp(scrollYCache / (vh * 0.8), 0, 1); if (baseAlpha <= 0.01) return; }
 
   if (p >= 1) {
     if (!b.sprite) buildLilySprite(b);
@@ -215,7 +231,7 @@ function updateLily(b, dt) {
     if (b.idleTimer <= 0) {
       const angle = rand(0, Math.PI * 2);
       const dist = b.size * 0.6;
-      spawnSparkleBurst(b.x + Math.cos(angle) * dist, (b.renderY || b.y) + Math.sin(angle) * dist, 4, true);
+      spawnSparkleBurst(b.x + Math.cos(angle) * dist, (b.renderY || b.y) + Math.sin(angle) * dist, 4, true, false);
       b.idleTimer = rand(900, 1800);
     }
   }
@@ -223,8 +239,8 @@ function updateLily(b, dt) {
   b.renderY = b.y - offset;
 }
 /* rx/ry/rs (opcionales): posición y tamaño relativos a la pantalla, para reacomodar al girar el teléfono */
-function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1, rx, ry, rs }) {
-  blooms.push({ x, y, size, progress: 0, delay, hue: rand(-0.15, 0.15), pulse: 1, idleTimer: 900, parallax, renderY: y, alpha, rx, ry, rs });
+function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1, rx, ry, rs, hero = false }) {
+  blooms.push({ x, y, size, progress: 0, delay, hue: rand(-0.15, 0.15), pulse: 1, idleTimer: 900, parallax, renderY: y, alpha, rx, ry, rs, hero });
 }
 function reacomodarLirios() {
   blooms.forEach((b) => {
@@ -237,10 +253,12 @@ function reacomodarLirios() {
 /* Cuando el canvas principal está pausado (cartas, juegos, vistas abiertas)
    los destellos de premio se dibujan en la capa superior (#cursor-canvas,
    encima de todo) para que se vean al ganar un juego. */
-function spawnSparkleBurst(x, y, count, rising = false) {
-  /* los destellos que suben son premios: grandes → arpegio + vibración larga; chicos → notita + toque */
-  if (rising && window.Sonidos) window.Sonidos.play(count >= 12 ? 'premio' : 'corazon');
-  if (rising && window.Haptica) window.Haptica.vibrar(count >= 30 ? [20, 40, 30] : 12);
+function spawnSparkleBurst(x, y, count, rising = false, sonar = rising) {
+  /* los destellos que suben son premios: grandes → arpegio + vibración larga; chicos → notita + toque.
+     sonar=false para los decorativos: antes los 8 lirios del fondo soltaban un destello "de premio"
+     cada ~1 s cada uno, y eso sonaba y vibraba sin parar (el bug de los sonidos que se repetían). */
+  if (sonar && window.Sonidos) window.Sonidos.play(count >= 12 ? 'premio' : 'corazon');
+  if (sonar && window.Haptica) window.Haptica.vibrar(count >= 30 ? [20, 40, 30] : 12);
   const target = (rafId === null && !document.hidden) ? topSparkles : sparkles;
   for (let i = 0; i < count; i++) {
     const angle = rising ? rand(-Math.PI * 0.75, -Math.PI * 0.25) : rand(0, Math.PI * 2);
@@ -609,7 +627,7 @@ document.addEventListener('visibilitychange', () => {
    Fase 5 — arreglo visual conocido: el lirio del hero se superponía al
    texto "Lexi" y le quitaba legibilidad. Más chico y con menos opacidad
    para que quede de fondo, no encima. */
-spawnLily({ x: vw / 2, y: vh / 2, size: Math.min(vw, vh) * 0.12, delay: 300, parallax: 0.02, alpha: 0.4, rx: .5, ry: .5, rs: .12 });
-spawnLily({ x: vw * 0.14, y: vh * 0.24, size: Math.min(vw, vh) * 0.08, delay: 700, parallax: 0.05, rx: .14, ry: .24, rs: .08 });
-spawnLily({ x: vw * 0.86, y: vh * 0.78, size: Math.min(vw, vh) * 0.09, delay: 1000, parallax: 0.04, rx: .86, ry: .78, rs: .09 });
+spawnLily({ x: vw / 2, y: vh / 2, size: Math.min(vw, vh) * 0.12, delay: 300, parallax: 0.02, alpha: 0.4, rx: .5, ry: .5, rs: .12, hero: true });
+spawnLily({ x: vw * 0.14, y: vh * 0.24, size: Math.min(vw, vh) * 0.08, delay: 700, parallax: 0.05, alpha: vw < 640 ? 0.75 : 1, rx: .14, ry: .24, rs: .08 });
+spawnLily({ x: vw * 0.86, y: vh * 0.78, size: Math.min(vw, vh) * 0.09, delay: 1000, parallax: 0.04, alpha: vw < 640 ? 0.75 : 1, rx: .86, ry: .78, rs: .09 });
 

@@ -7,7 +7,9 @@
 /* ---- fondo de luz ---- */
 #flujo-luz {
   position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0;
-  mix-blend-mode: screen;
+  /* sin mix-blend-mode: en Safari de iPhone una capa fija con "screen" hacía parpadear y
+     desaparecer otras capas fijas (los lirios del lienzo, la luna). El lienzo ya suma luz
+     por dentro con 'lighter', así que sobre el fondo oscuro se ve casi igual. */
 }
 /* con movimiento reducido (o sin canvas): degradado estático lila, sin fusión */
 #flujo-estatico { display: none; position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -18,8 +20,10 @@ body.sin-flujo #flujo-estatico {
     radial-gradient(ellipse 60% 34% at 72% 70%, rgba(var(--amatista-rgb), .22), transparent 72%);
 }
 #grano {
-  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .035; background-size: 128px 128px; mix-blend-mode: overlay;
+  position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .03; background-size: 128px 128px;
 }
+/* el grano no aporta en pantallas chicas y es una capa fija más que Safari tiene que componer */
+@media (pointer: coarse) { #grano { display: none; } }
 /* el inicio se funde con scrub desde flujo.js: que no parpadee al empezar */
 .hero-section { will-change: opacity, transform; transform-origin: 50% 40%; }
 

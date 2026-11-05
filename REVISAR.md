@@ -69,12 +69,11 @@ del corazón. Ajústalos en el arreglo `CODE` y en la función del abrazo.
 ## Rótulos del rediseño (míos, para que los cambies si quieres)
 
 - **Partes del recorrido** (título · subtítulo): I "Cómo empezó" · "28 de mayo de 2026"; II "Lo que guardo de ti" · "una voz y cien razones"; III "Lo que hemos vivido" · "flores, fotos y días que se quedan"; IV "Nuestra música" · "las canciones que ya son nuestras"; V "Lo que sigue" · "una carta que no termina". Están en `index.html` (`.cap-portal`) y en el `data-nombre` de cada `.capitulo`.
-- **Tarjeta "Instalar"** (Caminos del jardín): "Llevar el Jardín contigo", "Instálalo en tu pantalla de inicio" y la ventanita de instrucciones (`js/instalar.js`).
 - **Caminos del jardín:** títulos y subtítulos de las 4 escenas ("Cartas que se abren con el tiempo", "Cupones, memorama y más sorpresas", "Nuestro soundtrack", "Día, atardecer o noche") y "Por aquí se llega a cada rincón."
 
 ## Rediseño de movimiento (rótulos míos, sin publicar)
 
-- **Las cartas del final:** título "Las cartas del final" y subtítulo "Baja despacio: cada una se abre, se lee y se guarda como un sobre."; etiquetas "Carta N de 3". Los textos de las cartas son los de siempre (no se tocaron).
+- **Las cartas del final:** título "Las cartas del final" y subtítulo "Tres cartas guardadas en un solo sobre.", nota bajo el sobre "3 cartas para ti · toca el sobre o desliza para abrirlo"; etiquetas "Carta N de 3". Los textos de las cartas son los de siempre (no se tocaron).
 - **Barra superior:** "Caminos", "Cómo empezó", "Lo que guardo de ti", "Lo que hemos vivido", "Nuestra música", "Lo que sigue", "Cartas".
 
 ## Rueda de perdones (`contenido/rueda.js`, borrador mío)

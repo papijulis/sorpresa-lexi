@@ -81,7 +81,7 @@
   function medir() {
     movil = E.vw <= 768;
     var nd = Math.min(window.devicePixelRatio || 1, movil ? 1.5 : 2);
-    if (E.vw !== W || E.vh !== H || nd !== dpr) {   // el lienzo solo se rehace si cambió la pantalla
+    if (E.vw !== W || E.vh > H || H - E.vh > 160 || nd !== dpr) {   // solo si cambió la pantalla de verdad: el vaivén de la barra de Safari (±120 px) no borra el lienzo
       dpr = nd; W = E.vw; H = E.vh; diag = Math.sqrt(W * W + H * H);
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);

@@ -18,7 +18,7 @@
     vibrar: function (patron) {
       if (!activa()) return;
       var t = performance.now();
-      if (t - ultimo < 40) return;
+      if (t - ultimo < 120) return;   // antes 40 ms: con muchos aciertos seguidos el teléfono zumbaba sin pausa
       ultimo = t;
       try { navigator.vibrate(patron); } catch (e) { /* sin vibración */ }
     },

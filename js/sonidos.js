@@ -13,11 +13,13 @@
 (function () {
   'use strict';
   var KEY = 'jardin.sonidos.v1';
-  var VOLUMEN = 0.8;  // volumen general del bus: las voces ya van bajitas (≈ -27 dBFS al llegar aquí), quedan ~ -25 dBFS, muy por debajo de la música
+  var VOLUMEN = 0.4;  // volumen general del bus (2026-11-05: Julio pidió la mitad de lo que era, 0.8 → 0.4)
   var on = true;
   try { var raw = jardinStorage.get(KEY); if (raw) on = JSON.parse(raw).on !== false; } catch (e) { /* sin preferencia guardada */ }
 
   var bus = null, ruido = null, ultimo = {};
+  /* tope global: nunca más de TOPE sonidos en VENTANA ms, sumando todos los nombres */
+  var TOPE = 4, VENTANA = 600, recientes = [];
 
   function crearBus() {
     if (bus) return bus;
@@ -112,10 +114,17 @@
       if (!on || silencio() || !VOCES[nombre]) return;
       var ahora = performance.now();
       if (ultimo[nombre] && ahora - ultimo[nombre] < (ESPERA[nombre] || 100)) return;
-      ultimo[nombre] = ahora;
+      while (recientes.length && ahora - recientes[0] > VENTANA) recientes.shift();
+      if (recientes.length >= TOPE) return;
       try {
         var b = crearBus();
-        if (b.ac.state === 'suspended') b.ac.resume();
+        /* Con el contexto suspendido (antes del primer toque, al volver de otra app o con la
+           pantalla bloqueada en iPhone) currentTime no avanza: las notas que se programaban se
+           apilaban en el mismo instante y sonaban TODAS de golpe al reanudar, una tras otra
+           sin parar. Ahora, si no está corriendo, solo se reanuda y ese sonido se descarta. */
+        if (b.ac.state !== 'running') { b.ac.resume(); return; }
+        ultimo[nombre] = ahora;
+        recientes.push(ahora);
         VOCES[nombre](b, arg);
       } catch (e) { /* sin audio disponible: no pasa nada */ }
     },

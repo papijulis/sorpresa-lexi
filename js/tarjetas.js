@@ -17,7 +17,7 @@
 
   /* selector de la tarjeta → hijos con profundidad (px de parallax interno) */
   var TARJETAS = {
-    '.camino:not(.camino-ancho)': { '.camino-escena': 10, 'h3': 5 },
+    '.camino': { '.camino-escena': 10, 'h3': 5 },
     '.cal-card': { '#cal-title': 6 },
     '#mesiversario-card': { '#mesiversario-icon': 9, '#mesiversario-title': 4 },
     '.cd-aparato': { '.cd-escenario': 10, '.cd-lcd': 4 },

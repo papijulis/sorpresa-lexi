@@ -19,6 +19,8 @@
     .dock-musica { gap: .3rem; padding-left: .25rem; padding-right: .25rem; }
     .dock-sep { margin-left: .1rem; margin-right: .1rem; }
     .clock-grid > div { padding-top: 1rem; padding-bottom: 1rem; }
+    /* botones largos de texto: una sola línea cómoda en el teléfono */
+    #jar-btn { font-size: .9rem; padding: .8rem 1.4rem; max-width: 100%; }
     /* calendario: casillas de ~43px para tocar cómodo */
     .cal-section { padding-left: .75rem; padding-right: .75rem; }
     .cal-card { padding: .75rem; }

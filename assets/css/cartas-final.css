@@ -1,74 +1,152 @@
 /* ======================================================================
-   LAS CARTAS DEL FINAL — pistas de scroll con escenario fijo (js/cartas-final.js)
-   La carta es UN solo elemento: .carta-marco se recorta con clip-path (rectángulo
-   pequeño lila → casi pantalla completa → sobre). Márgenes: arriba deja pasar la
-   barra superior y abajo el dock; a los lados 16 px en móvil, 6 vw en escritorio.
+   LAS CARTAS DEL FINAL — un sobre que crece con el scroll hasta volverse el
+   pop-up de la carta en pergamino (js/cartas-final.js).
+   .carta-marco (en la pista) y .carta-lector-caja (el pop-up fijo) ocupan
+   EXACTAMENTE el mismo rectángulo (--carta-*), así el paso de uno a otro no salta.
 ====================================================================== */
+:root {
+  --carta-arriba: calc(14px + env(safe-area-inset-top, 0px));
+  --carta-abajo: calc(14px + env(safe-area-inset-bottom, 0px));
+  --carta-lado: max(14px, calc(50% - 23rem));
+}
 .cartas-final { position: relative; padding-top: 5rem; }
-.cartas-final-cab { text-align: center; padding: 0 1.5rem 2.5rem; }
+.cartas-final-cab { text-align: center; padding: 0 1.5rem 1rem; }
 .cartas-final-cab p { margin: .5rem 0 0; }
 
-.carta-pista { position: relative; height: 350vh; height: 350svh; }
+/* ---- la pista ---- */
+.carta-pista { position: relative; height: 260vh; height: 260svh; }
 .carta-escena { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .carta-marco {
-  position: absolute; top: 5rem; bottom: calc(6.2rem + env(safe-area-inset-bottom, 0px)); left: 16px; right: 16px;
-  will-change: clip-path;
+  position: absolute; top: var(--carta-arriba); bottom: var(--carta-abajo); left: var(--carta-lado); right: var(--carta-lado);
+  clip-path: inset(50% 50% 50% 50% round 26px); will-change: clip-path; pointer-events: none;
 }
-@media (min-width: 900px) { .carta-marco { left: 6vw; right: 6vw; top: 5.2rem; } }
-.carta-glow { position: absolute; inset: 0; }
-.carta-glow.con-brillo { filter: drop-shadow(0 0 22px rgba(var(--orquidea-rgb), .55)); }
-.carta-panel { position: absolute; inset: 0; border-radius: var(--radius-lg); overflow: hidden; background: rgba(var(--ciruela-rgb), .86); border: 1px solid var(--glass-border); }
-.carta-color { position: absolute; inset: 0; background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .9)); opacity: 1; pointer-events: none; }
-.carta-cuerpo { position: relative; display: flex; flex-direction: column; height: 100%; padding: 1.6rem 1.3rem 1rem; opacity: 0; }
-@media (min-width: 900px) { .carta-cuerpo { padding: 2.2rem 3.2rem 1.4rem; max-width: 52rem; margin: 0 auto; } }
-.carta-cab { text-align: center; margin-bottom: 1rem; }
-.carta-etiqueta { margin: 0; font-family: var(--fuente-ui); font-size: .72rem; font-weight: 600; letter-spacing: .28em; text-transform: uppercase; color: rgba(var(--dorado-rgb), .85); }
-.carta-titulo { margin: .35rem 0 0; font-size: clamp(1.7rem, 5vw, 2.6rem); line-height: 1.12; color: var(--pergamino-50); text-shadow: var(--texto-sombra); }
-.carta-sub { margin: .3rem 0 0; font-family: var(--fuente-ui); font-size: .8rem; color: rgba(var(--pergamino-rgb), .6); }
+.carta-marco.con-brillo { filter: drop-shadow(0 0 24px rgba(var(--orquidea-rgb), .45)); }
+.carta-cara { position: absolute; inset: 0; background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .92)); }
+.carta-papel { position: absolute; inset: 0; opacity: 0; display: flex; flex-direction: column; align-items: center; padding-top: 2.4rem; }
+.carta-papel .carta-etiqueta, .carta-papel .carta-titulo { opacity: 0; transition: opacity var(--dur-3) ease; }
+.carta-papel.con-titulo .carta-etiqueta, .carta-papel.con-titulo .carta-titulo { opacity: 1; }
+
+/* el sobre: siempre al centro de la escena */
+.carta-sobre { position: absolute; left: 50%; top: 50%; width: 128px; height: 128px; margin: -64px 0 0 -64px; will-change: transform, opacity; }
+.carta-sobre.apagado { pointer-events: none; }
+.carta-sobre-btn {
+  width: 100%; height: 100%; padding: 0; border-radius: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--ciruela-900); background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .92));
+  border: 1px solid rgba(var(--pergamino-rgb), .35); box-shadow: 0 0 26px rgba(var(--orquidea-rgb), .55), inset 0 1px 0 rgba(var(--pergamino-rgb), .3);
+  transition: box-shadow var(--dur-3) ease, transform var(--dur-2) var(--ease-rebote);
+}
+.carta-sobre-btn .ico { width: 3.2rem; height: 3.2rem; }
+.carta-sobre-btn:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 4px; }
+.carta-sobre-btn:active { transform: scale(.95); }
+@media (hover: hover) { .carta-sobre-btn:hover { box-shadow: 0 0 38px rgba(var(--orquidea-rgb), .75), inset 0 1px 0 rgba(var(--pergamino-rgb), .3); } }
+.carta-pista-nota {
+  position: absolute; left: 0; right: 0; top: calc(50% + 84px); margin: 0; padding: 0 1.5rem; text-align: center;
+  font-size: 1.05rem; color: rgba(var(--pergamino-rgb), .72); pointer-events: none;
+}
+
+/* ---- papel de pergamino (como la carta original) ---- */
+.carta-papel, .carta-lector-papel {
+  background-color: var(--pergamino-50);
+  background-image:
+    radial-gradient(circle at 8% 12%, rgba(var(--ambar-rgb), .09) 0, transparent 45%),
+    radial-gradient(circle at 92% 88%, rgba(var(--amatista-rgb), .08) 0, transparent 45%);
+  color: var(--tinta);
+}
+.carta-flourish { position: absolute; top: .7rem; left: .7rem; width: 3.2rem; height: 3.2rem; opacity: .16; fill: var(--sepia-700); pointer-events: none; }
+.carta-flourish.der { left: auto; right: .7rem; transform: scaleX(-1); }
+.carta-etiqueta { margin: 0; font-family: var(--fuente-ui); font-size: .7rem; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--sepia-700); }
+.carta-titulo { margin: .35rem 0 0; font-size: clamp(1.6rem, 5.4vw, 2.4rem); line-height: 1.15; color: var(--tinta); text-align: center; }
+.carta-sub { margin: .3rem 0 0; font-family: var(--fuente-ui); font-size: .78rem; color: rgba(var(--tinta-rgb), .62); }
+
+/* ---- el pop-up ---- */
+.carta-lector { position: fixed; inset: 0; z-index: var(--z-modal); pointer-events: none; visibility: hidden; }
+.carta-lector::before {
+  content: ''; position: absolute; inset: 0; background: rgba(var(--abismo-rgb), .72);
+  opacity: 0; transition: opacity var(--dur-3) ease;
+}
+.carta-lector.abierto { pointer-events: auto; visibility: visible; }
+.carta-lector.abierto::before { opacity: 1; }
+.carta-lector-caja {
+  position: absolute; top: var(--carta-arriba); bottom: var(--carta-abajo); left: var(--carta-lado); right: var(--carta-lado);
+  border-radius: 22px; overflow: hidden; box-shadow: 0 24px 60px rgba(var(--abismo-rgb), .5);
+  transition: clip-path 720ms var(--ease-emph);
+}
+.carta-lector.sin-anim, .carta-lector.sin-anim::before, .carta-lector.sin-anim .carta-lector-caja { transition: none !important; }
+/* al salir del sobre / volver a él, el papel se ve lila hasta que crece */
+.carta-lector-caja::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+  background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .92)); transition: opacity 520ms ease;
+}
+.carta-lector.desde-sobre .carta-lector-caja::after { opacity: 0; animation: cartaLila 720ms ease forwards; }
+.carta-lector.hacia-sobre .carta-lector-caja::after { opacity: 1; transition-delay: 120ms; }
+@keyframes cartaLila { 0% { opacity: 1; } 45% { opacity: .85; } 100% { opacity: 0; } }
+
+.carta-lector-papel { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 2rem 1.2rem 1rem; }
+@media (min-width: 640px) { .carta-lector-papel { padding: 2.6rem 3rem 1.3rem; } }
+.carta-lector-cerrar {
+  position: absolute; top: .7rem; right: .7rem; z-index: 2; width: 2.75rem; height: 2.75rem; border-radius: 999px; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; color: var(--tinta);
+  background: rgba(var(--dorado-rgb), .16); border: 1px solid rgba(var(--sepia-rgb), .3); transition: background .2s ease, transform .2s var(--ease-rebote);
+}
+.carta-lector-cerrar:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 2px; }
+.carta-lector-cerrar:active { transform: scale(.92); }
+@media (hover: hover) { .carta-lector-cerrar:hover { background: rgba(var(--dorado-rgb), .32); } }
+.carta-cab { text-align: center; margin: 0 2.4rem .9rem; }
 .carta-texto {
-  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: auto; padding: .4rem .3rem 1.2rem; text-align: left;
-  user-select: text; -webkit-user-select: text; scrollbar-width: thin;
-  font-family: var(--fuente-titulo); font-size: clamp(1rem, 2.6vw, 1.18rem); line-height: 1.75; color: rgba(var(--pergamino-rgb), .92);
+  flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+  padding: .3rem .2rem 1rem; text-align: left; user-select: text; -webkit-user-select: text; scrollbar-width: thin;
+  font-family: var(--fuente-titulo); font-size: clamp(1rem, 2.4vw, 1.12rem); line-height: 1.75; color: var(--tinta);
+  transition: opacity 260ms ease;
 }
-.carta-texto:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 2px; border-radius: var(--radius-md); }
-.carta-parrafo { margin: 0 0 1.1rem; white-space: pre-line; }
-.carta-firma { margin: 1.6rem 0 .4rem; text-align: right; font-size: clamp(1.4rem, 4vw, 1.9rem); line-height: 1.4; white-space: pre-line; color: var(--dorado-500); }
-.carta-icono { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; color: var(--ciruela-900); }
-.carta-icono .ico { width: 2.1rem; height: 2.1rem; }
+.carta-texto.cambiando { opacity: 0; }
+.carta-texto:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 2px; border-radius: 8px; }
+.carta-parrafo { margin: 0 0 1.05rem; white-space: pre-line; }
+.carta-firma { margin: 1.6rem 0 .4rem; text-align: right; font-size: clamp(1.4rem, 4vw, 1.85rem); line-height: 1.4; white-space: pre-line; color: var(--sepia-700); }
+.carta-texto .wax-seal { margin: .8rem 0 .4rem auto; }
+.carta-lector .letter-nav { margin-top: .6rem; padding-top: .7rem; border-top: 1px solid rgba(var(--tinta-rgb), .1); }
 
-/* fila de sobres guardados */
-.carta-slots { position: absolute; left: 50%; top: 72%; transform: translate(-50%, -50%); display: flex; gap: 1.4rem; }
-.carta-slot {
-  width: 3.6rem; height: 3.6rem; padding: 0; border-radius: 18px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-  color: var(--ciruela-900); background: linear-gradient(135deg, var(--accent), rgba(var(--amatista-rgb), .9)); border: 1px solid rgba(255,255,255,.35);
-  box-shadow: 0 0 18px rgba(var(--orquidea-rgb), .5); opacity: 0; transform: scale(.6); pointer-events: none;
-  transition: opacity var(--dur-3) var(--ease-out-soft), transform var(--dur-3) var(--ease-out-soft);
+/* navegación entre las tres cartas (la de la versión anterior del pergamino) */
+.letter-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+.letter-nav-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 2.9rem; height: 2.9rem; padding: 0; border-radius: 50%; cursor: pointer;
+  color: var(--sepia-700); background: rgba(var(--dorado-rgb), .16); border: 1px solid rgba(var(--sepia-rgb), .35);
+  transition: background .2s ease, transform .2s var(--ease-rebote), box-shadow .2s ease, opacity .2s ease;
 }
-.carta-slot .ico { width: 2.1rem; height: 2.1rem; }
-.carta-slot.guardado { opacity: 1; transform: none; pointer-events: auto; }
-@media (hover: hover) { .carta-slot.guardado:hover { transform: translateY(-3px) scale(1.04); box-shadow: 0 0 26px rgba(var(--orquidea-rgb), .7); } }
-.carta-slot:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 3px; }
-/* mientras la carta se lee, el sobre en turno no estorba */
-.carta-slot:not(.guardado) { visibility: hidden; }
+.letter-nav-btn .ico { width: 1.25rem; height: 1.25rem; }
+.letter-nav-prev .ico { transform: scaleX(-1); }
+.letter-nav-btn:active:not(:disabled) { transform: scale(.92); }
+.letter-nav-btn:disabled { opacity: .3; cursor: default; }
+.letter-nav-btn:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 3px; }
+@media (hover: hover) { .letter-nav-btn:hover:not(:disabled) { background: rgba(var(--dorado-rgb), .32); box-shadow: 0 4px 14px rgba(var(--sepia-rgb), .22); } }
+.letter-nav-n { min-width: 6.5rem; text-align: center; font-family: var(--fuente-ui); font-size: .78rem; font-weight: 600; letter-spacing: .06em; color: var(--sepia-700); }
+.wax-seal {
+  width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 34% 30%, var(--lacre-500), var(--lacre-800) 72%);
+  font-family: var(--fuente-titulo); color: var(--pergamino-100); font-weight: 700; font-size: 20px;
+  box-shadow: 0 4px 10px rgba(var(--abismo-rgb), .4), inset 0 2px 4px rgba(var(--pergamino-rgb), .25);
+}
 
-/* cierre: la vela del deseo */
-.cartas-cierre { display: flex; justify-content: center; padding: 3rem 1.5rem 4rem; }
+/* página quieta mientras se lee */
+html.carta-abierta, html.carta-abierta body { overflow: hidden; }
+
+/* ---- cierre: la vela del deseo ---- */
+.cartas-cierre { display: flex; justify-content: center; padding: 2rem 1.5rem 4rem; }
 .cartas-deseo { max-width: 34rem; width: 100%; padding: 2rem 1.5rem; text-align: center; color: var(--pergamino-50); background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+/* Safari de iPhone le ponía al botón de la vela su fondo blanco por defecto */
+#wish-candle {
+  -webkit-appearance: none; appearance: none; background: rgba(var(--dorado-rgb), .1); border: 1px solid rgba(var(--dorado-rgb), .28);
+  width: 6rem; height: 6rem; border-radius: 999px; padding: 0; display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 0 28px rgba(var(--dorado-rgb), .18);
+}
+/* el ícono va en un span con text-5xl y .ico-2xl (3.4em): salía de 10–12 rem en el teléfono */
+#wish-candle .ico { width: 3.2rem; height: 3.2rem; }
+#wish-candle > span { font-size: 1rem; line-height: 0; display: inline-flex; }
+#wish-candle:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 4px; }
 
-/* lector: reabre una carta guardada */
-.carta-lector { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: calc(1rem + env(safe-area-inset-top, 0px)) 1rem calc(1rem + env(safe-area-inset-bottom, 0px)); background: rgba(var(--abismo-rgb), .78); backdrop-filter: blur(8px); opacity: 0; pointer-events: none; transition: opacity var(--dur-3) ease; }
-.carta-lector.abierto { opacity: 1; pointer-events: auto; }
-.carta-lector-caja { position: relative; display: flex; flex-direction: column; width: min(100%, 46rem); max-height: 100%; padding: 1.6rem 1.3rem 1rem; border-radius: var(--radius-lg); background: rgba(var(--ciruela-rgb), .9); transform: scale(.94) translateY(12px); transition: transform var(--dur-4) var(--ease-out-soft); }
-.carta-lector.abierto .carta-lector-caja { transform: none; }
-.carta-lector-cerrar { top: .8rem; right: .8rem; transform: none; }
-.carta-lector-texto { max-height: calc(100svh - 11rem); }
-
-/* sin movimiento: tarjetas apiladas, sin scrub */
-.cartas-final.estatica .carta-pista { height: auto; padding: 0 16px 1.5rem; }
-.cartas-final.estatica .carta-escena { position: static; height: auto; overflow: visible; }
-.cartas-final.estatica .carta-marco { position: static; clip-path: none !important; max-width: 52rem; margin: 0 auto; }
-.cartas-final.estatica .carta-glow, .cartas-final.estatica .carta-panel { position: static; }
-.cartas-final.estatica .carta-color, .cartas-final.estatica .carta-icono, .cartas-final.estatica .carta-slots { display: none; }
-.cartas-final.estatica .carta-cuerpo { opacity: 1; height: auto; }
-.cartas-final.estatica .carta-texto { overflow: visible; }
-@media (prefers-reduced-motion: reduce) { .carta-lector, .carta-lector-caja, .carta-slot { transition: opacity .2s ease; } }
+/* ---- sin movimiento: el sobre es un botón quieto ---- */
+.cartas-final.estatica .carta-pista { height: auto; }
+.cartas-final.estatica .carta-escena { position: relative; height: 15rem; overflow: visible; }
+.cartas-final.estatica .carta-marco { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .carta-lector-caja, .carta-lector::before, .carta-texto { transition: opacity .2s ease; }
+}
