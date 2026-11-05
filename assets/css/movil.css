@@ -23,7 +23,7 @@
     .cal-section { padding-left: .75rem; padding-right: .75rem; }
     .cal-card { padding: .75rem; }
     .cal-card .grid { gap: .25rem; }
-    #mini-player-toggle, .banda-play { width: 2.75rem; height: 2.75rem; }
+    #mini-player-toggle { width: 2.75rem; height: 2.75rem; }
     .app-view-close { width: 2.75rem; height: 2.75rem; }
     #modal-close { top: .35rem; right: .5rem; width: 2.75rem; height: 2.75rem; }
     

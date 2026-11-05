@@ -100,7 +100,7 @@
       st.brillo.style.background = 'radial-gradient(circle at ' + st.gx.toFixed(1) + '% ' + st.gy.toFixed(1) + '%, rgba(var(--orquidea-rgb), .30), rgba(var(--orquidea-rgb), .06) 38%, transparent 62%)';
       for (var h = 0; h < st.hijos.length; h++) {
         var hh = st.hijos[h];
-        hh.el.style.translate = (st.ay !== undefined ? (st.ry / 5 * hh.d).toFixed(2) : 0) + 'px ' + (-st.rx / 5 * hh.d).toFixed(2) + 'px';
+        hh.el.style.translate = (st.ry / 5 * hh.d).toFixed(2) + 'px ' + (-st.rx / 5 * hh.d).toFixed(2) + 'px';
       }
     }
   }

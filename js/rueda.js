@@ -63,8 +63,9 @@
       canvas.width = canvas.height = Math.round(lado * dpr);
       rayos.forEach(function (r) { r.cache = null; r.flashC = null; });   // se rehacen al nuevo tamaño
     }
+    var medidor = document.createElement('canvas').getContext('2d');   // uno solo para medir todos los rayos
     function textoCache(i, color) {
-      var tam = 11, tmp = document.createElement('canvas').getContext('2d');
+      var tam = 11, tmp = medidor;
       tmp.font = '600 ' + tam + 'px ' + SANS;
       var w = tmp.measureText(FRASES[i]).width, max = R_MAX - R0 - 4, f = w > max ? max / w : 1;
       var cw = Math.ceil((w * f + 6) * ps), ch = Math.ceil(16 * ps);

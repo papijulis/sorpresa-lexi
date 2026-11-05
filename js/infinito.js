@@ -321,12 +321,16 @@
   /* ------------------------------------------------------------------
      Abrir / cerrar el popup (iris desde el botón tocado, como Buzón y Juegos)
   ------------------------------------------------------------------ */
+  var origenFoco = null;
   function abrir(origen) {
     if (abierto) return;
+    origenFoco = document.activeElement;
     if (typeof irisDesde === 'function') irisDesde(view, origen);
     abierto = true;
     if (window.Sonidos) window.Sonidos.play('abrir');
+    view.inert = false;
     view.classList.add('open');
+    document.getElementById('infinito-close').focus({ preventScroll: true });
     history.replaceState(null, '', '#infinito');
     canvasPauseReasons.add('infinito');
     updateCanvasPauseState();
@@ -355,6 +359,9 @@
     if (raf) { cancelAnimationFrame(raf); raf = null; }
     clearTimeout(idleTimeout); idleTimeout = null;
     view.classList.remove('open');
+    view.inert = true;
+    var vuelve = origenFoco && origenFoco !== document.body && document.contains(origenFoco) ? origenFoco : document.getElementById('clock-infinity-link');
+    if (vuelve && vuelve.focus) vuelve.focus({ preventScroll: true });
     if (location.hash === '#infinito') history.replaceState(null, '', location.pathname + location.search);
     canvasPauseReasons.delete('infinito');
     updateCanvasPauseState();
@@ -374,5 +381,8 @@
   document.getElementById('infinito-close').addEventListener('click', cerrar);
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && abierto) cerrar(); });
   window.Infinito = { abrir: abrir, cerrar: cerrar };
-  if (location.hash === '#infinito') abrir();
+  /* el mosaico de palabras se precalcula cuando el navegador está desocupado, para que abrir el
+     popup no dé un tirón en teléfonos lentos (el popup cerrado igual tiene su tamaño de layout) */
+  var precalcular = function () { if (!iniciado && box.offsetWidth) { sizeCanvas(); medirPalabras(); } };
+  if ('requestIdleCallback' in window) window.addEventListener('load', function () { requestIdleCallback(precalcular, { timeout: 8000 }); });
 })();

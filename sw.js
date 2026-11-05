@@ -16,7 +16,7 @@
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v29';
+const CACHE_VERSION = 'v30';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -30,8 +30,6 @@ const SHELL_URLS = [
   './js/corazon-palabras.js',
   './js/rueda.js',
   './js/flor-especial.js',
-  './assets/vendor/three.module.min.js',
-  './assets/vendor/OrbitControls.js',
   './js/infinito.js',
   './assets/css/utilities.css',
   './assets/css/tokens.css',
@@ -97,13 +95,19 @@ const CONTENIDO_URLS = [
   './contenido/rueda.js',
 ];
 
+/* Precache tolerante: cada archivo por separado. Con addAll (todo o nada) un solo 404 o un
+   corte de red dejaba la versión nueva sin instalar y a Lexi con la vieja para siempre.
+   Three.js (≈ 700 KB) NO se precachea: solo lo usa "una flor especial" y se guarda la
+   primera vez que se abre (network-first del runtime). */
+async function precachear(nombre, urls) {
+  const cache = await caches.open(nombre);
+  await Promise.allSettled(urls.map((u) => fetch(u, { cache: 'reload' }).then((r) => (r.ok ? cache.put(u, r) : null))));
+}
 self.addEventListener('install', (event) => {
   event.waitUntil(
     (async () => {
-      const shell = await caches.open(SHELL_CACHE);
-      await shell.addAll(SHELL_URLS);
-      const contenido = await caches.open(CONTENIDO_CACHE);
-      await contenido.addAll(CONTENIDO_URLS);
+      await precachear(SHELL_CACHE, SHELL_URLS);
+      await precachear(CONTENIDO_CACHE, CONTENIDO_URLS);
       self.skipWaiting();
     })()
   );
@@ -126,28 +130,26 @@ function isOriginalesRequest(url) {
   return url.pathname.includes('/assets/img/originales/');
 }
 
-async function staleWhileRevalidate(request, cacheName) {
-  const cache = await caches.open(cacheName);
-  const cached = await cache.match(request);
-  const networkPromise = fetch(request)
-    .then((response) => {
-      if (response && response.ok) cache.put(request, response.clone());
-      return response;
-    })
-    .catch(() => cached);
-  return cached || networkPromise;
-}
-
+/* network-first con tiempo límite: con señal débil, si hay copia guardada se usa a los 4 s en
+   vez de esperar indefinidamente; la respuesta de red, si llega después, igual actualiza la caché */
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-  try {
-    const response = await fetch(request);
+  const red = fetch(request).then((response) => {
     if (response && response.ok) cache.put(request, response.clone());
     return response;
+  });
+  red.catch(() => {});   // si gana el reloj y luego falla la red, no es un error sin atender
+  const cached = await cache.match(request);
+  if (!cached) return red;
+  let reloj;
+  const tiempo = new Promise((res) => { reloj = setTimeout(() => res(cached), 4000); });
+  try {
+    const r = await Promise.race([red, tiempo]);
+    clearTimeout(reloj);
+    return r || cached;
   } catch (e) {
-    const cached = await cache.match(request);
-    if (cached) return cached;
-    throw e;
+    clearTimeout(reloj);
+    return cached;
   }
 }
 

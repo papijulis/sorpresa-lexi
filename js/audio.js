@@ -17,9 +17,14 @@ function getAudioCtx() {
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
+/* En iPhone/iPad, pasar el <audio> por Web Audio (createMediaElementSource) hace que la música
+   se corte al bloquear la pantalla y obedezca el interruptor de silencio: ahí se usa el
+   ecualizador de respaldo (barras CSS) y la música va directo por el elemento <audio>. */
+const ES_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (/macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
 function setupAnalysers() {
   if (analysersSetupDone) return;
   analysersSetupDone = true;
+  if (ES_IOS) { useRealEq = false; return; }
   try {
     const ac = getAudioCtx();
     const bgSource = ac.createMediaElementSource(bgAudio);

@@ -8,7 +8,7 @@
 ====================================================================== */
 (function () {
   'use strict';
-  var CLICABLE = 'button, [role="button"], a[href], .camino, .tl-mes-btn, .juego-card, .buzon-envelope, .cupon-card, .song-select-card, .polaroid, .banda-play';
+  var CLICABLE = 'button, [role="button"], a[href], .camino, .tl-mes-btn, .juego-card, .buzon-envelope, .cupon-card, .song-select-card, .polaroid';
   /* estos ya hacen su propio sonido (abrir vista, cambiar cielo…): solo llevan pétalos */
   var CON_SONIDO_PROPIO = '#buzon-toggle, #juegos-toggle, #sunset-toggle, #camino-buzon, #camino-juegos, #clock-infinity-link, #camino-efectos, .tl-mes-btn, [data-cielo], .app-view-close, #modal-close';
   var ultimoAire = 0;

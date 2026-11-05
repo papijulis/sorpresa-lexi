@@ -27,14 +27,14 @@ function resizeCanvas() {
 /* scrollY cacheado: leerlo en cada cuadro (updateLily) forzaba un recálculo
    de layout por flor. Se actualiza solo al hacer scroll. */
 let scrollYCache = window.scrollY || 0;
-window.addEventListener('scroll', () => { scrollYCache = window.scrollY || 0; }, { passive: true });
+Motor.suscribir((E) => { scrollYCache = E.y; });   // el único lector de scroll es motor.js
 let resizeQueued = false;
 window.addEventListener('resize', () => {
   if (resizeQueued) return;
   resizeQueued = true;
   requestAnimationFrame(() => {
     resizeQueued = false;
-    if (window.innerWidth !== vw || window.innerHeight !== vh) resizeCanvas();
+    if (window.innerWidth !== vw || window.innerHeight !== vh) { resizeCanvas(); reacomodarLirios(); }
   });
 });
 resizeCanvas();
@@ -102,13 +102,13 @@ function drawPetal(p) {
   ctx.fill();
   ctx.restore();
 }
-function updateParticles(t) {
-  windCurrent += (windTarget - windCurrent) * 0.02;
+function updateParticles(t, k) {
+  windCurrent += (windTarget - windCurrent) * 0.02 * k;
   for (let i = particles.length - 1; i >= 0; i--) {
     const p = particles[i];
-    p.y += p.speedY;
-    p.x += p.speedX + windCurrent * 0.6 + Math.sin(t / 900 + p.sway) * 0.3;
-    p.rot += p.rotSpeed + windCurrent * 0.004;
+    p.y += p.speedY * k;
+    p.x += (p.speedX + windCurrent * 0.6 + Math.sin(t / 900 + p.sway) * 0.3) * k;
+    p.rot += (p.rotSpeed + windCurrent * 0.004) * k;
     if ((!isSunset && p.y > vh + 20) || (isSunset && p.y < -20) || p.x < -30 || p.x > vw + 30) {
       particles.splice(i, 1);
     }
@@ -222,8 +222,15 @@ function updateLily(b, dt) {
   const offset = clamp(scrollYCache * b.parallax, -140, 140);
   b.renderY = b.y - offset;
 }
-function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1 }) {
-  blooms.push({ x, y, size, progress: 0, delay, hue: rand(-0.15, 0.15), pulse: 1, idleTimer: 900, parallax, renderY: y, alpha });
+/* rx/ry/rs (opcionales): posición y tamaño relativos a la pantalla, para reacomodar al girar el teléfono */
+function spawnLily({ x, y, size, delay = 0, parallax = 0.02, alpha = 1, rx, ry, rs }) {
+  blooms.push({ x, y, size, progress: 0, delay, hue: rand(-0.15, 0.15), pulse: 1, idleTimer: 900, parallax, renderY: y, alpha, rx, ry, rs });
+}
+function reacomodarLirios() {
+  blooms.forEach((b) => {
+    if (b.rx === undefined) return;
+    b.x = vw * b.rx; b.y = vh * b.ry; b.size = Math.min(vw, vh) * b.rs; b.sprite = null;   // el sprite se rehace a la nueva medida
+  });
 }
 
 /* ---- sparkles + bokeh ---- */
@@ -250,6 +257,8 @@ function spawnSparkleBurst(x, y, count, rising = false) {
   if (target === topSparkles) startTopLayer();
 }
 function spawnBokeh(x, y, count) {
+  /* con el canvas en pausa nadie los consume: se acumulaban y salían todos de golpe al volver */
+  if (rafId === null || bokehs.length > 40) return;
   for (let i = 0; i < count; i++) {
     bokehs.push({
       x: x + rand(-60, 60), y: y + rand(-60, 60),
@@ -258,15 +267,15 @@ function spawnBokeh(x, y, count) {
     });
   }
 }
-function updateSparkles() {
+function updateSparkles(k) {
   for (let i = sparkles.length - 1; i >= 0; i--) {
     const s = sparkles[i];
-    s.x += s.vx; s.y += s.vy; s.vy += 0.01; s.life -= s.decay;
+    s.x += s.vx * k; s.y += s.vy * k; s.vy += 0.01 * k; s.life -= s.decay * k;
     if (s.life <= 0) sparkles.splice(i, 1);
   }
   for (let i = bokehs.length - 1; i >= 0; i--) {
     const bk = bokehs[i];
-    bk.life -= bk.decay;
+    bk.life -= bk.decay * k;
     if (bk.life <= 0) bokehs.splice(i, 1);
   }
 }
@@ -278,13 +287,22 @@ function drawSparkle(s) {
   ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2); ctx.fill();
   ctx.restore();
 }
+/* bokeh: un sprite difuminado por color, hecho una sola vez (antes era ctx.filter = blur(6px)
+   por círculo y por cuadro: caro, y Safari viejo lo ignoraba) */
+const bokehSprites = {};
+function spriteBokeh(color) {
+  if (bokehSprites[color]) return bokehSprites[color];
+  const c = document.createElement('canvas'); c.width = c.height = 96;
+  const g = c.getContext('2d'), gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+  gr.addColorStop(0, color); gr.addColorStop(.62, color); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr; g.fillRect(0, 0, 96, 96);
+  return (bokehSprites[color] = c);
+}
 function drawBokeh(bk) {
-  ctx.save();
+  const r = bk.size * 1.25;
   ctx.globalAlpha = Math.max(0, bk.life) * 0.6;
-  ctx.filter = 'blur(6px)';
-  ctx.fillStyle = bk.color;
-  ctx.beginPath(); ctx.arc(bk.x, bk.y, bk.size, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
+  ctx.drawImage(spriteBokeh(bk.color), bk.x - r, bk.y - r, r * 2, r * 2);
+  ctx.globalAlpha = 1;
 }
 
 /* ---- butterflies (purple/violet, orbit around lilies) ---- */
@@ -348,13 +366,13 @@ function drawButterfly(b) {
 function spawnFirefly() {
   fireflies.push({ x: rand(0, vw), y: rand(vh * 0.2, vh), vx: rand(-0.15, 0.15), vy: rand(-0.2, -0.05), phase: rand(0, Math.PI * 2) });
 }
-function updateFireflies(t) {
+function updateFireflies(t, k) {
   /* atardecer y noche: todas; de día, unas pocas solo mientras se ve la portada */
   const tope = (isSunset || isNight) ? FIREFLY_CAP : (scrollYCache < vh * 0.9 ? Math.round(FIREFLY_CAP * 0.35) : 0);
   if (fireflies.length < tope && Math.random() < 0.05) spawnFirefly();
   for (let i = fireflies.length - 1; i >= 0; i--) {
     const f = fireflies[i];
-    f.x += f.vx; f.y += f.vy;
+    f.x += f.vx * k; f.y += f.vy * k;
     if (f.y < -10 || f.x < -10 || f.x > vw + 10) fireflies.splice(i, 1);
   }
 }
@@ -526,12 +544,13 @@ function sampleFpsAndMaybeGoLight(t) {
 }
 
 function loop(t) {
-  const dt = t - lastFrame;
+  const dt = Math.min(64, t - lastFrame);
+  const k = dt / 16.67;
   lastFrame = t;
   sampleFpsAndMaybeGoLight(t);
   ctx.clearRect(0, 0, vw, vh);
 
-  updateParticles(t);
+  updateParticles(t, k);
   particles.forEach(drawPetal);
 
   bokehs.forEach(drawBokeh);
@@ -542,13 +561,13 @@ function loop(t) {
   updateButterflies(dt);
   butterflies.forEach(drawButterfly);
 
-  updateFireflies(t);
+  updateFireflies(t, k);
   fireflies.forEach((f) => drawFirefly(f, t));
 
   updateBirds(dt);
   birds.forEach(drawBird);
 
-  updateSparkles();
+  updateSparkles(k);
   sparkles.forEach(drawSparkle);
 
   updateHeartRain(dt);
@@ -559,7 +578,11 @@ function loop(t) {
 
   rafId = requestAnimationFrame(loop);
 }
-let rafId = requestAnimationFrame(loop);
+/* el bucle arranca cuando YA cargaron todos los scripts: usa updateHeartRain (extras.js) y
+   updateAudioBars (audio.js); si un cuadro llegaba antes, un ReferenceError lo mataba para siempre */
+let rafId = null;
+function arrancarLoop() { if (rafId === null && canvasPauseReasons.size === 0) { lastFrame = performance.now(); rafId = requestAnimationFrame(loop); } }
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', arrancarLoop); else setTimeout(arrancarLoop, 0);
 
 /* Motivos para pausar el canvas principal: la pestaña oculta
    (visibilitychange), o una vista de pantalla completa tapándolo del
@@ -572,7 +595,7 @@ function updateCanvasPauseState() {
       cancelAnimationFrame(rafId); rafId = null;
       sparkles.length = 0; // los destellos del fondo no deben quedar congelados ni reaparecer después
     }
-  } else if (!rafId) {
+  } else if (!rafId && document.readyState !== 'loading') {
     lastFrame = performance.now(); // evita un dt gigante por el tiempo en pausa
     rafId = requestAnimationFrame(loop);
   }
@@ -586,7 +609,7 @@ document.addEventListener('visibilitychange', () => {
    Fase 5 — arreglo visual conocido: el lirio del hero se superponía al
    texto "Lexi" y le quitaba legibilidad. Más chico y con menos opacidad
    para que quede de fondo, no encima. */
-spawnLily({ x: vw / 2, y: vh / 2, size: Math.min(vw, vh) * 0.12, delay: 300, parallax: 0.02, alpha: 0.4 });
-spawnLily({ x: vw * 0.14, y: vh * 0.24, size: Math.min(vw, vh) * 0.08, delay: 700, parallax: 0.05 });
-spawnLily({ x: vw * 0.86, y: vh * 0.78, size: Math.min(vw, vh) * 0.09, delay: 1000, parallax: 0.04 });
+spawnLily({ x: vw / 2, y: vh / 2, size: Math.min(vw, vh) * 0.12, delay: 300, parallax: 0.02, alpha: 0.4, rx: .5, ry: .5, rs: .12 });
+spawnLily({ x: vw * 0.14, y: vh * 0.24, size: Math.min(vw, vh) * 0.08, delay: 700, parallax: 0.05, rx: .14, ry: .24, rs: .08 });
+spawnLily({ x: vw * 0.86, y: vh * 0.78, size: Math.min(vw, vh) * 0.09, delay: 1000, parallax: 0.04, rx: .86, ry: .78, rs: .09 });
 

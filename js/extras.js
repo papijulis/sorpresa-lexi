@@ -315,7 +315,7 @@ function renderTimeline() {
 
   /* ---- la enredadera: un tallo que se dibuja con el scroll, con hojas y zarcillos ---- */
   const NS = 'http://www.w3.org/2000/svg';
-  let vineFill = null, decos = [], tlTop = 0, tlHeight = 0, tops = [], tlTicking = false, lastBuiltH = -1;
+  let vineFill = null, decos = [], tlTop = 0, tlHeight = 0, tops = [], lastBuiltH = -1;
   function buildVine(h) {
     lastBuiltH = h;
     svg.setAttribute('viewBox', `0 0 40 ${h}`);
@@ -350,7 +350,6 @@ function renderTimeline() {
     update();
   }
   function update() {
-    tlTicking = false;
     const markerY = window.scrollY + window.innerHeight * 0.75;
     const filled = clamp(markerY - tlTop, 0, tlHeight);
     if (vineFill) vineFill.style.strokeDashoffset = String(1 - (tlHeight ? filled / tlHeight : 0));
@@ -363,8 +362,8 @@ function renderTimeline() {
       if (lit !== litTargets[i].classList.contains('lit')) litTargets[i].classList.toggle('lit', lit);
     }
   }
-  function onScroll() { if (!tlTicking) { tlTicking = true; requestAnimationFrame(update); } }
-  window.addEventListener('scroll', onScroll, { passive: true });
+  let tlUltimoY = -1;
+  Motor.suscribir((E) => { if (E.y !== tlUltimoY) { tlUltimoY = E.y; update(); } });   // único lector de scroll: motor.js
   window.addEventListener('resize', measure);
   window.addEventListener('load', measure);
   /* al plegar/desplegar un mes cambia el alto: se vuelve a medir (un solo cuadro por cambio) */

@@ -25,11 +25,22 @@ const IMG_DIMENSIONS = {
   'ramo-feito-ella.jpeg': { w: 716, h: 760 },
   'viendo-edgerunners.jpeg': { w: 570, h: 760 },
 };
+function escaparAttr(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
 function pictureHTML(src, alt, extraImgAttrs) {
   const webpSrc = src.replace(/\.jpe?g$/i, '.webp');
   const dims = IMG_DIMENSIONS[src.split('/').pop()];
   const dimAttrs = dims ? ` width="${dims.w}" height="${dims.h}"` : '';
-  return `<picture><source srcset="${webpSrc}" type="image/webp"><img src="${src}" alt="${alt || ''}" loading="lazy"${dimAttrs} ${extraImgAttrs || ''}></picture>`;
+  return `<picture><source srcset="${webpSrc}" type="image/webp"><img src="${src}" alt="${escaparAttr(alt)}" loading="lazy"${dimAttrs} ${extraImgAttrs || ''}></picture>`;
+}
+
+/* Un elemento que no es <button> pero se abre al tocarlo (día del calendario, sobre del
+   Buzón, polaroid): también con teclado (Enter / Espacio) y con nombre para lectores. */
+function hacerClicable(el, fn, etiqueta) {
+  el.setAttribute('role', 'button');
+  el.tabIndex = 0;
+  if (etiqueta) el.setAttribute('aria-label', etiqueta);
+  el.addEventListener('click', fn);
+  el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fn(e); } });
 }
 
 /* localStorage with an in-memory fallback (private mode, quota, etc).
@@ -55,4 +66,17 @@ function createSafeStorage() {
   };
 }
 const jardinStorage = createSafeStorage();
+
+/* claves de "una vez por día" (11:11, celebración del 28): se borran las de hace más de 60 días */
+(function podarClaves() {
+  try {
+    const limite = Date.now() - 60 * 86400000;
+    for (let i = localStorage.length - 1; i >= 0; i--) {
+      const k = localStorage.key(i);
+      if (!k || !/^jardin\.(1111|mesiversario\.celebrado)\./.test(k)) continue;
+      const m = k.match(/(\d{4}-\d{2}-\d{2})/);
+      if (m && new Date(m[1] + 'T00:00:00').getTime() < limite) localStorage.removeItem(k);
+    }
+  } catch (e) { /* sin localStorage: nada que podar */ }
+})();
 

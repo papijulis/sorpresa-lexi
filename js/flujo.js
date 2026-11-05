@@ -80,10 +80,12 @@
 
   function medir() {
     movil = E.vw <= 768;
-    dpr = Math.min(window.devicePixelRatio || 1, movil ? 1.5 : 2);
-    W = E.vw; H = E.vh; diag = Math.sqrt(W * W + H * H);
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    var nd = Math.min(window.devicePixelRatio || 1, movil ? 1.5 : 2);
+    if (E.vw !== W || E.vh !== H || nd !== dpr) {   // el lienzo solo se rehace si cambió la pantalla
+      dpr = nd; W = E.vw; H = E.vh; diag = Math.sqrt(W * W + H * H);
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
     var t = M.anclas(ANCLAS);
     for (var i = 0; i < t.length; i++) tops[i] = t[i] === null ? (i ? tops[i - 1] + 800 : 0) : t[i];
     heroH = Math.max(1, hero.offsetHeight);
@@ -107,7 +109,10 @@
     out[o + 1] = S.cy * H + a * sinT + b * cosT;
   }
 
-  var ultimoOp = -1, hOp = -1;
+  var ultimoOp = -1, hOp = -1, ultimoDibujo = 0, ultimoYDibujo = -1, quieto = 0;
+  var po = new Float32Array(2);
+  /* desenfoque del inicio solo donde sale barato: escritorio y sin modo ligero */
+  var conBlur = function () { return E.vw > 768 && !(typeof LIGHT_MODE !== 'undefined' && LIGHT_MODE); };
   function cuadro(E) {
     /* --- fusión: tramo 30 %–85 % del inicio, con inercia --- */
     var objetivo = M.clamp((E.y - heroH * .30) / (heroH * .55), 0, 1);
@@ -120,7 +125,7 @@
       hOp = e;
       hero.style.opacity = (1 - e).toFixed(3);
       hero.style.transform = e > .001 ? 'scale(' + (1 + .04 * e).toFixed(4) + ')' : '';
-      hero.style.filter = e > .01 ? 'blur(' + (6 * e).toFixed(2) + 'px)' : '';
+      hero.style.filter = e > .01 && conBlur() ? 'blur(' + (6 * e).toFixed(2) + 'px)' : '';
       hero.style.pointerEvents = e > .6 ? 'none' : '';
     }
 
@@ -130,13 +135,22 @@
       return;
     }
 
+    /* --- ritmo de dibujo: a 60 fps mientras hay scroll o la fusión se mueve; quieto, ~24 fps
+       (la ondulación es lentísima); en modo ligero, siempre ~30 fps --- */
+    if (E.y !== ultimoYDibujo || Math.abs(objetivo - fusS) > .001) { quieto = 0; ultimoYDibujo = E.y; } else quieto += E.dt;
+    var ligero = typeof LIGHT_MODE !== 'undefined' && LIGHT_MODE;
+    var intervalo = ligero ? 33 : (quieto > 1200 ? 41 : 0);
+    if (intervalo && E.t - ultimoDibujo < intervalo) return;
+    var dtDibujo = ultimoDibujo ? Math.min(100, E.t - ultimoDibujo) : E.dt;
+    ultimoDibujo = E.t;
+
     /* --- keyframe según la sección visible, con inercia --- */
     var ref = E.y + E.vh * .35, i = 0;
     while (i < tops.length - 2 && ref >= tops[i + 1]) i++;
     var f = M.suave((ref - tops[i]) / Math.max(1, tops[i + 1] - tops[i]));
     var A = KF[i], B = KF[Math.min(i + 1, KF.length - 1)];
     for (var key in T) T[key] = A[key] + (B[key] - A[key]) * f;
-    var k = 1 - Math.pow(1 - .06, E.dt / 16.7);
+    var k = 1 - Math.pow(1 - .06, dtDibujo / 16.7);
     for (key in S) S[key] += (T[key] - S[key]) * k;
     cosT = Math.cos(S.th); sinT = Math.sin(S.th);
     fase = E.t * .00007;
@@ -148,13 +162,14 @@
     ctx.globalCompositeOperation = 'lighter';
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-    var fx = foco.x - E.y * 0 , fy = foco.y - E.y * (0.55 + .0);   // el foco sube con el inicio (parallax)
+    var fx = foco.x, fy = foco.y - E.y * .55;   // el foco sube con el inicio, más lento que el scroll (parallax)
     var rad = Math.min(W, H) * .17;
     var lineas = e;            // 0 = solo polvo, 1 = trazos continuos
     var e15 = Math.pow(e, 1.4);
 
-    for (var j = 0; j < NR; j++) {
-      var q = j / (NR - 1) - .5;
+    var nr = ligero ? Math.ceil(NR / 2) : NR;
+    for (var j = 0; j < nr; j++) {
+      var q = j / (nr - 1) - .5;
       var central = 1 - Math.min(1, Math.abs(q) * 1.5);
       var hue = 262 + q * 24 + (j % 3) * 3;
       var base = (.16 + .26 * central) * e15;
@@ -181,10 +196,9 @@
 
     /* polvo de luz que acompaña a los listones */
     if (e > .2) {
-      var po = new Float32Array(2);
       for (var m = 0; m < polvo.length; m++) {
         var pl = polvo[m];
-        pl.u += pl.v * E.dt; if (pl.u > 1) pl.u -= 1;
+        pl.u += pl.v * dtDibujo; if (pl.u > 1) pl.u -= 1;
         punto(pl.j - .5, pl.u, po, 0);
         var tw = .35 + .65 * Math.abs(Math.sin(E.t * .0009 + pl.f));
         ctx.fillStyle = 'hsla(' + (270 + pl.j * 20).toFixed(0) + ',100%,90%,' + (tw * .55 * e).toFixed(3) + ')';

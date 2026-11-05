@@ -51,7 +51,12 @@
     function fuente(px) { return '600 ' + px + 'px ' + FUENTE; }
 
     /* ---- mosaico: se calcula una vez por tamaño ---- */
+    var ultimaClave = '';
     function medir(w, h, K, dpr_) {
+      /* el mosaico es caro (miles de intentos): si el tamaño no cambió, se reutiliza */
+      var clave = Math.round(w) + 'x' + Math.round(h) + '@' + dpr_ + ':' + document.documentElement.dataset.cielo;
+      if (clave === ultimaClave && palabras.length) { reiniciar(); return; }
+      ultimaClave = clave;
       W = w; H = h; dpr = dpr_;
       canvas.width = S.width = Math.round(W * dpr); canvas.height = S.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); sctx.setTransform(dpr, 0, 0, dpr, 0, 0);

@@ -84,8 +84,6 @@
   }
   .shake-anim { animation: shakeX 0.55s ease; }
 
-  @keyframes softFloat { 0%,100%{transform:translate3d(0,0,0);} 50%{transform:translate3d(0,-10px,0);} }
-  .float-soft { animation: softFloat 4.5s ease-in-out infinite; }
 
   @keyframes pulseHeart {
     0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(var(--dorado-rgb), 0.6)); }

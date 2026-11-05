@@ -67,7 +67,7 @@
 .dock-nota.on { opacity: 1; transform: translate(-50%, 0); }
 
 /* el aviso (toast) sube para no taparse con el dock */
-#toast { bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
+#toast { bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); z-index: var(--z-overlay); }
 main { padding-bottom: 5.5rem; }
 
 /* ícono del cielo: sol / atardecer / luna según el estado */

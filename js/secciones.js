@@ -82,7 +82,7 @@ function renderCalendar() {
       heart.className = 'text-sm leading-none mt-0.5 ' + (memory.special ? 'heart-special' : '');
       heart.style.color = memory.special ? 'var(--dorado-500)' : 'rgba(var(--pergamino-rgb), .35)';
       cell.appendChild(heart);
-      cell.addEventListener('click', () => openModal({ icon: memory.special ? 'i-corazon-lleno' : 'i-corazon', title: memory.display, body: memory.text }));
+      hacerClicable(cell, () => openModal({ icon: memory.special ? 'i-corazon-lleno' : 'i-corazon', title: memory.display, body: memory.text }), memory.display + ': ver recuerdo');
     }
     calGrid.appendChild(cell);
   }
@@ -254,20 +254,20 @@ function playDedicatedSong(title) {
 
 function milestoneBodyHTML(hito) {
   const p = hito.premio;
-  const frase = `<p class="font-hand text-lg" style="color:#B45309;">${hito.frase}</p>`;
+  const frase = `<p class="font-hand text-lg" style="color:var(--dorado-500);">${hito.frase}</p>`;
   if (p.tipo === 'foto') {
     let html = frase + pictureHTML(p.src, p.caption || '', 'style="width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-top:14px;box-shadow:0 14px 30px rgba(0,0,0,.45);"');
-    if (p.caption) html += `<p class="font-hand text-base mt-2" style="color:#3B2A1A;">${p.caption}</p>`;
+    if (p.caption) html += `<p class="font-hand text-base mt-2" style="color:rgba(var(--pergamino-rgb), .8);">${p.caption}</p>`;
     return html;
   }
   if (p.tipo === 'cancion') {
-    return frase + `<p class="font-ui text-xs mt-3" style="color:#7E22CE;">${ico('i-nota', 'ico-sm')} Sonando para ti: <strong>${p.valor}</strong></p>`;
+    return frase + `<p class="font-ui text-xs mt-3" style="color:var(--orquidea-400);">${ico('i-nota', 'ico-sm')} Sonando para ti: <strong>${p.valor}</strong></p>`;
   }
   if (p.tipo === 'carta') {
-    return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:#3B2A1A;">${p.texto}</p>`;
+    return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:var(--pergamino-50);">${p.texto}</p>`;
   }
   if (p.tipo === 'final') {
-    return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:#7E22CE;">${REASONS[secretIndex].texto}</p>`;
+    return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:var(--lavanda-200);">${REASONS[secretIndex].texto}</p>`;
   }
   return '';
 }
@@ -317,7 +317,7 @@ jarBtn.addEventListener('click', () => {
       openModal({
         icon: hito.premio.tipo === 'final' ? 'brillo' : 'i-sobre-corazon',
         title: hito.premio.tipo === 'final' ? 'Encontraste las 100 razones' : 'Una razón por la que eres mi todo',
-        bodyHTML: `<span>${REASONS[idx].texto}</span><div style="margin-top:18px;padding-top:18px;border-top:1px solid rgba(0,0,0,.12);">${milestoneBodyHTML(hito)}</div>`,
+        bodyHTML: `<span>${REASONS[idx].texto}</span><div style="margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14);">${milestoneBodyHTML(hito)}</div>`,
       });
     } else {
       openModal({ icon: 'i-sobre-corazon', title: 'Una razón por la que eres mi todo', body: REASONS[idx].texto });
@@ -333,8 +333,10 @@ function renderPolaroidGrid(gridEl, photos) {
     const rotateBase = rand(-7, 7);
     const card = document.createElement('div');
     card.className = 'polaroid reveal w-32 sm:w-40';
+    /* el escalonado solo para la entrada: luego se quita para que el hover responda al instante */
     card.style.transitionDelay = (i * 90) + 'ms';
-    card.style.transform = `rotate(${rotateBase.toFixed(1)}deg)`;
+    card.addEventListener('transitionend', () => { card.style.transitionDelay = ''; }, { once: true });
+    card.style.setProperty('--rot', rotateBase.toFixed(1) + 'deg');
     card.innerHTML = `
       ${pictureHTML(p.src, p.caption, `onerror="this.replaceWith(Object.assign(document.createElement('div'), { className: 'img-fallback' }))"`)}
       <p class="font-hand text-center text-base mt-3" style="color:#3B2A1A;">${p.caption}</p>
@@ -346,12 +348,10 @@ function renderPolaroidGrid(gridEl, photos) {
         const py = (e.clientY - rect.top) / rect.height - 0.5;
         card.style.transform = `rotate(${rotateBase.toFixed(1)}deg) rotateX(${(-py * 16).toFixed(2)}deg) rotateY(${(px * 16).toFixed(2)}deg) translateY(-6px) scale(1.06)`;
       });
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = `rotate(${rotateBase.toFixed(1)}deg)`;
-      });
+      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
     }
     card.style.cursor = 'pointer';
-    card.addEventListener('click', () => {
+    hacerClicable(card, () => {
       if (p.src.includes('flores-panchito')) {
         card.classList.remove('panchito-wiggle');
         void card.offsetWidth;
@@ -360,7 +360,7 @@ function renderPolaroidGrid(gridEl, photos) {
         if (typeof spawnSparkleBurst === 'function') spawnSparkleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 16, true);
       }
       openLightbox(p.src, p.caption, photos, i);
-    });
+    }, 'Ver foto: ' + (p.caption || 'foto ' + (i + 1)));
     gridEl.appendChild(card);
     revealObserver.observe(card);
   });

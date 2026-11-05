@@ -14,30 +14,18 @@
     background: var(--pergamino-50); padding: 12px 12px 40px 12px;
     box-shadow: 0 14px 30px rgba(0,0,0,0.45);
     transition: transform .25s ease-out, box-shadow .25s ease-out, opacity .8s ease;
-    transform-style: preserve-3d;
+    transform-style: preserve-3d; transform: rotate(var(--rot, 0deg));
   }
+  /* la entrada al bajar compone con el giro de cada polaroid (antes el transform inline la anulaba) */
+  .polaroid.reveal { transform: translateY(24px) rotate(var(--rot, 0deg)); }
+  .polaroid.reveal.in-view { transform: rotate(var(--rot, 0deg)); }
+  .polaroid:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 4px; }
   .polaroid:hover { will-change: transform; }
   .polaroid img, .polaroid .img-fallback { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: linear-gradient(135deg,var(--pergamino-100),#F59E0B33); }
 
-  /* ---- letter ---- */
-  .letter-scroll {
-    background: #FAF5EB; position: relative; overflow: hidden;
-    background-image:
-      radial-gradient(circle at 8% 12%, rgba(245,158,11,0.08) 0, transparent 45%),
-      radial-gradient(circle at 92% 88%, rgba(var(--amatista-rgb), 0.08) 0, transparent 45%);
-    color: var(--tinta);
-  }
+  /* ---- tinta (cartas del final) ---- */
   .ink-hidden { opacity: 0; filter: blur(3px); transition: opacity .9s ease, filter .9s ease; }
   .ink-in { opacity: 1; filter: blur(0); }
-  .wax-seal {
-    width: 58px; height: 58px; border-radius: 50%;
-    background: radial-gradient(circle at 34% 30%, #c0374f, #7f1d2e 72%);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Playfair Display', serif; color: #f5d7c8; font-weight: 700; font-size: 22px;
-    box-shadow: 0 4px 10px rgba(0,0,0,.4), inset 0 2px 4px rgba(255,255,255,.25);
-    margin-left: auto; margin-top: 1.25rem;
-  }
-  .flourish { position: absolute; opacity: 0.16; pointer-events: none; }
   /* botones modernos de la interfaz: icono redondo y píldora suave */
   .btn-icono {
     display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;

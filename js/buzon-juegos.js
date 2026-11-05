@@ -201,7 +201,7 @@ function renderBuzon() {
       <p class="font-ui text-[11px] sm:text-xs text-parchment/50 mt-1">${subText}</p>
       ${openable && !leida ? '<span class="buzon-unread-dot"></span>' : ''}
     `;
-    card.addEventListener('click', () => {
+    hacerClicable(card, () => {
       if (openable) {
         openCarta(carta, card);
       } else if (carta.desbloqueaCon === 'caceria') {
@@ -211,24 +211,36 @@ function renderBuzon() {
       } else {
         showToast(`Esta carta se abre el ${carta.apertura.split('-').reverse().join('/')}`);
       }
-    });
+    }, carta.titulo + (openable ? (leida ? ', leída' : ', nueva') : ', cerrada'));
     buzonGrid.appendChild(card);
   });
   updateBuzonDot();
 }
 
+/* al cerrar una vista el foco vuelve a quien la abrió (o a su botón del dock) */
+function volverFoco(el, defecto) {
+  const destino = el && el !== document.body && document.contains(el) && !el.closest('[inert]') ? el : defecto;
+  if (destino && destino.focus) destino.focus({ preventScroll: true });
+}
+let buzonOrigen = null, juegosOrigen = null;
 function openBuzonView(origen) {
+  if (!viewBuzon.classList.contains('open')) buzonOrigen = document.activeElement;
   renderBuzon();
   irisDesde(viewBuzon, origen);
   if (window.Sonidos) window.Sonidos.play('abrir');
+  viewBuzon.inert = false;
   viewBuzon.classList.add('open');
   history.replaceState(null, '', '#buzon');
+  buzonCloseBtn.focus({ preventScroll: true });
   canvasPauseReasons.add('buzon');
   updateCanvasPauseState();
 }
 function closeBuzonView() {
   if (window.Sonidos && viewBuzon.classList.contains('open')) window.Sonidos.play('cerrar');
+  const estabaAbierta = viewBuzon.classList.contains('open');
   viewBuzon.classList.remove('open');
+  viewBuzon.inert = true;
+  if (estabaAbierta) volverFoco(buzonOrigen, buzonToggleBtn);
   if (location.hash === '#buzon') history.replaceState(null, '', location.pathname + location.search);
   canvasPauseReasons.delete('buzon');
   updateCanvasPauseState();
@@ -236,7 +248,9 @@ function closeBuzonView() {
 buzonToggleBtn.addEventListener('click', openBuzonView);
 buzonCloseBtn.addEventListener('click', closeBuzonView);
 updateBuzonDot();
-if (location.hash === '#buzon') openBuzonView();
+/* recargar con #buzon / #juegos / #infinito ya no abre la vista encima de la pantalla de
+   entrada: se limpia el hash y el recorrido empieza como siempre */
+if (/^#(buzon|juegos|infinito)$/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
 
 /* ======================================================================
    PRÓXIMO MESIVERSARIO — tarjeta en el Jardín + celebración el día 28
@@ -328,7 +342,7 @@ function renderJuegosGrid() {
       <p class="font-ui text-xs" style="color:rgba(253,251,247,.6);">${juego.descripcion}</p>
       ${juego.progressLabel ? `<p class="juego-card-progress">${juego.progressLabel()}</p>` : ''}
     `;
-    card.addEventListener('click', () => launchJuego(juego));
+    hacerClicable(card, () => launchJuego(juego), juego.titulo);
     juegosGridEl.appendChild(card);
   });
 
@@ -341,9 +355,9 @@ function renderJuegosGrid() {
       <p class="font-ui text-xs" style="color:rgba(253,251,247,.6);">${window.JuegoCaceria.descripcion}</p>
       <p class="juego-card-progress">${window.JuegoCaceria.progressLabel()}</p>
     `;
-    card.addEventListener('click', () => {
+    hacerClicable(card, () => {
       showToast(`Corazones encontrados: ${window.JuegoCaceria.progressLabel()}. Están casi invisibles por todo el sitio — fíjate bien.`);
-    });
+    }, window.JuegoCaceria.titulo);
     juegosGridEl.appendChild(card);
   }
 }
@@ -369,25 +383,30 @@ function exitJuego() {
 juegoExitBtn.addEventListener('click', exitJuego);
 
 function openJuegosView(origen) {
+  if (!viewJuegos.classList.contains('open')) juegosOrigen = document.activeElement;
   renderJuegosGrid();
   irisDesde(viewJuegos, origen);
   if (window.Sonidos) window.Sonidos.play('abrir');
+  viewJuegos.inert = false;
   viewJuegos.classList.add('open');
   history.replaceState(null, '', '#juegos');
+  juegosCloseBtn.focus({ preventScroll: true });
   canvasPauseReasons.add('juegos');
   updateCanvasPauseState();
 }
 function closeJuegosView() {
   if (window.Sonidos && viewJuegos.classList.contains('open')) window.Sonidos.play('cerrar');
   exitJuego();
+  const estabaAbierta = viewJuegos.classList.contains('open');
   viewJuegos.classList.remove('open');
+  viewJuegos.inert = true;
+  if (estabaAbierta) volverFoco(juegosOrigen, juegosToggleBtn);
   canvasPauseReasons.delete('juegos');
   updateCanvasPauseState();
   if (location.hash === '#juegos') history.replaceState(null, '', location.pathname + location.search);
 }
 juegosToggleBtn.addEventListener('click', openJuegosView);
 juegosCloseBtn.addEventListener('click', closeJuegosView);
-if (location.hash === '#juegos') openJuegosView();
 
 function updateJuegosDot() {
   if (!window.JuegoCaceria || !juegosDot) return;

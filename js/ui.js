@@ -26,16 +26,36 @@ function openModal({ icon = 'i-corazon-lleno', title = '', body = '', bodyHTML =
   modalTitle.textContent = title;
   if (bodyHTML) modalBody.innerHTML = bodyHTML; else modalBody.textContent = body;
   if (nav) modalPanel.dataset.nav = nav; else delete modalPanel.dataset.nav;
+  const yaAbierto = modalBackdrop.classList.contains('open');
+  if (!yaAbierto) modalOrigen = document.activeElement;   // a donde vuelve el foco al cerrar
+  modalBackdrop.inert = false;
   modalBackdrop.classList.add('open');
+  if (!yaAbierto) document.getElementById('modal-close').focus({ preventScroll: true });
   if (!silencioso && window.Sonidos) window.Sonidos.play('abrir');
 }
+let modalOrigen = null;
 function closeModal() {
-  if (window.Sonidos && modalBackdrop.classList.contains('open')) window.Sonidos.play('cerrar');
+  if (!modalBackdrop.classList.contains('open')) return;
+  if (window.Sonidos) window.Sonidos.play('cerrar');
   modalBackdrop.classList.remove('open');
+  modalBackdrop.inert = true;
   delete modalPanel.dataset.nav;
+  if (modalOrigen && modalOrigen.focus && document.contains(modalOrigen)) modalOrigen.focus({ preventScroll: true });
+  modalOrigen = null;
 }
 document.getElementById('modal-close').addEventListener('click', closeModal);
 modalBackdrop.addEventListener('click', (e) => { if (e.target === modalBackdrop) closeModal(); });
+/* Esc cierra; Tab no se sale del panel mientras está abierto */
+document.addEventListener('keydown', (e) => {
+  if (!modalBackdrop.classList.contains('open')) return;
+  if (e.key === 'Escape') { closeModal(); e.preventDefault(); return; }
+  if (e.key !== 'Tab') return;
+  const f = Array.from(modalPanel.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])')).filter((x) => !x.disabled && x.offsetParent !== null);
+  if (!f.length) return;
+  const i = f.indexOf(document.activeElement);
+  if (e.shiftKey && i <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
+  else if (!e.shiftKey && (i === f.length - 1 || i === -1)) { f[0].focus(); e.preventDefault(); }
+});
 
 /* ======================================================================
    LIGHTBOX (Fase 5) — foto en grande, cierra con tap al fondo, Escape,
@@ -153,7 +173,10 @@ measureScrollMax();
 window.addEventListener('resize', measureScrollMax);
 window.addEventListener('load', measureScrollMax);
 setTimeout(measureScrollMax, 1500);
-window.addEventListener('scroll', updateScrollProgress, { passive: true });
+/* el alto cambia al abrir meses de la línea del tiempo, con las cartas del final, etc. */
+if ('ResizeObserver' in window) { let rq = 0; new ResizeObserver(() => { clearTimeout(rq); rq = setTimeout(() => { measureScrollMax(); updateScrollProgress(); }, 120); }).observe(document.body); }
+let ultimoScrollProgreso = -1;
+Motor.suscribir((E) => { if (E.y !== ultimoScrollProgreso) { ultimoScrollProgreso = E.y; updateScrollProgress(); } });
 
 /* ======================================================================
    SCROLL REVEAL (IntersectionObserver)

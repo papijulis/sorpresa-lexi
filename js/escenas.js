@@ -15,20 +15,26 @@
   var clamp = function (v) { return Math.max(0, Math.min(1, v)); };
 
   var visibles = new Set();
-  var pendiente = false;
+  var pendiente = false, ultimoY = -1;
 
-  function progreso(el) {
-    var r = el.getBoundingClientRect(), vh = window.innerHeight;
-    if (el.dataset.escena === 'trazo') return clamp((vh * 0.92 - r.top) / (vh * 0.3));
-    return clamp((vh - r.top) / (vh + r.height));
-  }
+  /* primero se LEEN todas las medidas y después se ESCRIBEN todas: intercalarlas forzaba un
+     recálculo de layout por elemento en cada cuadro de scroll */
   function actualizar() {
     pendiente = false;
-    visibles.forEach(function (el) { el.style.setProperty('--p', progreso(el).toFixed(3)); });
+    var vh = window.innerHeight, lista = [], valores = [];
+    visibles.forEach(function (el) { lista.push(el); valores.push(el.getBoundingClientRect()); });
+    for (var i = 0; i < lista.length; i++) {
+      var el = lista[i], r = valores[i];
+      var p = el.dataset.escena === 'trazo' ? clamp((vh * 0.92 - r.top) / (vh * 0.3)) : clamp((vh - r.top) / (vh + r.height));
+      el.style.setProperty('--p', p.toFixed(3));
+    }
   }
-  function programar() {
-    if (!pendiente) { pendiente = true; requestAnimationFrame(actualizar); }
-  }
+  function programar() { pendiente = true; }
+  /* el único lector de scroll es motor.js */
+  if (window.Motor) window.Motor.suscribir(function (E) {
+    if (E.y !== ultimoY) { ultimoY = E.y; pendiente = true; }
+    if (pendiente && visibles.size) actualizar();
+  });
 
   var ioEscenas = 'IntersectionObserver' in window ? new IntersectionObserver(function (entradas) {
     entradas.forEach(function (e) { if (e.isIntersecting) visibles.add(e.target); else visibles.delete(e.target); });
@@ -78,7 +84,6 @@
     document.querySelectorAll('[data-escena], [data-en-vista], .mov-florecer, .mov-revelar').forEach(registrar);
   }
 
-  window.addEventListener('scroll', programar, { passive: true });
   window.addEventListener('resize', programar);
   window.Escenas = { registrar: registrar, decorar: decorar };
   decorar();

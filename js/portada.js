@@ -71,10 +71,14 @@
     });
     if (hero) hero.style.setProperty('--sy', Math.min(sy, vh).toFixed(1));
   }
-  function pedir() { if (!pendiente) { pendiente = true; requestAnimationFrame(pintar); } }
+  /* sin rAF propio: se pinta desde el bucle de motor.js, solo cuando cambió el scroll o el puntero */
+  function pedir() { pendiente = true; }
+  Motor.suscribir(function (E) {
+    if (E.y !== sy) { sy = E.y; pendiente = true; }
+    if (pendiente) pintar();
+  });
 
   if (REDUCIDO) { raiz.style.setProperty('--par', '0'); frente.style.setProperty('--par', '0'); if (hero) hero.style.setProperty('--par', '0'); }
-  window.addEventListener('scroll', function () { sy = window.scrollY || 0; pedir(); }, { passive: true });
   window.addEventListener('resize', pedir);
   if (PUNTERO_FINO && !REDUCIDO) {
     window.addEventListener('pointermove', function (e) {
