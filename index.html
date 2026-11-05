@@ -42,6 +42,7 @@
 <link rel="stylesheet" href="./assets/css/cd.css">
 <link rel="stylesheet" href="./assets/css/movimiento.css">
 <link rel="stylesheet" href="./assets/css/cartas-final.css">
+<link rel="stylesheet" href="./assets/css/rueda.css">
 <link rel="stylesheet" href="./assets/css/infinito.css">
 <link rel="stylesheet" href="./assets/css/movil.css">
 </head>
@@ -516,6 +517,18 @@
   </div>
   <p class="font-ui text-xs sm:text-sm text-parchment/60 text-center max-w-md mx-auto mb-8 px-6">Cartas para cuando haga falta, mesiversarios, cápsulas del tiempo y alguna sorpresa escondida.</p>
   <div id="buzon-grid" class="app-view-body buzon-grid"></div>
+  <div class="rueda-wrap app-view-body">
+    <button type="button" id="rueda-abrir" class="rueda-circulo" aria-label="Para cuando cometo un error: 100 razones para pedir perdón"><span class="font-hand">para cuando cometo un error</span></button>
+  </div>
+</div>
+
+<!-- ===================== LA RUEDA DE LOS 100 PERDONES (se abre desde el círculo del Buzón) ===================== -->
+<div id="rueda" class="rueda" role="dialog" aria-modal="true" aria-label="Cien razones para pedir perdón" hidden>
+  <div class="rueda-lienzo"><canvas id="rueda-canvas" tabindex="0" aria-label="Rueda con cien formas de pedir perdón. Toca para pausar."></canvas></div>
+  <button type="button" id="rueda-cerrar" class="app-view-close rueda-cerrar" aria-label="Cerrar"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
+  <button type="button" id="rueda-repetir" class="btn-suave rueda-repetir"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg> de nuevo</button>
+  <p id="rueda-estado" class="sr-only" role="status" aria-live="polite"></p>
+  <ol id="rueda-lista" class="sr-only" aria-label="Las cien razones"></ol>
 </div>
 
 <!-- ===================== RINCÓN DE JUEGOS ===================== -->
@@ -664,6 +677,7 @@
 <script src="./contenido/frases.js"></script>
 <script src="./contenido/cupones.js"></script>
 <script src="./contenido/idiomas.js"></script>
+<script src="./contenido/rueda.js"></script>
 
 <script src="./js/juegos/cupones.js"></script>
 <script src="./js/juegos/memorama.js"></script>
@@ -680,6 +694,7 @@
 <script src="./js/buzon-juegos.js"></script>
 <script src="./js/extras.js"></script>
 <script src="./js/corazon-palabras.js"></script>
+<script src="./js/rueda.js"></script>
 <script src="./js/infinito.js"></script>
 <script src="./js/sonidos.js"></script>
 <script src="./js/micro.js"></script>

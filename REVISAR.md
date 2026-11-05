@@ -77,6 +77,10 @@ del corazón. Ajústalos en el arreglo `CODE` y en la función del abrazo.
 - **Las cartas del final:** título "Las cartas del final" y subtítulo "Baja despacio: cada una se abre, se lee y se guarda como un sobre."; etiquetas "Carta N de 3". Los textos de las cartas son los de siempre (no se tocaron).
 - **Barra superior:** "Caminos", "Cómo empezó", "Lo que guardo de ti", "Lo que hemos vivido", "Nuestra música", "Lo que sigue", "Cartas".
 
+## Rueda de perdones (`contenido/rueda.js`, borrador mío)
+
+Las 100 frases de "Para cuando cometo un error": las primeras 73 son tu base (traducidas del video), de la 74 a la 98 las escribí yo (más de reparar y de esperanza) y las dos últimas son "Te amo, y lo siento" y "¿Podemos empezar de nuevo?". El cierre es "Perdóname. Siempre.". Léelas y cambia las que no suenen a ti.
+
 ## Decisiones tomadas (sin texto que revisar)
 
 - Sin botón ni texto para contactar a Julio (WhatsApp eliminado), por tu
