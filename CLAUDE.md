@@ -1,7 +1,7 @@
 # Nuestro Jardín — reglas del proyecto
 
 Sitio romántico para Lexi, mantenido por Julio. Vive en GitHub Pages:
-https://papijulis.github.io/sorpresa-lexi/ (rama `main`, carpeta raíz).
+https://papijulis.github.io/para-mi-lexi/ (rama `main`, carpeta raíz; repo `papijulis/para-mi-lexi`). La dirección vieja https://papijulis.github.io/sorpresa-lexi/ es otro repo (`papijulis/sorpresa-lexi`) que solo redirige aquí conservando ruta, `?` y `#`, y cuyo `sw.js` desinstala el service worker viejo. No borrar ese repo.
 100% estático — **sin backend, sin base de datos, sin build obligatorio**.
 
 ## Contexto
