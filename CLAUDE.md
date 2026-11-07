@@ -207,7 +207,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - **Componentes** (`assets/css/ornamentos.css`): `.ico`, `.orn-divisor` (el trazo se dibuja con el scroll; se agrega solo bajo cada `.titulo-seccion` o donde pongas `data-orn-divisor`), `.tarjeta-flor` (esquinas de pétalo), `.btn-brillo` (brillo que pasa en botones dorados), flor de precarga, y el lenguaje de movimiento: `.mov-florecer`, `.mov-latido`, `.mov-revelar`, `.mov-halo` (con `prefers-reduced-motion` ya cubierto).
 - **Escenas** (`js/escenas.js`): motor de scroll sin librerías. `data-escena="trazo|pasada"` escribe `--p` (0→1) solo mientras el elemento está en pantalla; `.mov-*`/`data-en-vista` agregan `.en-vista` una vez. `Escenas.registrar(el)` para elementos creados por JS.
 - **Marca** (`node tools/generar-marca.js` + Inkscape, comandos impresos al final): íconos de la app, maskable, favicon y `og.jpg` con la misma flor maestra.
-- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `portada`, `capitulos`, `tipografia`, `linea-tiempo`, `cd`, `movimiento`, `cartas-final`, `rueda`, `flor-especial`, `infinito`, `botones`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `sonidos`, `gestos`, `motor`, `portada`, `capitulos`, `navegacion`, `flujo`, `barra`, `cartas-final`, `tarjetas`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
+- El CSS ya no vive en `index.html`: `utilities`, `tokens`, `base`, `componentes`, `vistas`, `jardin`, `ornamentos`, `navegacion`, `portada`, `capitulos`, `tipografia`, `linea-tiempo`, `cd`, `movimiento`, `cartas-final`, `rueda`, `flor-especial`, `infinito`, `pausa`, `botones`, `movil` (en ese orden; `movil.css` al final para ganar la cascada) y el JS en `js/` (`ornamentos`, `nucleo`, `pausa`, `motor-canvas`, `ui`, `audio`, `secciones`, `buzon-juegos`, `extras`, `infinito`, `sonidos`, `gestos`, `motor`, `portada`, `capitulos`, `navegacion`, `flujo`, `barra`, `cartas-final`, `tarjetas`, `escenas`); todo cargado como `<script src>` clásicos que comparten el ámbito global.
 
 ## Navegación integrada (rediseño, punto 9)
 
@@ -269,6 +269,15 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 ## Fondo con ritmo (rediseño, bloque 11)
 
 - `actualizarRitmo(t)` (audio.js, llamada desde `updateAudioBars` en cada cuadro del loop): lee los 2 primeros bins del analizador (graves), suaviza `ritmoNivel` y dispara `ritmoPulso` en cada golpe (energía > 1.25× el promedio móvil, > 0.32, con 260 ms de espera). Ambas variables viven en motor-canvas.js (cargan antes). Las usan `#bg-ritmo` (resplandor amatista/rosa abajo, solo `opacity`/`transform`), el latido de los lirios (`b.pulse`) y un bokeh que sube en los golpes fuertes. Sin música, en modo ligero o con movimiento reducido todo decae a 0. Probado con datos de graves simulados (el navegador de pruebas no entrega audio real).
+
+## En pausa: museo de recuerdos (2026-11-06, decisión de Julio)
+
+- Interruptor único `window.JARDIN_EN_PAUSA` en `contenido/config.js` (textos en `window.PAUSA`, con `desde: '2026-11-06'`). `js/pausa.js` (carga justo después de `nucleo.js`) pone `window.EN_PAUSA`, `html/body.en-pausa` y cambia rótulos del HTML (Parte V "Lo que quedó escrito", lema de la portada, subtítulo del Buzón, rueda arriba del Buzón, vela apagada con el mismo id `wish-candle` porque es ancla de la Cacería). Estilos en `assets/css/pausa.css` (antes de `botones.css`). Con `false` todo vuelve a como estaba; no se borró contenido.
+- **El contador nunca se detiene**, con o sin pausa (regla absoluta de Julio).
+- Buzón (`cartaEnPausa`/`cartaVisible` en buzon-juegos.js): las cartas por fecha con `apertura > PAUSA.desde` quedan selladas "en pausa" para siempre (fecha tachada); las ya abiertas por fecha no se muestran; las de juegos (`desbloqueaCon`) siguen igual. Sin puntitos, bandera ni cuenta de cartas nuevas. La tarjeta del mesiversario es una placa fija y no hay celebración del 28.
+- Línea del tiempo: termina en `.tl-pausa` (lirio cerrado + `PAUSA.cierre` + un segundo círculo de la rueda; `Rueda.abrir(boton)` acepta el botón de origen). Lirios del mes topados en `PAUSA.flores` (5). Cupones: se raspan, no se canjean.
+- Cartas del final: 4 (la cuarta es `CARTA_CUARTA` en cartas.js; con `texto` vacío muestra `pendiente`).
+- Más sereno: `SERENO` en motor-canvas.js (pétalos 60 % y más lentos, máx. 2 mariposas, destellos al 45 %), sin mariposas extra de primavera, ritmo de la música al 45 % y sin bokeh por golpe, flujo de luz más lento, brillos/latidos CSS más lentos.
 
 ## Sistema de botones (2026-11-05)
 

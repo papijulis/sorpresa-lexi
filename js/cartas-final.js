@@ -30,9 +30,16 @@
     { titulo: 'Carta del Capítulo 1', sub: '21 de septiembre de 2026', texto: window.LETTER },
     { titulo: (window.CARTA_FINAL && window.CARTA_FINAL.titulo) || 'Para seguir escribiendo', texto: window.CARTA_FINAL && window.CARTA_FINAL.texto },
     { titulo: (window.CARTA_PARA_LEXI && window.CARTA_PARA_LEXI.titulo) || 'Para Lexi', texto: window.CARTA_PARA_LEXI && window.CARTA_PARA_LEXI.texto },
-  ].filter(function (c) { return c.texto; });
+  ];
+  /* la cuarta carta (contenido/cartas.js): mientras Julio la escribe es un papel en blanco */
+  var C4 = window.CARTA_CUARTA;
+  if (C4) datos.push(C4.texto ? { titulo: C4.titulo || 'La cuarta carta', texto: C4.texto } : { titulo: C4.titulo || 'La cuarta carta', pendiente: C4.pendiente || 'Todavía la estoy escribiendo.' });
+  datos = datos.filter(function (c) { return c.texto || c.pendiente; });
   var N = datos.length;
   if (!N) return;
+  var NUM = ['', 'Una carta guardada', 'Dos cartas guardadas', 'Tres cartas guardadas', 'Cuatro cartas guardadas', 'Cinco cartas guardadas', 'Seis cartas guardadas'];
+  var cabSub = seccion.querySelector('.cartas-final-cab p');
+  if (cabSub && NUM[N]) cabSub.textContent = NUM[N] + ' en un solo sobre.';
   var estatica = E.reducido;
   if (estatica) seccion.classList.add('estatica');
 
@@ -104,6 +111,15 @@
     var sub = lector.querySelector('.carta-sub'); sub.textContent = c.sub || ''; sub.hidden = !c.sub;
     limpiarTinta();
     lcTexto.innerHTML = '';
+    if (c.pendiente) {
+      var pe = document.createElement('p');
+      pe.className = 'carta-pendiente font-hand' + (conTinta ? ' ink-hidden' : '');
+      pe.textContent = c.pendiente;
+      lcTexto.appendChild(pe);
+      if (conTinta) timers.push(setTimeout(function () { pe.classList.add('ink-in'); }, 260));
+      terminarPintado(i, c);
+      return;
+    }
     var ps = c.texto.split('\n\n');
     var els = ps.map(function (t, k) {
       var p = document.createElement('p');
@@ -116,6 +132,11 @@
     lcTexto.appendChild(sello);
     lcTexto.scrollTop = 0;
     if (conTinta) els.forEach(function (p, k) { timers.push(setTimeout(function () { p.classList.add('ink-in'); }, 120 + Math.min(k, 7) * 300)); });
+    terminarPintado(i, c);
+  }
+  function terminarPintado(i, c) {
+    lcTexto.classList.toggle('es-pendiente', !!c.pendiente);
+    lcTexto.scrollTop = 0;
     lcN.textContent = 'Carta ' + (i + 1) + ' de ' + N;
     btnAnt.disabled = i === 0;
     btnSig.disabled = i === N - 1;

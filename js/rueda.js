@@ -211,14 +211,16 @@
   }
 
   /* ---- abrir / cerrar el overlay ---- */
-  var rueda = null, abierta = false, tCierre = 0;
+  var rueda = null, abierta = false, tCierre = 0, desde = abrirBtn;
+  /* se abre desde el círculo del Buzón o desde otro (el del final de la línea del tiempo) */
   function origen() {
-    var r = abrirBtn.getBoundingClientRect();
+    var r = desde.getBoundingClientRect();
     overlay.style.setProperty('--ox', Math.round(r.left + r.width / 2) + 'px');
     overlay.style.setProperty('--oy', Math.round(r.top + r.height / 2) + 'px');
   }
-  function abrir() {
+  function abrir(boton) {
     if (abierta) return;
+    desde = boton && boton.getBoundingClientRect ? boton : abrirBtn;
     clearTimeout(tCierre);
     abierta = true; origen();
     overlay.hidden = false; void overlay.offsetWidth;
@@ -238,12 +240,12 @@
       overlay.hidden = true;
       canvasPauseReasons.delete('rueda'); updateCanvasPauseState();
     }, REDUCIDO ? 220 : 820);
-    abrirBtn.focus({ preventScroll: true });
+    desde.focus({ preventScroll: true });
   }
   function repetir() { if (rueda) rueda.destruir(); rueda = crearRueda(); if (estado) estado.textContent = 'Rueda reiniciada'; }
 
   lista.innerHTML = FRASES.map(function (f) { return '<li>' + f.replace(/</g, '&lt;') + '</li>'; }).join('');
-  abrirBtn.addEventListener('click', abrir);
+  abrirBtn.addEventListener('click', function () { abrir(abrirBtn); });
   cerrarBtn.addEventListener('click', cerrar);
   repetirBtn.addEventListener('click', repetir);
   document.addEventListener('keydown', function (e) {

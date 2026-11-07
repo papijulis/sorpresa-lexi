@@ -1,0 +1,67 @@
+/* ======================================================================
+   EN PAUSA (2026-11-06) — el Jardín como un pequeño museo de recuerdos.
+   Solo aplica con html.en-pausa / body.en-pausa (js/pausa.js, que lee
+   window.JARDIN_EN_PAUSA de contenido/config.js). Carga antes de botones.css.
+====================================================================== */
+
+/* ---- portada: una línea discreta bajo el texto ---- */
+.hero-lema {
+  margin-top: .9rem; font-size: clamp(1rem, 2.6vw, 1.2rem); letter-spacing: .01em;
+  color: rgba(var(--pergamino-rgb), .62);
+}
+
+/* ---- Buzón: sobres sellados en pausa ---- */
+.buzon-envelope.en-pausa { filter: saturate(.55); opacity: .82; }
+.buzon-envelope.en-pausa .buzon-seal { opacity: .75; }
+.fecha-pausa { text-decoration-thickness: 1px; text-decoration-color: rgba(var(--pergamino-rgb), .45); margin-right: .25rem; }
+
+/* la rueda de los perdones, arriba y más grande */
+.rueda-wrap.rueda-protagonista { margin: .4rem auto 2.4rem; padding-bottom: 0; }
+.rueda-protagonista .rueda-circulo { width: 11.5rem; height: 11.5rem; }
+.rueda-protagonista .rueda-circulo span { font-size: 1.35rem; }
+
+/* ---- la placa que reemplaza al "Próximo mesiversario" ---- */
+#mesiversario-card.placa { cursor: default; }
+#mesiversario-card.placa #mesiversario-title { font-size: clamp(1.15rem, 3.4vw, 1.45rem); }
+
+/* ---- cierre de la línea del tiempo ---- */
+.tl-pausa { display: flex; gap: 1.1rem; padding: 1.4rem 0 1rem; }
+.tl-flor-pausa { width: 34px !important; height: 34px !important; color: rgba(var(--pergamino-rgb), .45); }
+.tl-pausa.lit .tl-flor-pausa { color: var(--lavanda-200); filter: drop-shadow(0 0 8px rgba(var(--orquidea-rgb), .45)); }
+.tl-pausa-in { flex: 1; min-width: 0; padding-top: .35rem; }
+.tl-pausa-etq {
+  font-family: var(--fuente-ui); font-size: .72rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase;
+  color: rgba(var(--pergamino-rgb), .5); margin-bottom: .9rem;
+}
+.tl-pausa-texto p { font-size: clamp(1.08rem, 2.8vw, 1.25rem); line-height: 1.65; color: var(--pergamino-100); }
+.tl-pausa-texto p + p { margin-top: .85rem; }
+.tl-pausa-firma { margin-top: 1.1rem; text-align: right; font-size: 1.35rem; color: var(--dorado-500); }
+.tl-pausa-rueda { display: flex; justify-content: center; margin-top: 2.4rem; }
+.tl-pausa-rueda .rueda-circulo { width: 10rem; height: 10rem; }
+.tl-pausa-rueda .rueda-circulo span { font-size: 1.2rem; }
+
+/* ---- la vela del deseo, apagada ---- */
+.vela-apagada { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 6rem; height: 6rem; color: rgba(var(--pergamino-rgb), .42); }
+.vela-apagada .ico { width: 3.2rem; height: 3.2rem; }
+.vela-humo {
+  position: absolute; left: 50%; top: .35rem; width: 2px; height: 1.6rem; margin-left: -1px; border-radius: 2px;
+  background: linear-gradient(to top, rgba(var(--pergamino-rgb), .35), transparent);
+  animation: velaHumo 5.5s ease-in-out infinite; transform-origin: 50% 100%;
+}
+@keyframes velaHumo {
+  0% { opacity: 0; transform: translateY(4px) scaleY(.6) rotate(0deg); }
+  35% { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-14px) scaleY(1.2) rotate(8deg); }
+}
+
+/* ---- la cuarta carta, todavía en blanco ---- */
+.carta-texto.es-pendiente { display: flex; align-items: center; justify-content: center; }
+.carta-pendiente { text-align: center; font-size: clamp(1.25rem, 3.6vw, 1.55rem); color: rgba(var(--sepia-rgb), .75); padding: 3rem 1rem; }
+
+/* ---- todo más sereno: los latidos y brillos van más lentos ---- */
+html.en-pausa .btn-brillo::after { animation-duration: 12s; }
+html.en-pausa .shimmer-gold { animation-duration: 7s; }
+html.en-pausa .rueda-circulo { animation-duration: 6.5s; }
+html.en-pausa .mov-latido { animation-duration: 3.6s; }
+
+@media (prefers-reduced-motion: reduce) { .vela-humo { animation: none; opacity: .5; } }

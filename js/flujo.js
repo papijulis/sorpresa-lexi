@@ -153,7 +153,7 @@
     var k = 1 - Math.pow(1 - .06, dtDibujo / 16.7);
     for (key in S) S[key] += (T[key] - S[key]) * k;
     cosT = Math.cos(S.th); sinT = Math.sin(S.th);
-    fase = E.t * .00007;
+    fase = E.t * (window.EN_PAUSA ? .000045 : .00007);   // en pausa, la luz fluye más lento
 
     /* --- dibujo --- */
     var op = (.95 * Math.min(1, e * 1.25));

@@ -78,7 +78,7 @@ function applySeason() {
   } else {
     SEASON_PALETTE = null; // resto del año: paleta dorada/lavanda de siempre
   }
-  if (month >= 3 && month <= 5) BUTTERFLY_CAP = 7; // primavera: más mariposas
+  if (month >= 3 && month <= 5 && !window.EN_PAUSA) BUTTERFLY_CAP = 7; // primavera: más mariposas (en pausa, no)
 }
 applySeason();
 
@@ -217,7 +217,8 @@ checkAusencia();
 /* ---- una flor nueva por cada mes juntos (tope por rendimiento) ---- */
 function spawnMonthlyFlowers() {
   const meses = Math.max(0, diffFromStart(new Date()).months);
-  const count = Math.min(10, meses);
+  /* en pausa el jardín deja de sumar flores: se queda con las de los meses que vivimos */
+  const count = Math.min(10, window.EN_PAUSA ? Math.min(meses, (window.PAUSA && window.PAUSA.flores) || 5) : meses);
   /* en el teléfono el texto ocupa casi todo el ancho: los lirios del mes van a las orillas
      y más tenues, para que no compitan con los títulos ni con las tarjetas */
   const angosta = vw < 640;
@@ -296,6 +297,27 @@ function renderTimeline() {
     litTargets.push(mes);
     return mes;
   });
+
+  /* EN PAUSA: después del último mes, la enredadera termina en un lirio cerrado con unas
+     palabras de Julio (window.PAUSA.cierre) y la rueda de los perdones, a la vista */
+  if (window.EN_PAUSA && window.PAUSA && window.PAUSA.cierre) {
+    const cierre = document.createElement('section');
+    cierre.className = 'tl-pausa';
+    cierre.setAttribute('aria-label', 'En pausa');
+    const parrafos = window.PAUSA.cierre.split('\n\n').map((t) => `<p>${t.replace(/</g, '&lt;')}</p>`).join('');
+    cierre.innerHTML = `
+      <div class="timeline-dot-col">${ico('lirio-linea', 'timeline-flor tl-flor-pausa')}</div>
+      <div class="tl-pausa-in">
+        <p class="tl-pausa-etq">en pausa</p>
+        <div class="tl-pausa-texto font-hand">${parrafos}</div>
+        ${window.PAUSA.cierreFirma ? `<p class="tl-pausa-firma font-hand">${window.PAUSA.cierreFirma}</p>` : ''}
+        <div class="tl-pausa-rueda"><button type="button" class="rueda-circulo rueda-abrir-extra" aria-label="Para cuando cometo un error: 100 razones para pedir perdón"><span class="font-hand">para cuando cometo un error</span></button></div>
+      </div>`;
+    itemsContainer.appendChild(cierre);
+    litTargets.push(cierre);
+    const btn = cierre.querySelector('.rueda-abrir-extra');
+    btn.addEventListener('click', () => { if (window.Rueda) window.Rueda.abrir(btn); });
+  }
 
   /* ---- plegar / desplegar ---- */
   function setMes(mes, abrir) {

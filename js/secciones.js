@@ -402,7 +402,8 @@ function revealHeroTitle() {
 const wishCandle = document.getElementById('wish-candle');
 const wishFinal = document.getElementById('wish-final');
 let wishUsed = false;
-wishCandle.addEventListener('click', () => {
+/* en pausa la vela queda apagada (js/pausa.js la reemplaza): no hay botón */
+if (wishCandle && !window.EN_PAUSA) wishCandle.addEventListener('click', () => {
   if (wishUsed) return;
   wishUsed = true;
   const rect = wishCandle.getBoundingClientRect();

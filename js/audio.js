@@ -63,13 +63,14 @@ function actualizarRitmo(t) {
     ritmoNivel += (e - ritmoNivel) * 0.2;
     if (e > ritmoProm * 1.25 && e > 0.32 && t - ritmoUltimoGolpe > 260) {
       ritmoPulso = 1; ritmoUltimoGolpe = t;
-      if (e > 0.6 && bokehs.length < 14) spawnBokeh(rand(vw * 0.15, vw * 0.85), rand(vh * 0.45, vh * 0.95), 1);
+      if (e > 0.6 && bokehs.length < 14 && !window.EN_PAUSA) spawnBokeh(rand(vw * 0.15, vw * 0.85), rand(vh * 0.45, vh * 0.95), 1);
     }
   } else {
     ritmoNivel *= 0.92; ritmoPulso *= 0.92;
   }
   ritmoPulso *= 0.9;
-  const v = suena || ritmoNivel > 0.01 ? Math.min(1, 0.18 + ritmoNivel * 0.62 + ritmoPulso * 0.4) : 0;
+  /* en pausa el fondo apenas respira con la música */
+  const v = (suena || ritmoNivel > 0.01 ? Math.min(1, 0.18 + ritmoNivel * 0.62 + ritmoPulso * 0.4) : 0) * (window.EN_PAUSA ? 0.45 : 1);
   if (Math.abs(v - ritmoPintado) > 0.012) {
     ritmoPintado = v;
     bgRitmoEl.style.opacity = v.toFixed(3);

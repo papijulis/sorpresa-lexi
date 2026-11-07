@@ -47,6 +47,17 @@ window.CARTA_PARA_LEXI = {
   borrador: false,
 };
 
+/* Cuarta carta del sobre final (2026-11-06). Julio la está escribiendo: mientras
+   `texto` esté vacío, el sobre muestra un papel en blanco con `pendiente`. Cuando
+   esté lista, basta pegar el texto (párrafos separados por una línea en blanco; el
+   último párrafo es la firma) y, si quieres, cambiar el título. */
+window.CARTA_CUARTA = {
+  titulo: "La cuarta carta",
+  pendiente: "Todavía la estoy escribiendo.",
+  texto: "",
+  borrador: true,
+};
+
 window.CARTAS = [
   {
     id: "mes-5",

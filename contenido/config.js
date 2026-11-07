@@ -3,6 +3,38 @@
 /* 28 de mayo de 2026, 00:00 hora de Ciudad de México (UTC−6 fijo): el mismo instante en cualquier zona del dispositivo */
 window.START_DATE = new Date('2026-05-28T00:00:00-06:00');
 
+/* ---- EN PAUSA (2026-11-06, decisión de Julio) ----
+   true = el Jardín queda como un pequeño museo de recuerdos: las cartas que
+   faltaban se quedan selladas "en pausa", las ya abiertas se guardan fuera del
+   Buzón, no hay mesiversarios ni avisos de carta nueva, los cupones ya no se
+   canjean, la vela queda apagada y todo se mueve más sereno. No se borra nada:
+   con false todo vuelve a ser como antes. EL CONTADOR NUNCA SE DETIENE, con o sin
+   pausa. Los textos de abajo son borrador (REVISAR.md). */
+window.JARDIN_EN_PAUSA = true;
+window.PAUSA = {
+  /* día en que se pausó: toda carta que se abría después de esta fecha se queda sellada para siempre */
+  desde: '2026-11-06',
+  lema: 'un pequeño museo de lo que fuimos',
+  buzon: 'Las cartas que faltaban se quedan aquí, selladas y en pausa. No se pierde ninguna.',
+  sello: 'en pausa',
+  placaTitulo: 'Desde el 28 de mayo de 2026',
+  placaTexto: 'y el contador no se detiene',
+  cupon: 'guardado',
+  cuponAviso: 'Este cupón se queda guardado, en pausa.',
+  vela: 'Aquí quedó nuestro deseo. Lo sigo guardando en mi corazón.',
+  parteTitulo: 'Lo que quedó escrito',
+  parteSub: 'cartas que se quedan guardadas',
+  /* al final de la línea del tiempo, después de septiembre */
+  cierre: `Aquí nuestra historia se queda en pausa.
+
+No la cierro: la dejo guardada tal como fue, con todo lo bonito que vivimos.
+
+Te voy a esperar el tiempo que necesites, hasta que estés lista y decidas qué sigue.
+
+Y pase lo que pase, te voy a seguir amando. Siempre.`,
+  cierreFirma: 'Julio',
+};
+
 window.MONTHS_SEQUENCE = [
   { year: 2026, month: 4, label: 'Mayo 2026' },
   { year: 2026, month: 5, label: 'Junio 2026' },

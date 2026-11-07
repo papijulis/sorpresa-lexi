@@ -8,6 +8,19 @@ Fuente del contenido nuevo: el banco de amor extraído del chat (citas
 textuales). El chat y el banco **no** están en este repositorio, que es
 público.
 
+## En pausa — museo de recuerdos (2026-11-06, `contenido/config.js` → `window.PAUSA`)
+
+Todos son borrador míos salvo donde se indica; edítalos ahí mismo.
+
+- **Cierre de la línea del tiempo** (`PAUSA.cierre`, firmado "Julio"): "Aquí nuestra historia se queda en pausa. / No la cierro: la dejo guardada tal como fue, con todo lo bonito que vivimos. / Te voy a esperar el tiempo que necesites, hasta que estés lista y decidas qué sigue. / Y pase lo que pase, te voy a seguir amando. Siempre."
+- **Portada** (`PAUSA.lema`): "un pequeño museo de lo que fuimos".
+- **Buzón** (`PAUSA.buzon`): "Las cartas que faltaban se quedan aquí, selladas y en pausa. No se pierde ninguna." · sello de cada sobre: "en pausa" · aviso al tocarlo: "Esta carta se queda guardada, sellada y en pausa."
+- **Placa** en lugar del próximo mesiversario: "Desde el 28 de mayo de 2026" / "y el contador no se detiene".
+- **Cupones** ya raspados: "guardado".
+- **Vela apagada** (`PAUSA.vela`): "Aquí quedó nuestro deseo. Lo sigo guardando en mi corazón."
+- **Parte V**: "Lo que quedó escrito" · "cartas que se quedan guardadas".
+- **Cuarta carta** (`contenido/cartas.js` → `CARTA_CUARTA`): título "La cuarta carta" y "Todavía la estoy escribiendo." mientras `texto` esté vacío. Cuando la termines, pega el texto ahí.
+
 ## Calendario (`contenido/recuerdos.js`)
 
 Entradas reescritas en versión positiva y sin nombres de terceros:

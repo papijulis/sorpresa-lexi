@@ -62,6 +62,10 @@ let SEASON_PALETTE = null; // set from the current month (Fase 4 — temporadas)
    partículas y se apaga el shadowBlur (caro en canvas). */
 const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 let LIGHT_MODE = REDUCED_MOTION;
+/* EN PAUSA (js/pausa.js, contenido/config.js): todo más sereno — menos pétalos y más lentos,
+   menos mariposas y destellos más discretos */
+const SERENO = !!window.JARDIN_EN_PAUSA;
+const SERENO_K = SERENO ? 0.62 : 1;
 let PARTICLE_CAP = LIGHT_MODE ? 25 : 55;
 let FIREFLY_CAP = LIGHT_MODE ? 8 : 18;
 if (LIGHT_MODE) document.body.classList.add('light-mode');
@@ -95,10 +99,10 @@ function spawnPetal() {
     x: rand(0, vw),
     y: isSunset ? vh + 20 : -20,
     size: rand(6, 13),
-    speedY: rand(0.4, 1.1) * (isSunset ? -1 : 1) * (isNight ? 0.7 : 1),
-    speedX: rand(-0.4, 0.4),
+    speedY: rand(0.4, 1.1) * (isSunset ? -1 : 1) * (isNight ? 0.7 : 1) * SERENO_K,
+    speedX: rand(-0.4, 0.4) * SERENO_K,
     rot: rand(0, Math.PI * 2),
-    rotSpeed: rand(-0.02, 0.02),
+    rotSpeed: rand(-0.02, 0.02) * SERENO_K,
     color: palette[Math.floor(rand(0, palette.length))],
     opacity: rand(0.5, 0.95),
     sway: rand(0, Math.PI * 2),
@@ -126,7 +130,7 @@ function updateParticles(t, k) {
       particles.splice(i, 1);
     }
   }
-  if (particles.length < (isNight ? Math.round(PARTICLE_CAP * 0.6) : PARTICLE_CAP) && t - lastPetalSpawn > 260) { spawnPetal(); lastPetalSpawn = t; }
+  if (particles.length < (isNight ? Math.round(PARTICLE_CAP * 0.6) : PARTICLE_CAP) && t - lastPetalSpawn > (SERENO ? 460 : 260)) { spawnPetal(); lastPetalSpawn = t; }
 }
 
 /* ---- botanical bezier lily ---- */
@@ -260,6 +264,7 @@ function spawnSparkleBurst(x, y, count, rising = false, sonar = rising) {
   if (sonar && window.Sonidos) window.Sonidos.play(count >= 12 ? 'premio' : 'corazon');
   if (sonar && window.Haptica) window.Haptica.vibrar(count >= 30 ? [20, 40, 30] : 12);
   const target = (rafId === null && !document.hidden) ? topSparkles : sparkles;
+  if (SERENO) count = Math.max(1, Math.round(count * 0.45));
   for (let i = 0; i < count; i++) {
     const angle = rising ? rand(-Math.PI * 0.75, -Math.PI * 0.25) : rand(0, Math.PI * 2);
     const speed = rising ? rand(0.3, 0.9) : rand(0.6, 3.2);
@@ -347,6 +352,7 @@ function spawnButterfly() {
 let BUTTERFLY_CAP = LIGHT_MODE ? 2 : 4; // sube en primavera (Fase 4 — temporadas), ver final del script
 /* teléfonos: menos partículas (pantalla chica, batería) */
 if (window.innerWidth < 640 && !LIGHT_MODE) { PARTICLE_CAP = 32; FIREFLY_CAP = 10; BUTTERFLY_CAP = 3; }
+if (SERENO) { PARTICLE_CAP = Math.round(PARTICLE_CAP * 0.6); BUTTERFLY_CAP = Math.min(BUTTERFLY_CAP, 2); }
 setInterval(() => { if (butterflies.length < BUTTERFLY_CAP && Math.random() < 0.7) spawnButterfly(); }, 3200);
 
 function updateButterflies(dt) {

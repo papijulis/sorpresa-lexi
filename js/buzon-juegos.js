@@ -61,7 +61,17 @@ function cartaIsOpenable(carta) {
       return false;
     }
   }
+  if (cartaEnPausa(carta)) return false;
   return getTodayDateString() >= carta.apertura;
+}
+/* EN PAUSA (js/pausa.js): las cartas por fecha que aún no llegaban se quedan selladas para
+   siempre; las que ya se habían abierto se guardan fuera del Buzón. Las de los juegos siguen igual. */
+function cartaEnPausa(carta) {
+  const desde = (window.PAUSA && window.PAUSA.desde) || getTodayDateString();
+  return !!window.EN_PAUSA && !carta.desbloqueaCon && carta.apertura > desde;
+}
+function cartaVisible(carta) {
+  return !window.EN_PAUSA || !!carta.desbloqueaCon || cartaEnPausa(carta);
 }
 
 const viewBuzon = document.getElementById('view-buzon');
@@ -71,7 +81,8 @@ const buzonToggleBtn = document.getElementById('buzon-toggle');
 const buzonCloseBtn = document.getElementById('buzon-close');
 
 function updateBuzonDot() {
-  const nuevas = window.CARTAS.filter((c) => cartaIsOpenable(c) && !buzonState.leidas.includes(c.id)).length;
+  /* en pausa no llegan cartas nuevas: sin puntito, sin bandera y sin cuenta */
+  const nuevas = window.EN_PAUSA ? 0 : window.CARTAS.filter((c) => cartaIsOpenable(c) && !buzonState.leidas.includes(c.id)).length;
   buzonDot.classList.toggle('hidden', nuevas === 0);
   /* la escena del Buzón en "Caminos del jardín": bandera arriba y cuenta de cartas nuevas */
   const escena = document.getElementById('escena-buzon');
@@ -97,7 +108,7 @@ function irisDesde(vista, origen) {
 }
 
 let cartaActualId = null;
-function cartasAbribles() { return window.CARTAS.filter(cartaIsOpenable); }
+function cartasAbribles() { return window.CARTAS.filter((c) => cartaVisible(c) && cartaIsOpenable(c)); }
 function marcarLeida(carta) {
   if (!buzonState.leidas.includes(carta.id)) { buzonState.leidas.push(carta.id); saveBuzonState(); }
 }
@@ -175,18 +186,21 @@ function openCarta(carta, cardEl) {
 function renderBuzon() {
   const today = getTodayDateString();
   buzonGrid.innerHTML = '';
-  window.CARTAS.forEach((carta) => {
+  window.CARTAS.filter(cartaVisible).forEach((carta) => {
     const openable = cartaIsOpenable(carta);
+    const pausada = cartaEnPausa(carta);
     const meta = TIPO_META[carta.tipo] || TIPO_META.sorpresa;
     const sealIcon = SELLO_META[carta.sello] || 'i-corazon-lleno';
     const leida = buzonState.leidas.includes(carta.id);
 
     const card = document.createElement('div');
-    card.className = 'buzon-envelope' + (openable ? '' : ' is-locked');
+    card.className = 'buzon-envelope' + (openable ? '' : ' is-locked') + (pausada ? ' en-pausa' : '');
     card.dataset.id = carta.id;
 
     let subText;
-    if (!openable && carta.desbloqueaCon) {
+    if (pausada) {
+      subText = `<s class="fecha-pausa">${carta.apertura.split('-').reverse().join('/')}</s> ${(window.PAUSA && window.PAUSA.sello) || 'en pausa'}`;
+    } else if (!openable && carta.desbloqueaCon) {
       subText = carta.pista || 'se desbloquea jugando';
     } else if (!openable) {
       const dias = daysBetween(today, carta.apertura);
@@ -196,14 +210,16 @@ function renderBuzon() {
     }
 
     card.innerHTML = `
-      <div class="buzon-seal" style="background:${meta.color}22;border:1.5px solid ${meta.color}66;color:${meta.color};">${ico(openable ? sealIcon : 'i-candado', 'ico-lg')}</div>
+      <div class="buzon-seal" style="background:${meta.color}22;border:1.5px solid ${meta.color}66;color:${meta.color};">${ico(openable || pausada ? sealIcon : 'i-candado', 'ico-lg')}</div>
       <p class="font-display text-sm sm:text-base text-parchment">${carta.titulo}</p>
       <p class="font-ui text-[11px] sm:text-xs text-parchment/50 mt-1">${subText}</p>
-      ${openable && !leida ? '<span class="buzon-unread-dot"></span>' : ''}
+      ${openable && !leida && !window.EN_PAUSA ? '<span class="buzon-unread-dot"></span>' : ''}
     `;
     hacerClicable(card, () => {
       if (openable) {
         openCarta(carta, card);
+      } else if (pausada) {
+        showToast('Esta carta se queda guardada, sellada y en pausa.');
       } else if (carta.desbloqueaCon === 'caceria') {
         showToast('Esta carta se desbloquea encontrando los 12 corazones escondidos por el sitio {i-corazon-lleno}');
       } else if (carta.desbloqueaCon) {
@@ -211,7 +227,7 @@ function renderBuzon() {
       } else {
         showToast(`Esta carta se abre el ${carta.apertura.split('-').reverse().join('/')}`);
       }
-    }, carta.titulo + (openable ? (leida ? ', leída' : ', nueva') : ', cerrada'));
+    }, carta.titulo + (pausada ? ', en pausa' : (openable ? (leida ? ', leída' : ', nueva') : ', cerrada')));
     buzonGrid.appendChild(card);
   });
   updateBuzonDot();
@@ -268,6 +284,18 @@ function nextMesiversarioDate(todayStr) {
 }
 
 function renderMesiversarioCard() {
+  /* en pausa: una placa fija, sin cuenta regresiva ni celebración del 28 */
+  if (window.EN_PAUSA) {
+    const P = window.PAUSA || {};
+    mesiversarioIcon.innerHTML = ico('lirio-mini', 'ico-lg');
+    mesiversarioTitle.textContent = P.placaTitulo || 'Desde el 28 de mayo de 2026';
+    mesiversarioBody.textContent = P.placaTexto || '';
+    mesiversarioCard.onclick = null;
+    mesiversarioCard.classList.add('placa');
+    mesiversarioCard.classList.remove('hover:scale-105', 'active:scale-95');
+    mesiversarioCard.setAttribute('aria-disabled', 'true');
+    return;
+  }
   const today = getTodayDateString();
   const day = Number(today.slice(8, 10));
   const todaysMesiversario = window.CARTAS.find((c) => c.tipo === 'mesiversario' && c.apertura === today);
@@ -298,6 +326,7 @@ function renderMesiversarioCard() {
 renderMesiversarioCard();
 
 function celebrateMesiversarioIfNeeded() {
+  if (window.EN_PAUSA) return;
   const today = getTodayDateString();
   if (Number(today.slice(8, 10)) !== 28) return;
   const key = 'jardin.mesiversario.celebrado.' + today;

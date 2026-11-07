@@ -116,6 +116,14 @@ window.JuegoCupones = (function () {
       reveal.appendChild(tag);
       return;
     }
+    /* en pausa los cupones se raspan y se leen, pero ya no se canjean */
+    if (window.EN_PAUSA) {
+      const tag = document.createElement('p');
+      tag.className = 'cupon-redeemed-tag';
+      tag.textContent = (window.PAUSA && window.PAUSA.cupon) || 'guardado';
+      reveal.appendChild(tag);
+      return;
+    }
     const btn = document.createElement('button');
     btn.className = 'cupon-redeem-btn btn-brillo';
     btn.textContent = 'Acepto';
