@@ -1,7 +1,7 @@
   /* ======================================================================
      MÓVIL — zonas seguras, toques de 44px, texto legible, sin hover pegado
   ====================================================================== */
-  /* lo fijo respeta el notch y la barra de inicio del teléfono (viewport-fit=cover) */
+  /* el scroll dentro de vistas y modal no se encadena a la página */
   .app-view, .modal-panel { overscroll-behavior: contain; }
 
   .clock-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
@@ -25,9 +25,7 @@
     .cal-section { padding-left: .75rem; padding-right: .75rem; }
     .cal-card { padding: .75rem; }
     .cal-card .grid { gap: .25rem; }
-    #mini-player-toggle { width: 2.75rem; height: 2.75rem; }
-    .app-view-close { width: 2.75rem; height: 2.75rem; }
-    #modal-close { top: .35rem; right: .5rem; width: 2.75rem; height: 2.75rem; }
+    #modal-close { top: .35rem; right: .5rem; }
     
     .cupon-redeem-btn { min-height: 2.5rem; padding-left: 1.1rem; padding-right: 1.1rem; }
     .cupon-card { aspect-ratio: 3 / 4; }
@@ -47,11 +45,17 @@
       column-gap: .9rem; align-items: center; text-align: left !important; padding: .75rem !important;
     }
     .song-select-card .vinyl-mini { grid-row: 1 / span 2; width: 64px !important; margin: 0 !important; font-size: 1.6rem; }
+    .song-select-card .vinyl-mini .ico { width: 3rem; height: 3rem; }
     .song-select-card p { margin: 0 !important; }
     .song-select-card .eq-wrap { grid-row: 1 / span 2; grid-column: 3; }
     .glass { backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
     .hero-panel.shown { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
     .modal-panel { max-height: 85vh; max-height: 85dvh; }
+  }
+  /* dock en teléfonos muy angostos (<360px): botones algo más estrechos para que quepa sin cortarse */
+  @media (max-width: 359px) {
+    .dock-btn { min-width: 2.75rem; padding-left: .2rem; padding-right: .2rem; }
+    .dock-musica { gap: .2rem; }
   }
   /* teléfonos muy angostos (<360px): cupones a una columna para que no se recorten */
   @media (max-width: 359px) {
@@ -69,6 +73,8 @@
     /* juegos en horizontal: el encabezado se esconde, "Salir" flota en la esquina y el lienzo
        toma el alto disponible (se queda vertical y centrado; antes pedían girar el teléfono) */
     #view-juegos.jugando { padding-top: calc(.5rem + env(safe-area-inset-top, 0px)); padding-bottom: calc(.5rem + env(safe-area-inset-bottom, 0px)); }
+    /* sin backdrop-filter: si no, la vista es el bloque contenedor de lo fixed y "Salir" se iría con su scroll */
+    #view-juegos.jugando { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(var(--abismo-rgb), .97); }
     #view-juegos.jugando .app-view-header, #view-juegos.jugando #juegos-intro { display: none; }
     #view-juegos.jugando .juego-exit-btn { position: fixed; top: calc(.5rem + env(safe-area-inset-top, 0px)); left: calc(.75rem + env(safe-area-inset-left, 0px)); z-index: 3; margin: 0; }
     .lirios-wrap, .constelacion-wrap, .curame-wrap { max-width: none; }
@@ -86,5 +92,5 @@
 
   @media (prefers-reduced-motion: reduce) {
     html, body { scroll-behavior: auto; }
-    * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
   }

@@ -1,7 +1,7 @@
 /* Cupones para raspar — tarjetas que Lexi destapa en el Rincón de
    Juegos. Al raspar uno aparece "Acepto": lo marca como aceptado
    (persistido) y muestra una nota romántica (NOTA_CUPON en config.js).
-   Quince cupones: en pantallas anchas son 5 filas de 3. Los íconos (icono) son ids del sprite js/ornamentos.js. Todo borrador — revisar en REVISAR.md. */
+   Quince cupones: en pantallas ≥1024px son 3 filas de 5. "canjeable" lo genera editor.html, pero hoy js/juegos/cupones.js no lo lee. Los íconos (icono) son ids del sprite js/ornamentos.js. Todo borrador — revisar en REVISAR.md. */
 window.CUPONES = [
   { id: "abrazo7h", titulo: "Un abrazo de 7 horas", descripcion: "Sin soltarnos, sin prisa.", icono: "i-abrazo", canjeable: true, borrador: true },
   { id: "semaforo", titulo: "Un beso en cada semáforo en rojo", descripcion: "Ya es de ley.", icono: "i-beso", canjeable: true, borrador: true },

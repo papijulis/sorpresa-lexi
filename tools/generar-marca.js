@@ -52,8 +52,8 @@ fs.writeFileSync(path.join(ROOT, 'assets/icons/icon-source.svg'), icono({ safe: 
 fs.writeFileSync(path.join(ROOT, 'assets/icons/icon-maskable-source.svg'), icono({ safe: true }));
 fs.writeFileSync(path.join(ROOT, 'assets/icons/favicon-source.svg'), favicon());
 fs.writeFileSync(path.join(ROOT, 'assets/img/og-source.svg'), og());
-console.log('marca: fuentes SVG generadas. Rasteriza con:');
-console.log(`  cd assets/icons && inkscape icon-source.svg -w 192 -h 192 -o icon-192.png && inkscape icon-source.svg -w 512 -h 512 -o icon-512.png`);
-console.log(`  inkscape icon-maskable-source.svg -w 192 -h 192 -o icon-maskable-192.png && inkscape icon-maskable-source.svg -w 512 -h 512 -o icon-maskable-512.png`);
-console.log(`  inkscape favicon-source.svg -w 32 -h 32 -o favicon-32.png`);
-console.log(`  cd ../img && inkscape og-source.svg -w 1200 -h 630 -o /tmp/og.png && convert /tmp/og.png -quality 90 og.jpg`);
+console.log('marca: fuentes SVG generadas. Rasteriza desde la raíz del repo con:');
+console.log(`  inkscape assets/icons/icon-source.svg -w 192 -h 192 -o assets/icons/icon-192.png && inkscape assets/icons/icon-source.svg -w 512 -h 512 -o assets/icons/icon-512.png`);
+console.log(`  inkscape assets/icons/icon-maskable-source.svg -w 192 -h 192 -o assets/icons/icon-maskable-192.png && inkscape assets/icons/icon-maskable-source.svg -w 512 -h 512 -o assets/icons/icon-maskable-512.png`);
+console.log(`  inkscape assets/icons/favicon-source.svg -w 32 -h 32 -o assets/icons/favicon-32.png`);
+console.log(`  inkscape assets/img/og-source.svg -w 1200 -h 630 -o /tmp/og.png && (magick /tmp/og.png -quality 90 assets/img/og.jpg || convert /tmp/og.png -quality 90 assets/img/og.jpg)`);

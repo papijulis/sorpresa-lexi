@@ -25,8 +25,6 @@ window.EN_PAUSA = !!window.JARDIN_EN_PAUSA;
   if (P.parteTitulo) {
     texto('#cap-5-t', P.parteTitulo);
     texto('#cap-5 .cap-sub', P.parteSub);
-    var cap5 = document.getElementById('cap-5');
-    if (cap5) cap5.dataset.nombre = 'V · ' + P.parteTitulo;
     texto('.cap-indice-item[data-cap="5"] span:last-child', P.parteTitulo);
     texto('.barra-enlace[href="#cap-5"] .barra-txt', P.parteTitulo);
     document.querySelectorAll('a[href="#cap-5"]:not(.barra-enlace):not(.cap-indice-item)').forEach(function (a) {

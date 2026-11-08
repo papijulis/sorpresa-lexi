@@ -1,6 +1,6 @@
 /* Memorama de nosotros — parejas con las fotos de fotos.js. Usa
-   window.FAVORITE_PHOTOS / window.POLAROIDS y openModal (globales del
-   inline script), referenciados solo dentro de funciones. */
+   window.FAVORITE_PHOTOS / window.POLAROIDS y openModal (globales de
+   los scripts principales), referenciados solo dentro de funciones. */
 window.JuegoMemorama = (function () {
   let mountEl = null;
   let cleanupFns = [];
@@ -30,7 +30,7 @@ window.JuegoMemorama = (function () {
     const deck = buildDeck();
     mount.innerHTML = `
       <div class="memorama-grid"></div>
-      <p class="memorama-status" id="memorama-status">Encuentra las parejas</p>
+      <p class="memorama-status" id="memorama-status" aria-live="polite">Encuentra las parejas</p>
     `;
     const grid = mount.querySelector('.memorama-grid');
     const statusEl = mount.querySelector('#memorama-status');
@@ -40,6 +40,8 @@ window.JuegoMemorama = (function () {
     let lock = false;
 
     function finish() {
+      // stop() vacía el mount: si ya salió del juego (o volvió a entrar), no abrir el modal viejo
+      if (!grid.isConnected) return;
       const banco = (window.FRASES && window.FRASES.length) ? window.FRASES : null;
       const frase = banco
         ? banco[Math.floor(Math.random() * banco.length)].texto
@@ -59,14 +61,18 @@ window.JuegoMemorama = (function () {
       const onClick = () => {
         if (lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
         card.classList.add('flipped');
+        card.setAttribute('aria-label', item.caption || 'Foto');
         flipped.push({ idx, item, card });
         if (flipped.length === 2) {
           lock = true;
           const [a, b] = flipped;
           if (a.item.pairId === b.item.pairId) {
             setTimeout(() => {
+              if (!grid.isConnected) return;
               a.card.classList.add('matched');
               b.card.classList.add('matched');
+              a.card.setAttribute('aria-disabled', 'true');
+              b.card.setAttribute('aria-disabled', 'true');
               matchedCount++;
               if (window.Acierto) window.Acierto('pareja');
               statusEl.textContent = a.item.caption || '¡Pareja encontrada!';
@@ -78,13 +84,20 @@ window.JuegoMemorama = (function () {
             setTimeout(() => {
               a.card.classList.remove('flipped');
               b.card.classList.remove('flipped');
+              a.card.setAttribute('aria-label', 'Carta ' + (a.idx + 1));
+              b.card.setAttribute('aria-label', 'Carta ' + (b.idx + 1));
               flipped = [];
               lock = false;
             }, 700);
           }
         }
       };
-      card.addEventListener('click', onClick);
+      // teclado y lector de pantalla (Enter / Espacio); hacerClicable vive en nucleo.js
+      if (typeof hacerClicable === 'function') {
+        hacerClicable(card, onClick, 'Carta ' + (idx + 1));
+      } else {
+        card.addEventListener('click', onClick);
+      }
       cleanupFns.push(() => card.removeEventListener('click', onClick));
       grid.appendChild(card);
     });

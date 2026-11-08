@@ -38,6 +38,12 @@ function setCielo(estado, silencioso) {
   isNight = estado === 'noche';
   document.body.classList.toggle('sunset-mode', isSunset);
   document.body.classList.toggle('night-mode', isNight);
+  /* la luna solo es parada de Tab y visible para lectores de pantalla de noche */
+  const luna = document.getElementById('night-moon');
+  if (luna) {
+    luna.tabIndex = isNight ? 0 : -1;
+    if (isNight) luna.removeAttribute('aria-hidden'); else luna.setAttribute('aria-hidden', 'true');
+  }
   /* en <html>: así los tokens de color (tokens.css) cambian de paleta con el cielo */
   document.documentElement.dataset.cielo = estado;
   const meta = document.querySelector('meta[name="theme-color"]');

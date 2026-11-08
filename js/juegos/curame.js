@@ -4,7 +4,7 @@
    y se recupera un poco, el tiempo sigue. Al aguantar DURACION_MS se
    guarda { completada: true } en jardin.curame.v1 y se desbloquea la
    carta con desbloqueaCon: "curame" (ver cartaIsOpenable() en
-   index.html). jardinStorage/openModal/etc. se usan solo dentro de
+   js/buzon-juegos.js). jardinStorage/openModal/etc. se usan solo dentro de
    funciones. */
 window.JuegoCurame = (function () {
   const STORAGE_KEY = 'jardin.curame.v1';
@@ -50,10 +50,10 @@ window.JuegoCurame = (function () {
     const arenaEl = mount.querySelector('#curame-arena');
     const replayBtn = mount.querySelector('#curame-replay');
 
-    let health, elapsed, lastT, nextSpawn, hearts, ended, grito;
+    let health, elapsed, lastT, nextSpawn, hearts, ended;
 
     function reset() {
-      health = 100; elapsed = 0; lastT = 0; nextSpawn = 400; hearts = []; ended = false; grito = 0;
+      health = 100; elapsed = 0; lastT = 0; nextSpawn = 400; hearts = []; ended = false;
       arenaEl.innerHTML = '';
       replayBtn.style.display = 'none';
       paint();
@@ -77,9 +77,9 @@ window.JuegoCurame = (function () {
       btn.style.left = x + 'px';
       btn.style.top = y + 'px';
       const heart = { el: btn, born: elapsed };
-      btn.addEventListener('pointerdown', (e) => {
+      const heal = (e) => {
         e.preventDefault();
-        if (ended || !btn.parentNode) return;
+        if (ended || !btn.parentNode || btn.classList.contains('popped')) return;
         health = Math.min(100, health + HEAL);
         btn.classList.add('popped');
         hearts = hearts.filter((h) => h !== heart);
@@ -88,7 +88,10 @@ window.JuegoCurame = (function () {
           const r = btn.getBoundingClientRect();
           spawnSparkleBurst(r.left + r.width / 2, r.top + r.height / 2, 6, true);
         }
-      });
+      };
+      btn.addEventListener('pointerdown', heal);
+      // teclado / lector de pantalla: click sintético con detail 0 (el toque real ya curó en pointerdown)
+      btn.addEventListener('click', (e) => { if (e.detail === 0) heal(e); });
       arenaEl.appendChild(btn);
       hearts.push(heart);
     }
@@ -105,13 +108,15 @@ window.JuegoCurame = (function () {
         spawnSparkleBurst(r.left + r.width / 2, r.top + r.height / 2, 60, true);
       }
       setTimeout(() => {
+        // ya salió del juego (stop() vacía el mount) o tocó "Jugar de nuevo": no abrir el modal viejo
+        if (!arenaEl.isConnected || !ended) return;
         if (typeof openModal === 'function') openModal({ icon: 'i-curame', title: '¡Me curaste!', body: 'Otra vez. Eres mi healer favorita. Se abrió una carta nueva en el Buzón.' });
       }, 350);
     }
 
     function loop(t) {
       if (!running) return;
-      // arena oculta (p. ej. teléfono en horizontal): el tiempo no corre, para que no se "gane" sin jugar
+      // arena sin layout (p. ej. vista o #juego-stage ocultos sin pasar por stop()): el tiempo no corre, para que no se "gane" sin jugar
       if (arenaEl.offsetParent === null) { lastT = 0; raf = requestAnimationFrame(loop); return; }
       const dt = lastT ? Math.min(t - lastT, 100) : 16;
       lastT = t;
@@ -119,7 +124,7 @@ window.JuegoCurame = (function () {
         elapsed += dt;
         const drain = 4 + (elapsed / DURACION_MS) * 4; // % por segundo
         health -= drain * (dt / 1000);
-        if (health <= 0) { health = 35; grito++; arenaEl.classList.add('shout'); setTimeout(() => arenaEl.classList.remove('shout'), 400); }
+        if (health <= 0) { health = 35; arenaEl.classList.add('shout'); setTimeout(() => arenaEl.classList.remove('shout'), 400); }
         nextSpawn -= dt;
         if (nextSpawn <= 0) { spawnHeart(); nextSpawn = 650 + Math.random() * 450; }
         for (let i = hearts.length - 1; i >= 0; i--) {

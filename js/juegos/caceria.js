@@ -1,7 +1,7 @@
 /* Cacería de corazones — 12 corazones casi invisibles repartidos por el
    sitio (no es un juego que se "lanza" como los demás: vive siempre
-   presente en el Jardín). init() se llama una sola vez al final del
-   script principal, cuando ya existen todos los elementos ancla
+   presente en el Jardín). init() se llama una sola vez desde
+   buzon-juegos.js en DOMContentLoaded, cuando ya existen todos los elementos ancla
    (galerías de fotos, buzón, juegos, etc). Al encontrar los 12 se abre
    la carta secreta con desbloqueaCon:"caceria" en cartas.js. */
 window.JuegoCaceria = (function () {
@@ -36,7 +36,24 @@ window.JuegoCaceria = (function () {
   }
   function saveState() { jardinStorage.set(STORAGE_KEY, JSON.stringify(state)); }
 
-  let state = loadState();
+  // Se lee en init() (DOMContentLoaded): este archivo carga ANTES que
+  // nucleo.js, donde vive jardinStorage, así que leer aquí daría vacío.
+  let state = null;
+
+  // Un corazón ya encontrado sale del orden de tabulación y del árbol de
+  // accesibilidad (es un control anidado dentro del botón que lo contiene).
+  function retirarDelFoco(el) {
+    el.tabIndex = -1;
+    if (document.activeElement === el) {
+      const anchor = el.parentElement;
+      if (anchor && anchor.tabIndex >= 0 && typeof anchor.focus === 'function') {
+        try { anchor.focus({ preventScroll: true }); } catch (e) { anchor.focus(); }
+      } else {
+        el.blur();
+      }
+    }
+    el.setAttribute('aria-hidden', 'true');
+  }
 
   function openSorpresaCarta() {
     const carta = (window.CARTAS || []).find((c) => c.desbloqueaCon === 'caceria');
@@ -49,10 +66,12 @@ window.JuegoCaceria = (function () {
   }
 
   function markFound(spotId, el) {
+    if (!state) state = loadState();
     if (state.encontrados.includes(spotId)) return;
     state.encontrados.push(spotId);
     saveState();
     el.classList.add('found');
+    retirarDelFoco(el);
 
     if (typeof spawnSparkleBurst === 'function') {
       const rect = el.getBoundingClientRect();
@@ -69,6 +88,7 @@ window.JuegoCaceria = (function () {
   }
 
   function init() {
+    state = loadState();
     SPOTS.forEach((spot) => {
       const anchor = document.querySelector(spot.selector);
       if (!anchor) return;
@@ -86,11 +106,22 @@ window.JuegoCaceria = (function () {
       if (spot.left) el.style.left = spot.left;
       if (spot.right) el.style.right = spot.right;
 
-      if (state.encontrados.includes(spot.id)) el.classList.add('found');
+      if (state.encontrados.includes(spot.id)) {
+        el.classList.add('found');
+        el.tabIndex = -1;
+        el.setAttribute('aria-hidden', 'true');
+      }
 
-      const onActivate = (e) => { e.stopPropagation(); markFound(spot.id, el); };
+      // Ya encontrado: deja pasar el clic al botón que lo contiene (Buzón,
+      // Cielo, nota de voz…) en vez de tragárselo para siempre.
+      const onActivate = (e) => {
+        if (state.encontrados.includes(spot.id)) return;
+        e.stopPropagation();
+        markFound(spot.id, el);
+      };
       el.addEventListener('click', onActivate);
       el.addEventListener('keydown', (e) => {
+        if (state.encontrados.includes(spot.id)) return;
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onActivate(e); }
       });
 

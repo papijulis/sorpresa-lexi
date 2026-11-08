@@ -47,7 +47,7 @@
   document.querySelectorAll('[data-tilt]').forEach(function (el) { registrar(el, [], false); });
   document.querySelectorAll(MAGNETICOS).forEach(function (el) { registrar(el, [], true); });
 
-  var actual = null;   // estado bajo el puntero
+  var actualTilt = null, actualMag = null;   // estados bajo el puntero (tarjeta y botón magnético, independientes)
   function apuntar(st, cx, cy, factor) {
     var r = st.el.getBoundingClientRect();
     if (!r.width) return;
@@ -58,22 +58,30 @@
     st.ax = px; st.ay = py;
   }
   function soltar(st) { if (!st) return; st.tx = 0; st.ty = 0; st.to = 0; st.dentro = false; st.ax = 0; st.ay = 0; }
-  function buscar(t) {
+  function buscarEn(t, sel) {
     if (!t || !t.closest) return null;
-    var el = t.closest('.tilt, ' + MAGNETICOS);
+    var el = t.closest(sel);
     return el ? porEl.get(el) || null : null;
   }
+  /* la tarjeta y el botón magnético que lleva dentro se siguen por separado:
+     pasar por el chip o por el play ya no endereza la tarjeta de golpe */
   function mover(cx, cy, target, factor) {
-    var st = buscar(target);
-    if (st !== actual) { soltar(actual); actual = st; }
-    if (st) apuntar(st, cx, cy, factor);
+    var tl = buscarEn(target, '.tilt');
+    var mg = buscarEn(target, MAGNETICOS);
+    if (tl && tl.mag) tl = null;
+    if (mg && !mg.mag) mg = null;
+    if (tl !== actualTilt) { soltar(actualTilt); actualTilt = tl; }
+    if (mg !== actualMag) { soltar(actualMag); actualMag = mg; }
+    if (tl) apuntar(tl, cx, cy, factor);
+    if (mg) apuntar(mg, cx, cy, factor);
   }
+  function soltarTodo() { soltar(actualTilt); soltar(actualMag); actualTilt = null; actualMag = null; }
   document.addEventListener('pointermove', function (e) { if (e.pointerType === 'mouse' || e.pointerType === 'pen') mover(e.clientX, e.clientY, e.target, 1); }, { passive: true });
   document.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) mover(t.clientX, t.clientY, document.elementFromPoint(t.clientX, t.clientY), .5); }, { passive: true });
   document.addEventListener('touchstart', function (e) { var t = e.touches[0]; if (t) mover(t.clientX, t.clientY, e.target, .5); }, { passive: true });
-  ['touchend', 'touchcancel'].forEach(function (n) { document.addEventListener(n, function () { soltar(actual); actual = null; }, { passive: true }); });
-  document.documentElement.addEventListener('pointerleave', function () { soltar(actual); actual = null; });
-  window.addEventListener('blur', function () { soltar(actual); actual = null; });
+  ['touchend', 'touchcancel'].forEach(function (n) { document.addEventListener(n, soltarTodo, { passive: true }); });
+  document.documentElement.addEventListener('pointerleave', soltarTodo);
+  window.addEventListener('blur', soltarTodo);
 
   function cuadro(E) {
     var k = 1 - Math.pow(1 - .14, E.dt / 16.7);

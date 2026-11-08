@@ -4,9 +4,11 @@
      Ciudad de México: de día recorre un arco de 6:00 a 18:00 (rosa al amanecer,
      dorado al mediodía); en atardecer queda bajo, ámbar; de noche, plata en la
      esquina de la luna. setCielo() (navegacion.js) llama Portada.actualizar().
-   • Parallax: el scroll escribe --sy y el puntero fino --mx/--my (−1…1) con un
-     solo requestAnimationFrame por movimiento. Con prefers-reduced-motion no hay
-     parallax (--par: 0). Todo se desvanece al bajar del inicio (--fade).
+   • Parallax: el scroll escribe --sy y el puntero fino --mx/--my (−1…1); se pinta
+     desde el bucle de motor.js (Motor.suscribir), sin rAF ni listener de scroll
+     propios, y solo cuando cambió el scroll o el puntero. Con
+     prefers-reduced-motion no hay parallax (--par: 0). Todo se desvanece al bajar
+     del inicio (--fade).
 ====================================================================== */
 (function () {
   'use strict';

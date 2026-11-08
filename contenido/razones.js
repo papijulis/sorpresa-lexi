@@ -5,7 +5,7 @@
    HITOS: premios especiales en 25/50/75/100 razones descubiertas.
    Julio puede agregar más razones normales al final del array sin tocar
    código — el contador, el anillo y los hitos ya existentes se ajustan
-   solos (ver index.html, sección "REASON JAR"). */
+   solos (ver js/secciones.js, sección "REASON JAR"). */
 window.REASONS = [
   // ---- Las 61 originales de la sorpresa del 21 de septiembre ----
   { texto: "Amo la Lexi real, que puedas ser exactamente quien eres.", borrador: false },

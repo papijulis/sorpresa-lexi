@@ -72,12 +72,9 @@
   /* ---- degradados de la firma ---- */
   --grad-oro: linear-gradient(to right, var(--dorado-500), var(--dorado-400));
   --grad-oro-diagonal: linear-gradient(135deg, var(--dorado-500), var(--ambar-500));
-  --grad-petalo: linear-gradient(to top, var(--ambar-500), #FEF08A);
-  --grad-noche: radial-gradient(circle at 50% 12%, var(--ciruela-700) 0%, var(--ciruela-800) 38%, var(--ciruela-900) 75%, var(--ciruela-950) 100%);
   --grad-cristal: linear-gradient(135deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .03));
 
   /* ---- radios ---- */
-  --radio-sm: .6rem;
   --radio-md: 1rem;
   --radio-lg: 1.5rem;
   --radio-xl: 2rem;
@@ -97,15 +94,11 @@
   --sombra-suave: 0 14px 30px rgba(0, 0, 0, .45);
   --sombra-honda: 0 20px 60px rgba(0, 0, 0, .6);
   --brillo-oro: 0 0 18px rgba(var(--dorado-rgb), .35);
-  --brillo-oro-fuerte: 0 0 30px rgba(var(--dorado-rgb), .6);
-  --brillo-amatista: 0 0 26px rgba(var(--amatista-rgb), .35);
-  --brillo-rosa: 0 0 22px rgba(var(--rosa-rgb), .4);
   --texto-sombra: 0 2px 14px rgba(var(--abismo-rgb), .85);
 
   /* ---- movimiento ---- */
   --ease-flor: cubic-bezier(.2, .8, .2, 1);        /* entrada suave, "florece" */
   --ease-rebote: cubic-bezier(.3, .7, .3, 1.4);     /* un poquito de rebote */
-  --ease-latido: cubic-bezier(.4, 0, .2, 1);
   --dur-rapida: .2s;
   --dur-media: .45s;
   --dur-lenta: .9s;

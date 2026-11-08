@@ -39,6 +39,15 @@
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30' fill='none' stroke='%23FFD700' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M2 28C2 13 13 2 28 2'/%3E%3Cpath d='M2 20C2 10 10 2 20 2' opacity='.55'/%3E%3Cpath d='M26.500 6.500c3 .2 4.500-1.500 4.500-4-2.800 0-4.500 1.200-4.500 4z' fill='%23FFD700' stroke='none'/%3E%3C/svg%3E") no-repeat center / contain;
   transition: opacity var(--dur-media) var(--ease-flor), transform var(--dur-media) var(--ease-flor);
 }
+/* con máscara, las esquinas toman --dorado-500 y cambian con el cielo (de noche, champán);
+   sin soporte se queda la imagen dorada fija de arriba */
+@supports ((mask-image: none) or (-webkit-mask-image: none)) {
+  .tarjeta-flor::before, .tarjeta-flor::after {
+    background: var(--dorado-500);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30' fill='none' stroke='%23000' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M2 28C2 13 13 2 28 2'/%3E%3Cpath d='M2 20C2 10 10 2 20 2' opacity='.55'/%3E%3Cpath d='M26.500 6.500c3 .2 4.500-1.500 4.500-4-2.800 0-4.500 1.200-4.500 4z' fill='%23000' stroke='none'/%3E%3C/svg%3E") no-repeat center / contain;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30' fill='none' stroke='%23000' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M2 28C2 13 13 2 28 2'/%3E%3Cpath d='M2 20C2 10 10 2 20 2' opacity='.55'/%3E%3Cpath d='M26.500 6.500c3 .2 4.500-1.500 4.500-4-2.800 0-4.500 1.200-4.500 4z' fill='%23000' stroke='none'/%3E%3C/svg%3E") no-repeat center / contain;
+  }
+}
 .tarjeta-flor::before { top: 8px; left: 8px; }
 .tarjeta-flor::after { bottom: 8px; right: 8px; transform: rotate(180deg); }
 .tarjeta-flor:hover::before, .tarjeta-flor:hover::after { opacity: .9; }

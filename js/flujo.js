@@ -19,7 +19,6 @@
   'use strict';
   var M = window.Motor, E = M.estado;
   var canvas = document.getElementById('flujo-luz');
-  var estatico = document.getElementById('flujo-estatico');
   var hero = document.querySelector('.hero-section');
   var heroPanel = document.getElementById('hero-panel');
   if (!canvas || !hero) return;
@@ -89,8 +88,9 @@
     var t = M.anclas(ANCLAS);
     for (var i = 0; i < t.length; i++) tops[i] = t[i] === null ? (i ? tops[i - 1] + 800 : 0) : t[i];
     heroH = Math.max(1, hero.offsetHeight);
-    var r = (heroPanel || hero).getBoundingClientRect();
-    foco.x = r.left + r.width / 2; foco.y = r.top + (E.y || 0) + r.height * .42;   // coordenada de página
+    var pEl = heroPanel || hero, px = 0, py = 0, n = pEl;
+    while (n) { px += n.offsetLeft; py += n.offsetTop; n = n.offsetParent; }   // posición de layout: sin el translate de portada.js ni la escala de la fusión
+    foco.x = px + pEl.offsetWidth / 2; foco.y = py + pEl.offsetHeight * .42;   // coordenada de página
   }
   var mt = 0;
   window.addEventListener('resize', function () { clearTimeout(mt); mt = setTimeout(medir, 160); });

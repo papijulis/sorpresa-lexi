@@ -45,7 +45,7 @@
   function vistaAbierta(id) { return document.getElementById(id).classList.contains('open'); }
   document.addEventListener('keydown', function (e) {
     if (e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
-    var k = e.key.toLowerCase();
+    var k = (e.key || '').toLowerCase();   // keydown sintéticos (autocompletado) pueden venir sin key
     if (k !== 'b' && k !== 'j') return;
     var t = e.target;
     if (t && (t.isContentEditable || /^(input|textarea|select)$/i.test(t.tagName))) return;
@@ -53,6 +53,9 @@
     if (document.getElementById('app-modal').classList.contains('open')) return;  // hay una carta abierta
     if (document.getElementById('lightbox').classList.contains('open')) return;
     if (typeof activeJuego !== 'undefined' && activeJuego) return;                // jugando: no estorbar
+    var rueda = document.getElementById('rueda'), flor = document.getElementById('flor-especial');
+    if ((rueda && !rueda.hidden) || (flor && !flor.hidden) ||
+        document.documentElement.classList.contains('carta-abierta')) return;   // rueda, flor 3D o lector de cartas abiertos
     var buzon = vistaAbierta('view-buzon'), juegos = vistaAbierta('view-juegos'), inf = vistaAbierta('view-infinito');
     if (inf) return;
     if (k === 'b') {

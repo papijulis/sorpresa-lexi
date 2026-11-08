@@ -24,8 +24,10 @@ body.sin-flujo #flujo-estatico {
 }
 /* el grano no aporta en pantallas chicas y es una capa fija más que Safari tiene que componer */
 @media (pointer: coarse) { #grano { display: none; } }
-/* el inicio se funde con scrub desde flujo.js: que no parpadee al empezar */
-.hero-section { will-change: opacity, transform; transform-origin: 50% 40%; }
+/* el inicio se funde con scrub desde flujo.js: que no parpadee al empezar. Solo transform: un
+   will-change con opacity/filter vuelve a la sección raíz de fondo y el backdrop-filter de
+   #hero-panel dejaría de difuminar los lirios */
+.hero-section { will-change: transform; transform-origin: 50% 40%; }
 
 /* ---- barra superior de vidrio ---- */
 .barra-sup {
@@ -34,7 +36,7 @@ body.sin-flujo #flujo-estatico {
   transform: translate(-50%, -140%); opacity: 0; filter: blur(8px); visibility: hidden;
   transition: transform var(--dur-4) var(--ease-out-soft), opacity var(--dur-4) var(--ease-out-soft), filter var(--dur-4) var(--ease-out-soft), visibility 0s linear var(--dur-4);
 }
-.barra-sup.visible { transform: translate(-50%, 0); opacity: 1; filter: blur(0); visibility: visible; transition-delay: 0s; }
+.barra-sup.visible { transform: translate(-50%, 0); opacity: 1; filter: none; visibility: visible; transition-delay: 0s; }
 .barra-nav {
   position: relative; display: flex; align-items: center; gap: .5rem; height: 56px; padding: 0 .5rem 0 .6rem;
   background: rgba(var(--ciruela-rgb), .66); border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
@@ -114,6 +116,7 @@ body.sin-flujo #flujo-estatico {
 /* ---- vidrio de los contenedores de sección ---- */
 .vidrio { background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
 .timeline-wrap { padding: 1.1rem .9rem .5rem .6rem; background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.timeline-wrap > .tl-vine { left: .6rem; } /* mismo valor que el padding-left de .timeline-wrap: el tallo (x=20 del SVG) pasa por el centro de .timeline-dot-col */
 
 /* ---- tarjetas vivas (js/tarjetas.js) ---- */
 .tilt { position: relative; transform-style: preserve-3d; }
@@ -122,14 +125,13 @@ body.sin-flujo #flujo-estatico {
 
 /* ---- botones: presión, brillo que recorre el borde ---- */
 .btn-suave { position: relative; overflow: hidden; }
-.btn-suave::after, .tl-todo::after {
+.btn-suave::after {
   content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
   background: linear-gradient(105deg, transparent 38%, rgba(var(--orquidea-rgb), .95) 50%, transparent 62%) 160% 0 / 220% 100% no-repeat;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   transition: background-position var(--dur-5) var(--ease-std);
 }
-.tl-todo { position: relative; overflow: hidden; }
-@media (hover: hover) { .btn-suave:hover::after, .tl-todo:hover::after { background-position: -60% 0; } }
+@media (hover: hover) { .btn-suave:hover::after { background-position: -60% 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   .reveal { transform: none; filter: none; transition: opacity .2s ease; }

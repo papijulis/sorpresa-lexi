@@ -93,11 +93,12 @@
     if (!el) return;
     e.preventDefault();
     cerrarHoja(false);
+    if (window.CartasFinal) window.CartasFinal.pausarAuto();   // que la carta no se abra sola al cruzar su pista
     el.scrollIntoView({ behavior: E.reducido ? 'auto' : 'smooth', block: 'start' });
   }
   enlaces.concat(hojaEnlaces).forEach(function (a) { a.addEventListener('click', ir); });
   var marca = barra.querySelector('.barra-marca');
-  marca.addEventListener('click', function (e) { e.preventDefault(); cerrarHoja(false); window.scrollTo({ top: 0, behavior: E.reducido ? 'auto' : 'smooth' }); });
+  marca.addEventListener('click', function (e) { e.preventDefault(); cerrarHoja(false); if (window.CartasFinal) window.CartasFinal.pausarAuto(); window.scrollTo({ top: 0, behavior: E.reducido ? 'auto' : 'smooth' }); });
 
   var mt = 0;
   window.addEventListener('resize', function () { clearTimeout(mt); mt = setTimeout(function () { medir(); if (E.vw > 768) cerrarHoja(false); }, 160); });

@@ -2,7 +2,8 @@
 """
 optimize-images.py — Fase 5: optimiza las fotos de assets/img/.
 
-Para cada *.jpeg en assets/img/ (que no esté ya dentro de originales/):
+Para cada *.jpeg/*.jpg en assets/img/ (que no esté ya dentro de originales/,
+y excepto og.jpg, la imagen para compartir de 1200x630):
   1. Guarda una copia intacta en assets/img/originales/ (si no existe ya).
   2. Reescala el original (lado largo a MAX_EDGE) y lo re-guarda como
      assets/img/<nombre>.jpeg (JPEG progresivo, calidad JPEG_Q).
@@ -31,12 +32,14 @@ ORIG_DIR = os.path.join(SRC_DIR, "originales")
 MAX_EDGE = 760
 JPEG_Q = 72
 WEBP_Q = 72
+EXCLUIR = {"og.jpg"}  # imagen para compartir en redes (1200x630): nunca se reescala ni lleva .webp, ver WEBP_EXEMPT en check-assets.js
 
 
 def main():
     os.makedirs(ORIG_DIR, exist_ok=True)
 
-    names = sorted(f for f in os.listdir(SRC_DIR) if f.lower().endswith((".jpeg", ".jpg")))
+    names = sorted(f for f in os.listdir(SRC_DIR)
+                   if f.lower().endswith((".jpeg", ".jpg")) and f.lower() not in EXCLUIR)
     if not names:
         print("No hay .jpeg en assets/img/ para optimizar.")
         return
@@ -60,6 +63,10 @@ def main():
         total_before += before_size
 
         im = Image.open(source_path)
+        # Conserva el perfil de color (p. ej. Display P3 del iPhone) solo si la
+        # imagen ya es RGB: un perfil CMYK/gris quedaría mal en el RGB de salida.
+        # El EXIF NO se conserva a propósito (no publicar GPS en un repo público).
+        icc = im.info.get("icc_profile") if im.mode in ("RGB", "RGBA") else None
         im = ImageOps.exif_transpose(im)
         im = im.convert("RGB")
         w, h = im.size
@@ -68,9 +75,10 @@ def main():
             scale = MAX_EDGE / long_edge
             im = im.resize((max(1, round(w * scale)), max(1, round(h * scale))), Image.LANCZOS)
 
-        im.save(current_path, "JPEG", quality=JPEG_Q, optimize=True, progressive=True)
+        extra = {"icc_profile": icc} if icc else {}
+        im.save(current_path, "JPEG", quality=JPEG_Q, optimize=True, progressive=True, **extra)
         webp_path = os.path.splitext(current_path)[0] + ".webp"
-        im.save(webp_path, "WEBP", quality=WEBP_Q, method=6)
+        im.save(webp_path, "WEBP", quality=WEBP_Q, method=6, **extra)
 
         after_jpeg = os.path.getsize(current_path)
         after_webp = os.path.getsize(webp_path)

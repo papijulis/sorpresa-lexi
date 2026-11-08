@@ -25,7 +25,7 @@
 #mesiversario-card.placa #mesiversario-title { font-size: clamp(1.15rem, 3.4vw, 1.45rem); }
 
 /* ---- cierre de la línea del tiempo ---- */
-.tl-pausa { display: flex; gap: 1.1rem; padding: 1.4rem 0 1rem; }
+.tl-pausa { position: relative; z-index: 1; display: flex; gap: 1.1rem; padding: 1.4rem 0 1rem; }
 .tl-flor-pausa { width: 34px !important; height: 34px !important; color: rgba(var(--pergamino-rgb), .45); }
 .tl-pausa.lit .tl-flor-pausa { color: var(--lavanda-200); filter: drop-shadow(0 0 8px rgba(var(--orquidea-rgb), .45)); }
 .tl-pausa-in { flex: 1; min-width: 0; padding-top: .35rem; }
@@ -61,7 +61,9 @@
 /* ---- todo más sereno: los latidos y brillos van más lentos ---- */
 html.en-pausa .btn-brillo::after { animation-duration: 12s; }
 html.en-pausa .shimmer-gold { animation-duration: 7s; }
-html.en-pausa .rueda-circulo { animation-duration: 6.5s; }
+/* el brillo visible de "Lexi" vive en cada letra (.char-in): charIn queda igual, solo se alenta el brillo */
+html.en-pausa .shimmer-gold .char-in { animation-duration: .6s, 7s; }
+html.en-pausa .rueda-circulo::after { animation-duration: 6.5s; }
 html.en-pausa .mov-latido { animation-duration: 3.6s; }
 
 @media (prefers-reduced-motion: reduce) { .vela-humo { animation: none; opacity: .5; } }

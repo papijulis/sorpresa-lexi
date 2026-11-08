@@ -83,13 +83,9 @@
 
 .carta-lector-papel { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 2rem 1.2rem 1rem; }
 @media (min-width: 640px) { .carta-lector-papel { padding: 2.6rem 3rem 1.3rem; } }
-.carta-lector-cerrar {
-  position: absolute; top: .7rem; right: .7rem; z-index: 2; width: 2.75rem; height: 2.75rem; border-radius: 999px; padding: 0; cursor: pointer;
-  display: flex; align-items: center; justify-content: center; color: var(--tinta);
-  background: rgba(var(--dorado-rgb), .16); border: 1px solid rgba(var(--sepia-rgb), .3); transition: background .2s ease, transform .2s var(--ease-rebote);
-}
+/* forma, color y hover del cierre y de las flechas: botones.css (redondos sobre el pergamino) */
+.carta-lector-cerrar { position: absolute; top: .7rem; right: .7rem; z-index: 2; }
 .carta-lector-cerrar:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 2px; }
-@media (hover: hover) { .carta-lector-cerrar:hover { background: rgba(var(--dorado-rgb), .32); } }
 .carta-cab { text-align: center; margin: 0 2.4rem .9rem; }
 .carta-texto {
   flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
@@ -106,16 +102,8 @@
 
 /* navegación entre las tres cartas (la de la versión anterior del pergamino) */
 .letter-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; }
-.letter-nav-btn {
-  display: inline-flex; align-items: center; justify-content: center; width: 2.9rem; height: 2.9rem; padding: 0; border-radius: 50%; cursor: pointer;
-  color: var(--sepia-700); background: rgba(var(--dorado-rgb), .16); border: 1px solid rgba(var(--sepia-rgb), .35);
-  transition: background .2s ease, transform .2s var(--ease-rebote), box-shadow .2s ease, opacity .2s ease;
-}
-.letter-nav-btn .ico { width: 1.25rem; height: 1.25rem; }
 .letter-nav-prev .ico { transform: scaleX(-1); }
-.letter-nav-btn:disabled { opacity: .3; cursor: default; }
 .letter-nav-btn:focus-visible { outline: 2px solid var(--sepia-700); outline-offset: 3px; }
-@media (hover: hover) { .letter-nav-btn:hover:not(:disabled) { background: rgba(var(--dorado-rgb), .32); box-shadow: 0 4px 14px rgba(var(--sepia-rgb), .22); } }
 .letter-nav-n { min-width: 6.5rem; text-align: center; font-family: var(--fuente-ui); font-size: .78rem; font-weight: 600; letter-spacing: .06em; color: var(--sepia-700); }
 .wax-seal {
   width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -124,8 +112,9 @@
   box-shadow: 0 4px 10px rgba(var(--abismo-rgb), .4), inset 0 2px 4px rgba(var(--pergamino-rgb), .25);
 }
 
-/* página quieta mientras se lee */
-html.carta-abierta, html.carta-abierta body { overflow: hidden; }
+/* página quieta mientras se lee: solo en html (se propaga al viewport). Si body también lleva
+   hidden, se vuelve contenedor de scroll y rompe el sticky de .carta-escena */
+html.carta-abierta { overflow: hidden; scrollbar-gutter: stable; }
 
 /* ---- cierre: la vela del deseo ---- */
 .cartas-cierre { display: flex; justify-content: center; padding: 2rem 1.5rem 4rem; }

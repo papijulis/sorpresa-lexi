@@ -1,9 +1,10 @@
 /* ======================================================================
-   PARTES DEL RECORRIDO — letrero discreto y tinte del fondo
+   PARTES DEL RECORRIDO — parte actual, índice y tinte del fondo
    Observa cada `.capitulo` con una banda de cero alto en el centro de la
    pantalla: la parte que la cruza es la actual. Escribe body[data-capitulo]
    (capitulos.css tiñe el fondo con eso), resalta su entrada en el índice de
-   "Caminos del jardín" y (el letrero de la parte lo da ahora la barra superior, js/barra.js).
+   "Caminos del jardín"; el letrero de la parte actual lo muestra la barra
+   superior (js/barra.js).
 ====================================================================== */
 (function () {
   'use strict';

@@ -1,6 +1,6 @@
 /* ======================================================================
    "PARA CUANDO COMETO UN ERROR" — la rueda de las 100 formas de pedir perdón
-   Un círculo en el Buzón (#rueda-abrir) se expande (clip-path: circle, 800 ms,
+   Un círculo en el Buzón (#rueda-abrir) se expande (clip-path: circle, 820 ms,
    ease-emph) hasta cubrir la pantalla y aparece la rueda, dibujada en un <canvas>
    2D con las constantes del original:
      TICK 16 ms · INTERVAL 9 cuadros entre frases · R0 182 · R_MAX 342
@@ -49,15 +49,18 @@
   /* ---- una rueda (instancia desechable) ---- */
   function crearRueda() {
     var ctx = canvas.getContext('2d');
-    var s = 1, dpr = 1, ps = 1;
+    var s = 1, dpr = 1, ps = 1, ultimoLado = 0, ultimoDpr = 0;
     var rayos = [], n = 0, rot = 0, acc = 0, fr = 0, ultimo = 0, raf = 0, pausada = false, vivo = true;
-    var estrellas = [], tCambio = 0, fraseVista = '', seleccion = -1, tSeleccion = 0, tFin = 0;
+    var estrellas = [], tCambio = 0, fraseVista = '', seleccion = -1, tSeleccion = 0;
     for (var e = 0; e < 90; e++) estrellas.push({ x: Math.random() * REF, y: Math.random() * REF, r: .5 + Math.random() * 1.1, f: Math.random() * 6.28, v: .4 + Math.random() * .9 });
 
     function medir() {
       var lado = Math.floor(Math.min(window.innerWidth - 8, window.innerHeight - 96, 760));
       lado = Math.max(260, lado);
-      dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1.5 : 2);
+      var nuevoDpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 700 ? 1.5 : 2);
+      if (lado === ultimoLado && nuevoDpr === ultimoDpr) return;   // mismo tamaño: conservar lienzo y cachés
+      ultimoLado = lado; ultimoDpr = nuevoDpr;
+      dpr = nuevoDpr;
       s = lado / REF; ps = s * dpr;
       canvas.style.width = canvas.style.height = lado + 'px';
       canvas.width = canvas.height = Math.round(lado * dpr);
@@ -75,7 +78,7 @@
       return { img: oc, w: cw / ps, h: ch / ps };
     }
     function nuevoRayo(i, t) {
-      return { i: i, color: palette(i / N), t0: t, tOff: 0, cache: null, flashC: null, cur: true };
+      return { i: i, color: palette(i / N), t0: t, tOff: 0, cache: null, flashC: null };
     }
 
     function pintarEstrellas(t) {
@@ -165,7 +168,6 @@
           if (n < N && fr % INTERVAL === 0) {
             var prev = rayos[rayos.length - 1]; if (prev) prev.tOff = t;
             rayos.push(nuevoRayo(n, t)); n++;
-            if (n >= N) tFin = t;
           }
         }
       }
@@ -175,6 +177,17 @@
       raf = requestAnimationFrame(cuadro);
     }
 
+    function alternarPausa() {
+      pausada = !pausada;
+      if (estado) estado.textContent = pausada ? 'Rueda en pausa' : 'Rueda en marcha';
+    }
+    function tecla(e) {   // el lienzo es enfocable: Enter/Espacio pausan igual que un toque
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      e.preventDefault();
+      if (e.repeat || n >= N) return;
+      alternarPausa();
+    }
     function tocar(e) {
       var r = canvas.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * REF, y = (e.clientY - r.top) / r.height * REF;
       if (n >= N) {
@@ -185,26 +198,26 @@
           if (REDUCIDO) dibujar(tSeleccion);
         }
       } else {
-        pausada = !pausada;
-        if (estado) estado.textContent = pausada ? 'Rueda en pausa' : 'Rueda en marcha';
+        alternarPausa();
       }
     }
     function visibilidad() { if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0; } } else if (vivo && !raf && !REDUCIDO) { ultimo = 0; raf = requestAnimationFrame(cuadro); } }
     var onResize = function () { medir(); if (REDUCIDO) dibujar(performance.now()); };
 
     canvas.addEventListener('pointerdown', tocar);
+    canvas.addEventListener('keydown', tecla);
     window.addEventListener('resize', onResize);
     document.addEventListener('visibilitychange', visibilidad);
     medir();
     if (REDUCIDO) {
-      for (var i = 0; i < N; i++) { var r0 = nuevoRayo(i, 0); r0.cur = false; rayos.push(r0); } n = N; dibujar(performance.now());
+      for (var i = 0; i < N; i++) rayos.push(nuevoRayo(i, 0)); n = N; dibujar(performance.now());
       if (estado) estado.textContent = CIERRE;
     } else raf = requestAnimationFrame(cuadro);
 
     return {
       destruir: function () {
         vivo = false; if (raf) cancelAnimationFrame(raf); raf = 0;
-        canvas.removeEventListener('pointerdown', tocar); window.removeEventListener('resize', onResize); document.removeEventListener('visibilitychange', visibilidad);
+        canvas.removeEventListener('pointerdown', tocar); canvas.removeEventListener('keydown', tecla); window.removeEventListener('resize', onResize); document.removeEventListener('visibilitychange', visibilidad);
         rayos.length = 0; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height);
       },
     };

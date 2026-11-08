@@ -1,7 +1,7 @@
 /* Constelación — unir 12 estrellas en orden para formar un corazón;
    al completarla se revela la fecha "28 · 05 · 2026" y queda guardada
    para aparecer como decoración permanente en el cielo nocturno del
-   Jardín (ver renderNightConstellation() en index.html, que llama a
+   Jardín (ver renderNightConstellation() en js/extras.js, que llama a
    getHeartPoints() de aquí para no duplicar la curva del corazón). */
 window.JuegoConstelacion = (function () {
   const STORAGE_KEY = 'jardin.constelacion.v1';
@@ -37,9 +37,10 @@ window.JuegoConstelacion = (function () {
     return { x: x * scale, y: -y * scale };
   }
 
-  // Expuesto para que index.html dibuje la misma forma, ya completada,
+  // Expuesto para que js/extras.js (renderNightConstellation) dibuje la misma forma, ya completada,
   // como decoración estática en el cielo nocturno — sin reimplementar
   // la curva ahí.
+  // scale multiplica unidades de la curva (x en ±16, y aprox. -11.7..17), no es un radio en píxeles.
   function getHeartPoints(scale) {
     const pts = [];
     for (let i = 0; i < POINT_COUNT; i++) {
@@ -120,6 +121,26 @@ window.JuegoConstelacion = (function () {
       const dateEl = mountEl && mountEl.querySelector('.constelacion-fecha');
       if (dateEl) dateEl.classList.add('in');
     }, 500);
+    // si ya es de noche, que la constelación aparezca en el cielo sin tener que cambiarlo
+    try {
+      if (typeof isNight !== 'undefined' && isNight && typeof applyNightMode === 'function') applyNightMode();
+    } catch (e) { /* el cielo se vuelve a dibujar al próximo cambio a noche */ }
+  }
+
+  function updateCanvasLabel() {
+    if (!canvas) return;
+    canvas.setAttribute('aria-label', finished
+      ? 'Constelación completa'
+      : 'Unir la estrella ' + (connected + 1) + ' de ' + POINT_COUNT);
+  }
+
+  // avance común del toque y del teclado
+  function advance() {
+    if (finished || !points.length) return;
+    connected++;
+    if (window.Acierto && connected < POINT_COUNT) window.Acierto('tic');
+    if (connected >= POINT_COUNT) completeConstellation();
+    updateCanvasLabel();
   }
 
   function handleTap(clientX, clientY) {
@@ -127,11 +148,7 @@ window.JuegoConstelacion = (function () {
     const rect = canvas.getBoundingClientRect();
     const x = clientX - rect.left, y = clientY - rect.top;
     const target = points[connected];
-    if (Math.hypot(x - target.x, y - target.y) < TAP_RADIUS) {
-      connected++;
-      if (window.Acierto && connected < POINT_COUNT) window.Acierto('tic');
-      if (connected >= POINT_COUNT) completeConstellation();
-    }
+    if (Math.hypot(x - target.x, y - target.y) < TAP_RADIUS) advance();
   }
 
   function start(mount) {
@@ -160,6 +177,20 @@ window.JuegoConstelacion = (function () {
     const onPointerDown = (e) => handleTap(e.clientX, e.clientY);
     canvas.addEventListener('pointerdown', onPointerDown);
     listeners.push(() => canvas.removeEventListener('pointerdown', onPointerDown));
+
+    // teclado: Enter / Espacio une la siguiente estrella
+    canvas.tabIndex = 0;
+    canvas.setAttribute('role', 'button');
+    updateCanvasLabel();
+    const cv = canvas;
+    const onKeyDown = (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();          // Espacio no debe desplazar la vista
+      if (e.repeat) return;        // mantener la tecla no arma toda la constelación
+      advance();
+    };
+    cv.addEventListener('keydown', onKeyDown);
+    listeners.push(() => cv.removeEventListener('keydown', onKeyDown));
 
     raf = requestAnimationFrame(draw);
   }

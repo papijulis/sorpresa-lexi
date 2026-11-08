@@ -47,20 +47,17 @@ function hacerClicable(el, fn, etiqueta) {
    Used by every feature that needs to remember progress across visits
    (frasco de razones, y lo que venga en fases futuras: buzón, cupones…). */
 function createSafeStorage() {
-  let memory = {};
-  let ok = true;
-  try {
-    const probe = '__jardin_probe__';
-    localStorage.setItem(probe, '1');
-    localStorage.removeItem(probe);
-  } catch (e) { ok = false; }
+  /* la memoria es una capa encima del disco: lo que no se pudo escribir se lee de memoria y todo
+     lo demás se sigue leyendo de localStorage (antes, un solo fallo de escritura —cuota llena—
+     dejaba de leer el progreso guardado el resto de la sesión) */
+  const memory = {};
   return {
     get(key) {
-      if (ok) { try { return localStorage.getItem(key); } catch (e) { ok = false; } }
-      return Object.prototype.hasOwnProperty.call(memory, key) ? memory[key] : null;
+      if (Object.prototype.hasOwnProperty.call(memory, key)) return memory[key];
+      try { return localStorage.getItem(key); } catch (e) { return null; }
     },
     set(key, value) {
-      if (ok) { try { localStorage.setItem(key, value); return; } catch (e) { ok = false; } }
+      try { localStorage.setItem(key, value); delete memory[key]; return; } catch (e) {}
       memory[key] = value;
     },
   };

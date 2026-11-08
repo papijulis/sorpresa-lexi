@@ -5,7 +5,7 @@
    ni su propio rAF para movimiento nuevo: se suscribe aquí.
    • Motor.estado: { y, dy, dir, vw, vh, t, dt, reducido }  (y = scroll cacheado)
    • Motor.suscribir(fn)   fn(estado) corre una vez por cuadro
-   • Motor.anclas(selectores) → mide (cacheado) la posición vertical absoluta
+   • Motor.anclas(selectores) → mide la posición vertical absoluta (sin caché, fuerza layout: llamar solo al medir, nunca por cuadro)
    • Motor.ease(x1,y1,x2,y2) → función de easing (cubic-bezier)
    • Motor.lerp / Motor.clamp / Motor.suave
    Se detiene con la pestaña oculta y vuelve sola.
@@ -52,8 +52,7 @@
       return cy(t);
     };
   }
-  /* posiciones verticales absolutas, medidas aquí (no en el cuadro): se refrescan al cambiar el layout */
-  var cacheAnclas = {};
+  /* posiciones verticales absolutas: sin caché, fuerza layout (getBoundingClientRect). Llamar solo desde medir() (resize/ResizeObserver), nunca por cuadro */
   function anclas(sels) {
     var y = window.scrollY || 0;
     return sels.map(function (s) {

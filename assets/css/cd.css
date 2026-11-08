@@ -10,7 +10,6 @@
   border-radius: var(--radio-xl); background: var(--grad-cristal); border: 1px solid rgba(255, 255, 255, .14);
   box-shadow: var(--sombra-suave);
 }
-.cd-aparato .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; padding: 0; }
 
 /* ---- pantallita LCD ---- */
 .cd-lcd {
@@ -55,17 +54,8 @@
 
 /* ---- mandos ---- */
 .cd-mandos { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: .6rem; }
-.cd-btn {
-  display: inline-flex; align-items: center; justify-content: center; width: 3rem; height: 3rem; border-radius: 50%; padding: 0; cursor: pointer;
-  background: rgba(255, 255, 255, .09); border: 1px solid rgba(255, 255, 255, .2); color: var(--pergamino-50);
-  transition: transform var(--dur-rapida) var(--ease-rebote), background var(--dur-rapida) ease;
-}
-.cd-btn .ico { width: 1.3rem; height: 1.3rem; }
-.cd-btn:disabled { opacity: .35; cursor: default; }
+/* .cd-btn y .cd-play los estila botones.css (redondo de ícono y círculo grande de reproducir) */
 .cd-prev .ico { transform: scaleX(-1); }
-.cd-play { width: 3.8rem; height: 3.8rem; border: none; background: var(--grad-oro-diagonal); color: var(--ciruela-900); box-shadow: var(--brillo-oro); }
-.cd-play .ico { width: 1.6rem; height: 1.6rem; }
-@media (hover: hover) { .cd-btn:not(.cd-play):not(:disabled):hover { background: rgba(255, 255, 255, .18); } }
 
 .cd-numeros { display: flex; justify-content: center; gap: .6rem; margin-top: .9rem; }
 .cd-num {

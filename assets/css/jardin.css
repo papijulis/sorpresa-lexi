@@ -5,7 +5,7 @@
   /* ---- cielo nocturno (punto 8): índigo profundo, vía láctea, estrellas de tres tonos,
      luna grande con halo y una estrella fugaz de vez en cuando ---- */
   #bg-layer-night {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+    position: fixed; inset: 0; z-index: var(--z-fondo); pointer-events: none; overflow: hidden;
     background:
       radial-gradient(ellipse 90% 40% at 50% 108%, rgba(var(--amatista-rgb), .22), transparent 70%),
       radial-gradient(circle at 50% 6%, var(--ciruela-700) 0%, var(--ciruela-800) 42%, var(--ciruela-900) 78%, var(--ciruela-950) 100%);
@@ -40,12 +40,18 @@
     background: none; border: none; padding: .6rem; cursor: pointer; pointer-events: none;
     filter: drop-shadow(0 0 10px rgba(var(--pergamino-rgb), .5)) drop-shadow(0 0 40px rgba(var(--orquidea-rgb), .5));
     animation: moonGlow 5s ease-in-out infinite;
+    /* fuera de la noche no es una parada de Tab invisible; se oculta al terminar el fundido de la capa (1.6 s) */
+    visibility: hidden; transition: visibility 0s linear 1.6s;
   }
-  body.night-mode:not(.sunset-mode) #night-moon { pointer-events: auto; }
+  body.night-mode:not(.sunset-mode) #night-moon { pointer-events: auto; visibility: visible; transition: visibility 0s; }
   @keyframes moonGlow {
     0%, 100% { filter: drop-shadow(0 0 8px rgba(var(--pergamino-rgb), .4)) drop-shadow(0 0 32px rgba(var(--orquidea-rgb), .4)); }
     50% { filter: drop-shadow(0 0 14px rgba(var(--pergamino-rgb), .7)) drop-shadow(0 0 54px rgba(var(--orquidea-rgb), .65)); }
   }
+  /* fuera de la noche la capa está en opacity 0: no animar filter/opacity a ciegas */
+  body:not(.night-mode) #night-moon,
+  body:not(.night-mode) .night-star,
+  body:not(.night-mode) .night-constellation circle { animation-play-state: paused; }
 
   /* ---- línea de tiempo ---- */
   .timeline-wrap { position: relative; max-width: 640px; margin: 0 auto; }
@@ -62,7 +68,7 @@
     animation: infinityGlow 3.4s ease-in-out infinite;
     transition: transform .25s ease;
   }
-  .clock-infinity:hover { transform: scale(1.18); }
+  @media (hover: hover) { .clock-infinity:hover { transform: scale(1.18); } }
   .clock-infinity .ico { width: 2.3em; height: 1.15em; vertical-align: middle; --fondo-ornamento: var(--ciruela-800); }
   @keyframes infinityGlow { 0%, 100% { filter: drop-shadow(0 0 4px rgba(var(--dorado-rgb), .35)); } 50% { filter: drop-shadow(0 0 10px rgba(var(--dorado-rgb), .9)); } }
   .clock-dedicatoria { max-width: 28rem; margin: 2.5rem auto 0; font-size: 1.05rem; line-height: 1.7; color: rgba(var(--pergamino-rgb), .82); }
@@ -74,35 +80,25 @@
 
   /* ---- lightbox (Fase 5) — foto en grande, con gesto de swipe-down para cerrar en móvil ---- */
   .lightbox {
-    position: fixed; inset: 0; z-index: 85;
-    background: rgba(3,0,8,0.94);
+    position: fixed; inset: 0; z-index: var(--z-lightbox);
+    background: rgba(var(--abismo-rgb), 0.94);
     display: flex; align-items: center; justify-content: center;
-    opacity: 0; pointer-events: none; transition: opacity .35s ease;
+    opacity: 0; pointer-events: none; visibility: hidden; transition: opacity .35s ease, visibility 0s linear .35s;
     padding: calc(1.5rem + env(safe-area-inset-top,0px)) calc(1.5rem + env(safe-area-inset-right,0px)) calc(1.5rem + env(safe-area-inset-bottom,0px)) calc(1.5rem + env(safe-area-inset-left,0px));
-    touch-action: pan-y;
+    touch-action: none; overscroll-behavior: contain;
   }
-  .lightbox.open { opacity: 1; pointer-events: auto; }
+  .lightbox.open { opacity: 1; pointer-events: auto; visibility: visible; transition: opacity .35s ease; }
   .lightbox img { max-width: 100%; max-height: 85vh; max-height: 85dvh; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,.6); transition: transform .2s ease; }
-  .lightbox-nav {
-    position: absolute; top: 50%; transform: translateY(-50%); width: 2.9rem; height: 2.9rem; padding: 0; border-radius: 50%; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; border: none; background: rgba(255,255,255,.12); color: var(--pergamino-50);
-    transition: background .2s ease;
-  }
+  /* los círculos de cristal viven en botones.css; aquí solo su lugar */
+  .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); }
   .lightbox-nav[hidden], .lightbox-count[hidden] { display: none; }
   .lightbox-prev { left: calc(.75rem + env(safe-area-inset-left,0px)); }
   .lightbox-prev .ico { transform: scaleX(-1); }
   .lightbox-next { right: calc(.75rem + env(safe-area-inset-right,0px)); }
-  .lightbox-nav .ico { width: 1.3rem; height: 1.3rem; }
-  @media (hover: hover) { .lightbox-nav:hover { background: rgba(255,255,255,.22); } }
   .lightbox-count { position: absolute; bottom: calc(1.1rem + env(safe-area-inset-bottom,0px)); left: 50%; transform: translateX(-50%); margin: 0; font-family: var(--fuente-ui); font-size: .8rem; letter-spacing: .1em; color: rgba(var(--pergamino-rgb), .7); }
   .lightbox img.lb-cambia { animation: lbCambia .35s var(--ease-flor) both; }
   @keyframes lbCambia { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
-  .lightbox-close {
-    position: absolute; top: calc(1.25rem + env(safe-area-inset-top,0px)); right: calc(1.25rem + env(safe-area-inset-right,0px));
-    width: 2.75rem; height: 2.75rem; border-radius: 999px;
-    background: rgba(255,255,255,.1); color: var(--pergamino-50); padding: 0;
-    border: 1px solid rgba(255,255,255,.18); cursor: pointer; display: flex; align-items: center; justify-content: center;
-  }
+  .lightbox-close { position: absolute; top: calc(1.25rem + env(safe-area-inset-top,0px)); right: calc(1.25rem + env(safe-area-inset-right,0px)); }
 
 
 

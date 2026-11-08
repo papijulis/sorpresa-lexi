@@ -25,6 +25,7 @@
 <meta name="twitter:image" content="https://papijulis.github.io/sorpresa-lexi/assets/img/og.jpg">
 
 <link rel="preload" href="./assets/fonts/PlayfairDisplay-latin-400-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="./assets/fonts/PlayfairDisplay-latin-400-900-italic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./assets/fonts/CormorantGaramond-latin-300-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="./assets/fonts/Inter-latin-300-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="./assets/css/utilities.css">
@@ -103,7 +104,7 @@
 </div>
 
 <!-- ===================== SCREEN 2: SONG SELECTION ===================== -->
-<div id="screen-songs">
+<div id="screen-songs" inert>
   <div class="max-w-3xl w-[92%] text-center">
     <h2 class="font-display text-3xl sm:text-4xl text-parchment mb-2">Para iniciar, elige tu canción favorita</h2>
     <p class="font-ui text-parchment/60 text-sm sm:text-base mb-10">del soundtrack de nuestro amor</p>
@@ -112,7 +113,7 @@
 </div>
 
 <!-- ===================== SCREEN 3: MAIN JOURNEY ===================== -->
-<main id="main-content" class="hidden-content">
+<main id="main-content" class="hidden-content" inert>
 
   <!-- HERO -->
   <section class="hero-section min-h-screen flex flex-col items-center justify-center text-center px-6 relative">
@@ -218,7 +219,7 @@
   </section>
 
   <!-- PARTE I -->
-  <div class="capitulo" id="cap-1" data-capitulo="1" data-nombre="I · Cómo empezó">
+  <div class="capitulo" id="cap-1" data-capitulo="1">
   <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-1-t">
     <p class="cap-num" aria-hidden="true">I</p>
     <div class="cap-texto">
@@ -286,7 +287,7 @@
   <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
 
   <!-- PARTE II -->
-  <div class="capitulo" id="cap-2" data-capitulo="2" data-nombre="II · Lo que guardo de ti">
+  <div class="capitulo" id="cap-2" data-capitulo="2">
   <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-2-t">
     <p class="cap-num" aria-hidden="true">II</p>
     <div class="cap-texto">
@@ -316,7 +317,7 @@
       </div>
     </div>
     <audio id="voice-audio" preload="none" crossorigin="anonymous" src="./assets/audio/nota-voz.mp3"></audio>
-    <p id="voice-fallback-note" class="hidden max-w-md mx-auto text-center font-ui text-[11px] text-parchment/40 mt-3">Coloca tu nota de voz en <span class="font-mono">./assets/audio/nota-voz.mp3</span></p>
+    <p id="voice-fallback-note" class="hidden max-w-md mx-auto text-center font-ui text-[11px] text-parchment/40 mt-3">No se pudo cargar la nota de voz. Revisa tu conexión e inténtalo de nuevo.</p>
   </section>
 
   <!-- REASON JAR -->
@@ -400,7 +401,7 @@
   <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
 
   <!-- PARTE III -->
-  <div class="capitulo" id="cap-3" data-capitulo="3" data-nombre="III · Lo que hemos vivido">
+  <div class="capitulo" id="cap-3" data-capitulo="3">
   <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-3-t">
     <p class="cap-num" aria-hidden="true">III</p>
     <div class="cap-texto">
@@ -438,7 +439,7 @@
   <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
 
   <!-- PARTE IV -->
-  <div class="capitulo" id="cap-4" data-capitulo="4" data-nombre="IV · Nuestra música">
+  <div class="capitulo" id="cap-4" data-capitulo="4">
   <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-4-t">
     <p class="cap-num" aria-hidden="true">IV</p>
     <div class="cap-texto">
@@ -459,7 +460,7 @@
   <div class="cap-puente" data-escena="trazo" aria-hidden="true"><svg class="ico" focusable="false"><use href="#lirio-mini"/></svg></div>
 
   <!-- PARTE V -->
-  <div class="capitulo" id="cap-5" data-capitulo="5" data-nombre="V · Lo que sigue">
+  <div class="capitulo" id="cap-5" data-capitulo="5">
   <section class="cap-portal" data-escena="pasada" aria-labelledby="cap-5-t">
     <p class="cap-num" aria-hidden="true">V</p>
     <div class="cap-texto">
@@ -494,14 +495,14 @@
 
   <footer class="py-14 text-center text-gold">
     <p class="font-hand text-2xl">te amo, Lexi.</p>
-    <p class="font-hand text-base mt-3" style="color:rgba(255,215,0,.7);">Hoy, mañana y siempre. Hasta la luna.</p>
+    <p class="font-hand text-base mt-3" style="color:rgba(var(--dorado-rgb), .7);">Hoy, mañana y siempre. Hasta la luna.</p>
   </footer>
 </main>
 
 <!-- ===================== EL BUZÓN ===================== -->
-<div id="view-buzon" class="app-view" inert>
+<div id="view-buzon" class="app-view" role="dialog" aria-modal="true" aria-labelledby="buzon-header-title" inert>
   <div class="app-view-header">
-    <h2 class="font-display text-2xl sm:text-3xl text-gold">El Buzón</h2>
+    <h2 id="buzon-header-title" class="font-display text-2xl sm:text-3xl text-gold">El Buzón</h2>
     <button id="buzon-close" aria-label="Cerrar el Buzón" class="app-view-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   </div>
   <p class="font-ui text-xs sm:text-sm text-parchment/60 text-center max-w-md mx-auto mb-8 px-6">Cartas para cuando haga falta, mesiversarios, cápsulas del tiempo y alguna sorpresa escondida.</p>
@@ -532,7 +533,7 @@
 </div>
 
 <!-- ===================== RINCÓN DE JUEGOS ===================== -->
-<div id="view-juegos" class="app-view" inert>
+<div id="view-juegos" class="app-view" role="dialog" aria-modal="true" aria-labelledby="juegos-header-title" inert>
   <div class="app-view-header">
     <h2 id="juegos-header-title" class="font-display text-2xl sm:text-3xl text-gold">Rincón de Juegos</h2>
     <button id="juegos-close" aria-label="Cerrar Juegos" class="app-view-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
@@ -548,12 +549,12 @@
 </div>
 
 <!-- ===================== INFINITO (popup: corazón de flores + corazón de idiomas + contador) ===================== -->
-<div id="view-infinito" class="app-view" inert aria-label="Infinito">
+<div id="view-infinito" class="app-view" role="dialog" aria-labelledby="infinito-header-title" inert>
   <div class="app-view-header">
-    <h2 class="font-display text-2xl sm:text-3xl text-gold">Hoy, mañana y siempre</h2>
+    <h2 id="infinito-header-title" class="font-display text-2xl sm:text-3xl text-gold">Hoy, mañana y siempre</h2>
     <button id="infinito-close" aria-label="Cerrar Infinito" class="app-view-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   </div>
-  <main class="inf-wrap app-view-body">
+  <div class="inf-wrap app-view-body">
     <header class="inf-title">
       <p class="inf-symbol" aria-hidden="true"><svg class="ico" focusable="false"><use href="#infinito"/></svg></p>
       <div class="orn-divisor" data-escena="trazo" data-orn-divisor></div>
@@ -584,7 +585,7 @@
       <div class="code-panel tarjeta-flor" id="code-panel" aria-hidden="true"><span id="code-out"></span><span class="code-caret">▍</span></div>
       <p class="sr-only" id="code-sr"></p>
     </section>
-  </main>
+  </div>
 </div>
 <div id="inf-toast" class="inf-toast" role="status" aria-live="polite"></div>
 
@@ -604,7 +605,7 @@
     </div>
     <button type="button" id="barra-menu" class="barra-menu" aria-label="Abrir el menú de secciones" aria-expanded="false" aria-controls="barra-hoja"><span class="barra-menu-lineas" aria-hidden="true"></span></button>
   </nav>
-  <div id="barra-hoja" class="barra-hoja" aria-label="Secciones">
+  <nav id="barra-hoja" class="barra-hoja" aria-label="Secciones">
     <a href="#caminos">Caminos del jardín</a>
     <a href="#cap-1"><b>I</b> Cómo empezó</a>
     <a href="#cap-2"><b>II</b> Lo que guardo de ti</a>
@@ -612,11 +613,11 @@
     <a href="#cap-4"><b>IV</b> Nuestra música</a>
     <a href="#cap-5"><b>V</b> Lo que sigue</a>
     <a href="#cartas-final">Las cartas del final</a>
-  </div>
+  </nav>
 </header>
 
 <!-- ===================== DOCK (punto 9): navegación integrada ===================== -->
-<nav id="dock" class="dock" aria-label="Navegación del jardín">
+<nav id="dock" class="dock" aria-label="Navegación del jardín" inert>
   <button id="buzon-toggle" class="dock-btn" aria-label="El Buzón">
     <svg class="ico" aria-hidden="true" focusable="false"><use href="#i-sobre"/></svg><span>Buzón</span>
     <span id="buzon-dot" class="dock-dot hidden"></span>
@@ -657,7 +658,7 @@
 </div>
 
 <!-- ===================== LIGHTBOX (Fase 5) ===================== -->
-<div id="lightbox" class="lightbox">
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Foto" inert>
   <button id="lightbox-close" aria-label="Cerrar foto" class="lightbox-close"><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-cerrar"/></svg></button>
   <button id="lightbox-prev" aria-label="Foto anterior" class="lightbox-nav lightbox-prev" hidden><svg class="ico" aria-hidden="true" focusable="false"><use href="#i-siguiente"/></svg></button>
   <img id="lightbox-img" src="" alt="">
@@ -666,7 +667,7 @@
 </div>
 
 <!-- ===================== TOAST ===================== -->
-<div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[90%] text-center opacity-0 pointer-events-none"></div>
+<div id="toast" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[90%] text-center opacity-0 pointer-events-none"></div>
 
 <script src="./contenido/config.js"></script>
 <script src="./contenido/recuerdos.js"></script>

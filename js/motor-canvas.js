@@ -1,10 +1,23 @@
 /* ======================================================================
    CANVAS FX ENGINE — single unified hardware-accelerated canvas
 ====================================================================== */
+/* Si iOS Safari se queda sin memoria de canvas, getContext('2d') devuelve null: con este
+   contexto mudo el fondo simplemente no se dibuja, pero el resto del sitio sigue vivo. */
+function ctxMudo() {
+  const m = new Proxy(() => {}, {
+    get: (t, k) => (typeof k === 'symbol' ? (k === Symbol.toPrimitive ? () => 0 : undefined) : m),
+    set: () => true,
+    apply: () => m
+  });
+  return m;
+}
+function ctx2d(c, opts) {
+  try { return c.getContext('2d', opts) || ctxMudo(); } catch (e) { return ctxMudo(); }
+}
 const canvas = document.getElementById('fx-canvas');
-const ctx = canvas.getContext('2d', { alpha: true });
+const ctx = ctx2d(canvas, { alpha: true });
 const cursorCanvas = document.getElementById('cursor-canvas');
-const cursorCtx = cursorCanvas.getContext('2d', { alpha: true });
+const cursorCtx = ctx2d(cursorCanvas, { alpha: true });
 let vw = 0, vh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 
 /* En iPhone la barra de Safari se esconde/aparece al hacer scroll y cambia innerHeight
@@ -15,6 +28,7 @@ let vw = 0, vh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
 let altoLienzo = 0;
 function cambioDePantallaReal() {
   const w = window.innerWidth, h = window.innerHeight;
+  if (Math.min(window.devicePixelRatio || 1, w < 640 ? 1.5 : 2) !== dpr) return true;   // monitor 1x <-> 2x sin cambiar de tamaño
   if (w !== vw) return true;
   return h > altoLienzo || altoLienzo - h > 160;
 }
@@ -73,8 +87,8 @@ function applyLightMode() {
   if (LIGHT_MODE) return;
   LIGHT_MODE = true;
   document.body.classList.add('light-mode');
-  PARTICLE_CAP = 25;
-  FIREFLY_CAP = 8;
+  PARTICLE_CAP = Math.min(PARTICLE_CAP, 25);
+  FIREFLY_CAP = Math.min(FIREFLY_CAP, 8);
   BUTTERFLY_CAP = Math.min(BUTTERFLY_CAP, 2);
 }
 
@@ -192,13 +206,15 @@ function buildLilySprite(b) {
   const R = Math.ceil(b.size * 1.15);
   const off = document.createElement('canvas');
   off.width = off.height = Math.max(1, Math.round(R * 2 * dpr));
-  const c = off.getContext('2d');
+  const c = ctx2d(off);
   c.scale(dpr, dpr);
   c.translate(R, R);
   paintLilyShape(c, b.size, b.hue, true);
   b.sprite = off;
   b.spriteR = R;
 }
+/* el lirio del inicio ya desvanecido (ver drawLily): sin destellos ni mariposas en el centro de la pantalla */
+function heroOculto(b) { return !!b.hero && scrollYCache >= vh * 0.78; }
 function drawLily(b) {
   if (b.progress <= 0) return;
   const p = Math.min(1, b.progress);
@@ -233,9 +249,11 @@ function updateLily(b, dt) {
     b.pulse = 1 + Math.sin(performance.now() / 1400 + b.hue * 10) * 0.03 + ritmoPulso * 0.06; // + el golpe de la música
     b.idleTimer -= dt;
     if (b.idleTimer <= 0) {
-      const angle = rand(0, Math.PI * 2);
-      const dist = b.size * 0.6;
-      spawnSparkleBurst(b.x + Math.cos(angle) * dist, (b.renderY || b.y) + Math.sin(angle) * dist, 4, true, false);
+      if (!heroOculto(b)) {
+        const angle = rand(0, Math.PI * 2);
+        const dist = b.size * 0.6;
+        spawnSparkleBurst(b.x + Math.cos(angle) * dist, (b.renderY || b.y) + Math.sin(angle) * dist, 4, true, false);
+      }
       b.idleTimer = rand(900, 1800);
     }
   }
@@ -316,7 +334,7 @@ const bokehSprites = {};
 function spriteBokeh(color) {
   if (bokehSprites[color]) return bokehSprites[color];
   const c = document.createElement('canvas'); c.width = c.height = 96;
-  const g = c.getContext('2d'), gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+  const g = ctx2d(c), gr = g.createRadialGradient(48, 48, 0, 48, 48, 48);
   gr.addColorStop(0, color); gr.addColorStop(.62, color); gr.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = gr; g.fillRect(0, 0, 96, 96);
   return (bokehSprites[color] = c);
@@ -331,7 +349,7 @@ function drawBokeh(bk) {
 /* ---- butterflies (purple/violet, orbit around lilies) ---- */
 const BUTTERFLY_COLORS = ['#A855F7', '#7E22CE', '#C084FC', '#D8B4FE'];
 function spawnButterfly() {
-  const eligible = blooms.filter((b) => b.progress > 0.4);
+  const eligible = blooms.filter((b) => b.progress > 0.4 && !heroOculto(b));
   if (!eligible.length) return;
   const target = eligible[Math.floor(rand(0, eligible.length))];
   butterflies.push({
@@ -364,7 +382,7 @@ function updateButterflies(dt) {
     const ty = b.target.renderY !== undefined ? b.target.renderY : b.target.y;
     b.x = b.target.x + Math.cos(b.angle) * b.radius;
     b.y = ty + Math.sin(b.angle) * b.radius * 0.55 - Math.sin(b.age / 500) * b.bobAmp * 0.3;
-    if (b.age > b.maxLife) b.life -= 0.012;
+    if (b.age > b.maxLife) b.life -= 0.012 * dt / 16.67;
     if (b.life <= 0) butterflies.splice(i, 1);
   }
 }
@@ -534,7 +552,7 @@ function startTopLayer() {
   if (!topRaf && !document.hidden) topRaf = requestAnimationFrame(topFrame);
 }
 window.addEventListener('pointermove', (e) => {
-  if (e.pointerType === 'touch') return;
+  if (e.pointerType === 'touch' || REDUCED_MOTION) return;
   if (cursorTrail.length > 40) cursorTrail.shift();
   cursorTrail.push({ x: e.clientX, y: e.clientY, life: 1, rot: rand(0, Math.PI), col: Math.floor(rand(0, 4)) });
   startTopLayer();
@@ -567,40 +585,46 @@ function sampleFpsAndMaybeGoLight(t) {
   }
 }
 
+/* un error en un cuadro ya no mata el bucle: se reporta una sola vez y se limpia el estado
+   del contexto (un save() sin su restore() dejaría la transformación corrida) */
+let loopErrorVisto = false;
+function loopFallo(e) {
+  if (!loopErrorVisto) { loopErrorVisto = true; try { console.error('[jardin] cuadro del canvas:', e); } catch (_) {} }
+  try { ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.globalAlpha = 1; ctx.shadowBlur = 0; } catch (_) {}
+}
 function loop(t) {
-  const dt = Math.min(64, t - lastFrame);
+  rafId = requestAnimationFrame(loop); // primero: una excepción ya no puede matar el bucle ni dejar rafId "vivo"
+  const dt = Math.max(0, Math.min(64, t - lastFrame));
   const k = dt / 16.67;
   lastFrame = t;
-  sampleFpsAndMaybeGoLight(t);
-  ctx.clearRect(0, 0, vw, vh);
+  try {
+    sampleFpsAndMaybeGoLight(t);
+    ctx.clearRect(0, 0, vw, vh);
 
-  updateParticles(t, k);
-  particles.forEach(drawPetal);
+    updateParticles(t, k);
+    particles.forEach(drawPetal);
 
-  bokehs.forEach(drawBokeh);
+    bokehs.forEach(drawBokeh);
 
-  blooms.forEach((b) => updateLily(b, dt));
-  blooms.forEach(drawLily);
+    blooms.forEach((b) => updateLily(b, dt));
+    blooms.forEach(drawLily);
 
-  updateButterflies(dt);
-  butterflies.forEach(drawButterfly);
+    updateButterflies(dt);
+    butterflies.forEach(drawButterfly);
 
-  updateFireflies(t, k);
-  fireflies.forEach((f) => drawFirefly(f, t));
+    updateFireflies(t, k);
+    fireflies.forEach((f) => drawFirefly(f, t));
 
-  updateBirds(dt);
-  birds.forEach(drawBird);
+    updateBirds(dt);
+    birds.forEach(drawBird);
 
-  updateSparkles(k);
-  sparkles.forEach(drawSparkle);
+    updateSparkles(k);
+    sparkles.forEach(drawSparkle);
+  } catch (e) { loopFallo(e); }
 
-  updateHeartRain(dt);
-  heartRain.forEach(drawHeartRainItem);
+  try { updateHeartRain(dt); heartRain.forEach(drawHeartRainItem); } catch (e) { loopFallo(e); }
 
-
-  updateAudioBars(t);
-
-  rafId = requestAnimationFrame(loop);
+  try { updateAudioBars(t); } catch (e) { loopFallo(e); }
 }
 /* el bucle arranca cuando YA cargaron todos los scripts: usa updateHeartRain (extras.js) y
    updateAudioBars (audio.js); si un cuadro llegaba antes, un ReferenceError lo mataba para siempre */
@@ -617,6 +641,7 @@ function updateCanvasPauseState() {
   if (canvasPauseReasons.size > 0) {
     if (rafId) {
       cancelAnimationFrame(rafId); rafId = null;
+      if (!fpsDecided) fpsSampleStart = null; // la muestra de fps vuelve a empezar al reanudar (no cuenta el tiempo en pausa)
       sparkles.length = 0; // los destellos del fondo no deben quedar congelados ni reaparecer después
     }
   } else if (!rafId && document.readyState !== 'loading') {

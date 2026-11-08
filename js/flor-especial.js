@@ -41,12 +41,13 @@
   var hudT = document.getElementById('flor-hud-t'), hudB = document.getElementById('flor-hud-b');
   var texto = document.getElementById('flor-esp-texto');
   var REDUCIDO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var THREE = null, Orbit = null, inst = null, abierto = false, cargando = false, tCierre = 0;
+  var THREE = null, Orbit = null, inst = null, abierto = false, genAbrir = 0, tCierre = 0;
 
   function sm(a, b, x) { x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
 
   /* ---------------------------------------------------------------- escena */
   function crearEscena(T, OrbitControls) {
+    if (!T || typeof OrbitControls !== 'function') return null;   // sin controles no se crea el renderer: abrir() cae al lirio 2D
     var W = host.clientWidth || 600, H = host.clientHeight || 520;
     var renderer;
     try { renderer = new T.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' }); } catch (e) { return null; }
@@ -365,7 +366,6 @@
     var F3 = rama(.84, [.05, .3, .35], [.1, 1.85, .95], .92, 3.1, false);     // al frente, más arriba
     var B1 = rama(.92, [-.32, .2, -.25], [-.62, 2.3, -.6], .62, 4.2, true);    // botones jóvenes, arriba y atrás
     var B2 = rama(1, [.05, .25, -.02], [.06, 2.75, -.06], .56, 5.0, true);
-    var abiertas = [F1, F2, F3], botones = [B1, B2];
 
     /* ---- polvo flotante ---- */
     var N_POLVO = movil ? 90 : 150, polvoPos = new Float32Array(N_POLVO * 3), polvoSem = [];
@@ -430,7 +430,7 @@
     function cuadro(now) {
       raf = 0;
       if (!vivo) return;
-      var dt = Math.min(.1, (now - ultimo) / 1000); ultimo = now; tTotal += dt;
+      var dt = Math.max(0, Math.min(.1, (now - ultimo) / 1000)); ultimo = now; tTotal += dt;
       var f = REDUCIDO ? 1 : Math.min(1, tTotal / DURACION);
       pintar(f, tTotal);
       polvoCuadro(tTotal);
@@ -438,11 +438,11 @@
       if (et !== etapaActual) { etapaActual = et; hudT.textContent = ETAPAS[et]; }
       hudB.style.transform = 'scaleX(' + f.toFixed(3) + ')';
       if (f >= 1 && !listo) { listo = true; texto.classList.add('visible'); }
-      controls.update(); render();
+      controls.update(dt); render();   // con deltaTime el giro automático no depende de los Hz de la pantalla
       raf = requestAnimationFrame(cuadro);
     }
     function arrancar() { if (!raf && vivo) { ultimo = performance.now(); raf = requestAnimationFrame(cuadro); } }
-    function vis() { if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0; } } else arrancar(); }
+    function vis() { if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0; } } else if (REDUCIDO) { if (vivo) render(); } else arrancar(); }
     document.addEventListener('visibilitychange', vis);
     var ro = 'ResizeObserver' in window ? new ResizeObserver(function () {
       var w = host.clientWidth, h = host.clientHeight; if (!w || !h) return;
@@ -456,7 +456,6 @@
     } else arrancar();
 
     return {
-      _depurar: { pintar: pintar, render: render, camera: camera, controls: controls, flores: flores, raiz: raiz, T: T, scene: scene, detener: function () { vivo = false; } },
       dispose: function () {
         vivo = false; if (raf) cancelAnimationFrame(raf); raf = 0;
         document.removeEventListener('visibilitychange', vis); if (ro) ro.disconnect();
@@ -476,26 +475,25 @@
     return { dispose: function () { d.remove(); } };
   }
   async function abrir() {
-    if (abierto || cargando) return;
+    if (abierto) return;
+    var gen = ++genAbrir;   // cada apertura tiene su propia espera; una carga vieja que termina tarde se descarta
     clearTimeout(tCierre);
     abierto = true; dlg.hidden = false; void dlg.offsetWidth; dlg.classList.add('abierto');
     texto.classList.remove('visible'); hudT.textContent = 'CARGANDO…'; hudB.style.transform = 'scaleX(0)';
     canvasPauseReasons.add('flor-especial'); updateCanvasPauseState();
     if (window.Sonidos) window.Sonidos.play('abrir');
     cerrarBtn.focus({ preventScroll: true });
-    cargando = true;
     try {
       if (!THREE && precarga) await precarga;
-      if (!THREE) {
+      if (!THREE || !Orbit) {   // los dos módulos se asignan juntos: nunca queda THREE sin OrbitControls
         var base = new URL('./assets/vendor/', document.baseURI).href;
-        THREE = await import(base + 'three.module.min.js');
-        Orbit = (await import(base + 'OrbitControls.js')).OrbitControls;
+        var m3 = await import(base + 'three.module.min.js');
+        var mo = await import(base + 'OrbitControls.js');
+        THREE = m3; Orbit = mo.OrbitControls;
       }
-      if (!abierto) { cargando = false; return; }
+      if (!abierto || gen !== genAbrir) return;   // se cerró o hay una apertura más nueva
       inst = crearEscena(THREE, Orbit) || fallback2D();
-    } catch (e) { if (abierto) inst = fallback2D(); }
-    cargando = false;
-    if (!abierto && inst) { inst.dispose(); inst = null; }
+    } catch (e) { if (abierto && gen === genAbrir && !inst) inst = fallback2D(); }
   }
   function cerrar() {
     if (!abierto) return;
@@ -503,7 +501,7 @@
     if (window.Sonidos) window.Sonidos.play('cerrar');
     if (inst) { inst.dispose(); inst = null; }
     canvasPauseReasons.delete('flor-especial'); updateCanvasPauseState();
-    tCierre = setTimeout(function () { dlg.hidden = true; }, 360);
+    tCierre = setTimeout(function () { dlg.hidden = true; }, 420);
     btn.focus({ preventScroll: true });
   }
   /* precarga silenciosa de Three cuando el botón se acerca: en los videos tardaba ~5 s en "CARGANDO…" */
@@ -526,5 +524,5 @@
     if (e.key === 'Escape') { cerrar(); e.preventDefault(); e.stopPropagation(); }
     else if (e.key === 'Tab') { e.preventDefault(); cerrarBtn.focus(); }   // foco atrapado: el único control es la ✕ (el lienzo se maneja con el puntero)
   }, true);
-  window.FlorEspecial = { abrir: abrir, cerrar: cerrar, _inst: function () { return inst; } };
+  window.FlorEspecial = { abrir: abrir, cerrar: cerrar };
 })();

@@ -3,8 +3,8 @@
    El recorrido se cuenta en cinco partes. Cada una abre con un "portal" a
    pantalla completa (número gigante en contorno + título + trazo), las
    secciones densas van en medio, y entre parte y parte crece un tallo con un
-   lirio. El fondo cambia de tinte con la parte en la que estás y un letrero
-   discreto dice cuál es. (Se dice "Parte", no "Capítulo": "Capítulo 1" ya es
+   lirio. El fondo cambia de tinte con la parte en la que estás; la barra superior
+   (barra.js) marca cuál es. (Se dice "Parte", no "Capítulo": "Capítulo 1" ya es
    el nombre de la sorpresa del 21 de septiembre.)
 ====================================================================== */
 @property --cap-rgb { syntax: '<number>#'; inherits: true; initial-value: 255, 215, 0; }

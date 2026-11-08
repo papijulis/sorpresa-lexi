@@ -67,17 +67,6 @@ function lemniscata(a = 44, cx = 50, cy = 25, n = 120) {
   }
   return d + 'Z';
 }
-/* corazón paramétrico — viewBox 0 0 100 100 (misma curva de Constelación) */
-function corazonPath(k = 2.7, n = 120) {
-  let d = '';
-  for (let i = 0; i <= n; i++) {
-    const t = (i / n) * Math.PI * 2;
-    const x = 16 * Math.pow(Math.sin(t), 3);
-    const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
-    d += (i ? 'L' : 'M') + f(50 + x * k) + ' ' + f(50 - 2.5 * k + y * k);
-  }
-  return d + 'Z';
-}
 
 /* ---------- íconos de línea, cuadrícula 24x24 ---------- */
 const L = (inner) => `<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${inner}</g>`;
@@ -129,11 +118,9 @@ const ICONOS = {
   pausa: `<rect x="6.500" y="5" width="4" height="14" rx="1.200" fill="currentColor"/><rect x="13.500" y="5" width="4" height="14" rx="1.200" fill="currentColor"/>`,
   cerrar: L('<path d="M6 6l12 12M18 6L6 18"/>'),
   candado: L('<rect x="5" y="10.500" width="14" height="10" rx="2.500"/><path d="M8 10.500V8a4 4 0 0 1 8 0v2.500"/>'),
-  reloj: L('<circle cx="12" cy="12" r="8.500"/><path d="M12 7v5l3.200 2"/>'),
   regalo: L('<rect x="3.500" y="9" width="17" height="11" rx="1.800"/><path d="M3 9h18M12 9v11M12 9c-2.500 0-4.500-1-4.500-2.800a1.800 1.800 0 0 1 3-1.300C11.700 5.800 12 7.500 12 9zM12 9c2.500 0 4.500-1 4.500-2.800a1.800 1.800 0 0 0-3-1.300C12.300 5.800 12 7.500 12 9z"/>'),
   sandglass: L('<path d="M6.500 3.500h11M6.500 20.500h11M7.500 3.500c0 4 4.500 5.500 4.500 8.500s-4.500 4.500-4.500 8.500M16.500 3.500c0 4-4.500 5.500-4.500 8.500s4.500 4.500 4.500 8.500"/>'),
   palomita: L('<path d="M5 12.800l4.600 4.600L19 7.500"/>'),
-  mariposa: L('<path d="M12 12C9 6.500 4.500 6 3.500 9.500 3 12 6 13.500 12 12zM12 12c-4 .5-7 3-5.500 6 1.200 2 4.500 1 5.500-6z"/><path d="M12 12c3-5.500 7.500-6 8.500-2.500.5 2.500-2.500 4-8.500 2.500zM12 12c4 .5 7 3 5.500 6-1.200 2-4.500 1-5.500-6z"/><path d="M12 8.500v8.500M10.500 6.800 12 8.500l1.500-1.700"/>'),
 };
 
 /* ---------- símbolos "firma" con viewBox propio ---------- */
@@ -146,16 +133,7 @@ const SIMBOLOS = [
     `<path d="${lemniscata()}" pathLength="100" fill="none" stroke="currentColor" stroke-width="2.800" stroke-linejoin="round"/>` +
     `<g transform="translate(50 25) scale(.2)" fill="var(--fondo-ornamento, #18062B)" stroke="currentColor" stroke-width="7" stroke-linejoin="round">` +
     [0, 1, 2, 3, 4, 5].map((i) => `<path d="${petalPath(40, 17)}" transform="rotate(${i * 60})"/>`).join('') + `</g>`],
-  ['corazon-firma', '0 0 100 100', `<path d="${corazonPath()}" pathLength="100" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/>`],
   ['brillo', '0 0 100 100', '<path d="M50 4C55 36 64 45 96 50 64 55 55 64 50 96 45 64 36 55 4 50 36 45 45 36 50 4z" fill="currentColor"/>'],
-  /* divisor ornamental: dos líneas que se desvanecen + flor al centro (viewBox 0 0 400 28) */
-  ['divisor', '0 0 400 28',
-    `<path class="orn-trazo" d="M10 14H168" pathLength="100" fill="none" stroke="currentColor" stroke-width="1.400" stroke-linecap="round"/>` +
-    `<path class="orn-trazo" d="M390 14H232" pathLength="100" fill="none" stroke="currentColor" stroke-width="1.400" stroke-linecap="round"/>` +
-    `<g class="orn-flor" transform="translate(200 14) scale(.2)" fill="none" stroke="currentColor" stroke-width="7" stroke-linejoin="round">` +
-    [0, 1, 2, 3, 4, 5].map((i) => `<path d="${petalPath(46, 19)}" transform="rotate(${i * 60})"/>`).join('') +
-    `<circle r="5" fill="currentColor" stroke="none"/></g>` +
-    `<circle cx="180" cy="14" r="1.600" fill="currentColor"/><circle cx="220" cy="14" r="1.600" fill="currentColor"/>`],
 ];
 
 /* ---------- ensamblado ---------- */

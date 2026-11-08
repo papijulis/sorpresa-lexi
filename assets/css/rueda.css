@@ -1,6 +1,6 @@
 /* ======================================================================
    LA RUEDA DE LOS 100 PERDONES — círculo en el Buzón + overlay que se expande
-   desde él con clip-path: circle() (800 ms, ease-emph). Fondo: del azul noche
+   desde él con clip-path: circle() (820 ms, ease-emph). Fondo: del azul noche
    (7, 9, 27) al ciruela (43, 19, 48), como la rueda original.
 ====================================================================== */
 .rueda-wrap { display: flex; justify-content: center; margin-top: 2.2rem; padding-bottom: 1rem; }
@@ -8,25 +8,31 @@
   position: relative; display: inline-flex; align-items: center; justify-content: center; width: 8.4rem; height: 8.4rem; padding: 1rem; border-radius: 50%; cursor: pointer;
   text-align: center; color: var(--pergamino-50); background: var(--glass); border: 1px solid var(--glass-border);
   backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 0 22px rgba(var(--orquidea-rgb), .28), inset 0 0 22px rgba(var(--orquidea-rgb), .12);
-  animation: ruedaLatido 4.2s ease-in-out infinite; transition: transform var(--dur-3) var(--ease-std);
+  box-shadow: 0 0 18px rgba(var(--orquidea-rgb), .22), inset 0 0 18px rgba(var(--orquidea-rgb), .1);
+  transition: transform var(--dur-3) var(--ease-std); isolation: isolate;
+}
+/* el latido del brillo va solo con opacity (compositor) en un pseudo-elemento; z-index -1 lo deja bajo el texto (isolation crea el contexto de apilamiento) */
+.rueda-circulo::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none; z-index: -1;
+  box-shadow: 0 0 34px rgba(var(--orquidea-rgb), .4), inset 0 0 26px rgba(var(--orquidea-rgb), .14);
+  opacity: 0; animation: ruedaLatido 4.2s ease-in-out infinite;
 }
 .rueda-circulo span { font-size: 1.12rem; line-height: 1.25; text-shadow: var(--texto-sombra); }
 .rueda-circulo::before { content: ''; position: absolute; inset: -7px; border-radius: 50%; border: 1px dashed rgba(var(--dorado-rgb), .3); }
-@keyframes ruedaLatido { 0%, 100% { box-shadow: 0 0 18px rgba(var(--orquidea-rgb), .22), inset 0 0 18px rgba(var(--orquidea-rgb), .1); } 50% { box-shadow: 0 0 34px rgba(var(--orquidea-rgb), .5), inset 0 0 26px rgba(var(--orquidea-rgb), .2); } }
+@keyframes ruedaLatido { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 .rueda-circulo:active { transform: scale(.96); }
 @media (hover: hover) { .rueda-circulo:hover { transform: scale(1.05); } }
 
 .rueda {
   position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center;
   background: linear-gradient(180deg, rgb(7, 9, 27), rgb(43, 19, 48)); --ox: 50%; --oy: 50%;
-  clip-path: circle(0 at var(--ox) var(--oy)); transition: clip-path 820ms var(--ease-emph); visibility: hidden;
+  clip-path: circle(0 at var(--ox) var(--oy)); transition: clip-path 820ms var(--ease-emph), visibility 0s linear 820ms; visibility: hidden;
 }
-.rueda.abierta { clip-path: circle(150vmax at var(--ox) var(--oy)); visibility: visible; }
+.rueda.abierta { clip-path: circle(150vmax at var(--ox) var(--oy)); visibility: visible; transition-delay: 0s; }
 .rueda[hidden] { display: none; }
 .rueda-lienzo { display: flex; align-items: center; justify-content: center; padding-bottom: 3.4rem; }
 .rueda-lienzo canvas { display: block; touch-action: manipulation; border-radius: 50%; cursor: pointer; }
 .rueda-lienzo canvas:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 4px; }
 .rueda-cerrar { top: calc(1rem + env(safe-area-inset-top, 0px)); right: calc(1rem + env(safe-area-inset-right, 0px)); transform: none; z-index: 2; }
 .rueda-repetir { position: absolute; bottom: calc(1.1rem + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); z-index: 2; }
-@media (prefers-reduced-motion: reduce) { .rueda { transition: opacity .2s ease; clip-path: none; opacity: 0; } .rueda.abierta { opacity: 1; } .rueda-circulo { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .rueda { transition: opacity .2s ease, visibility 0s linear .2s; clip-path: none; opacity: 0; } .rueda.abierta { opacity: 1; } .rueda-circulo::after { animation: none; opacity: 0; } }

@@ -84,7 +84,10 @@ window.JuegoLluviaLirios = (function () {
     const frase = banco
       ? banco[Math.floor(Math.random() * banco.length)].texto
       : '¡Atrapaste todos los lirios! Así de fácil se me hace quererte, sin esfuerzo, uno tras otro.';
+    const c = canvas;
     setTimeout(() => {
+      // ya salió del juego (stop() vacía el mount) o tocó "Jugar de nuevo": no abrir el modal viejo
+      if (!c || !c.isConnected || !finished) return;
       if (typeof openModal === 'function') openModal({ icon: 'lirio', title: '¡Atrapaste todos los lirios!', body: frase });
     }, 300);
   }
@@ -157,7 +160,7 @@ window.JuegoLluviaLirios = (function () {
       <div class="lirios-wrap">
         <div class="lirios-hud"><span style="color:var(--dorado-500);">${ico('lirio-mini', 'ico-sm')}</span> <span><span id="lirios-count">0 / ${TARGET}</span></span></div>
         <canvas class="lirios-canvas" id="lirios-canvas"></canvas>
-        <p class="font-ui text-[11px] mt-3" style="color:rgba(253,251,247,.5);">Mueve el dedo o el mouse para atrapar los lirios. Las espinas no te detienen.</p>
+        <p class="font-ui text-[11px] mt-3" style="color:rgba(253,251,247,.5);">Mueve el dedo, el mouse o las flechas para atrapar los lirios. Las espinas no te detienen.</p>
         <button id="lirios-replay" class="cupon-redeem-btn" style="margin-top:.75rem;display:none;">Jugar de nuevo</button>
       </div>
     `;
@@ -177,6 +180,21 @@ window.JuegoLluviaLirios = (function () {
     canvas.addEventListener('pointerdown', onPointerDown);
     listeners.push(() => canvas.removeEventListener('pointermove', onPointerMove));
     listeners.push(() => canvas.removeEventListener('pointerdown', onPointerDown));
+
+    // teclado: flechas izquierda/derecha mueven el lirio que atrapa
+    const onKey = (e) => {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      if (!running || e.ctrlKey || e.altKey || e.metaKey) return;
+      const tg = e.target;
+      if (tg && (tg.isContentEditable || /^(input|textarea|select)$/i.test(tg.tagName || ''))) return;
+      const modal = document.getElementById('app-modal');
+      const lb = document.getElementById('lightbox');
+      if ((modal && modal.classList.contains('open')) || (lb && lb.classList.contains('open'))) return;
+      e.preventDefault();
+      paddleX = Math.min(1, Math.max(0, paddleX + (e.key === 'ArrowLeft' ? -0.06 : 0.06)));
+    };
+    window.addEventListener('keydown', onKey);
+    listeners.push(() => window.removeEventListener('keydown', onKey));
 
     const onReplay = () => reset();
     replayBtnEl.addEventListener('click', onReplay);

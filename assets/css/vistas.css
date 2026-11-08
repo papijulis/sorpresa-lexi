@@ -1,6 +1,6 @@
   /* ---- app views (El Buzón, y lo que venga después) ---- */
   .app-view {
-    position: fixed; inset: 0; z-index: 75;
+    position: fixed; inset: 0; z-index: var(--z-vista);
     background: rgba(var(--abismo-rgb), 0.92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     display: flex; flex-direction: column;
     padding: calc(5rem + env(safe-area-inset-top, 0px)) calc(1.25rem + env(safe-area-inset-right, 0px)) calc(2rem + env(safe-area-inset-bottom, 0px)) calc(1.25rem + env(safe-area-inset-left, 0px));
@@ -10,13 +10,8 @@
   }
   .app-view.open { opacity: 1; pointer-events: auto; transform: scale(1); }
   .app-view-header { display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: .5rem; }
-  .app-view-close {
-    position: absolute; right: 0; top: 50%; transform: translateY(-50%);
-    width: 2.5rem; height: 2.5rem; border-radius: 999px;
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50); padding: 0; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; transition: background .25s ease, transform .2s var(--ease-rebote);
-  }
-  @media (hover: hover) { .app-view-close:hover { background: rgba(255,255,255,.16); } }
+  /* el círculo de cristal vive en botones.css; aquí solo su lugar */
+  .app-view-close { position: absolute; right: 0; top: 50%; transform: translateY(-50%); }
   .app-view-body { max-width: 72rem; margin: 0 auto; width: 100%; }
 
   .buzon-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1.25rem; }
@@ -47,7 +42,6 @@
     width: 10px; height: 10px; border-radius: 999px; background: var(--rosa-400);
     box-shadow: 0 0 6px rgba(var(--rosa-rgb), .8);
   }
-  .buzon-read-check { opacity: .55; }
 
   /* letter detail content inside the reusable modal */
   .letter-detail-text { white-space: pre-line; }
@@ -65,15 +59,9 @@
   .juego-card-emoji { font-size: 2rem; margin-bottom: .5rem; display: block; }
   .juego-card-progress { font-size: .72rem; color: rgba(var(--dorado-rgb), .8); margin-top: .5rem; font-family: 'Inter', sans-serif; }
 
-  .juego-exit-btn {
-    display: inline-flex; align-items: center; gap: .5rem; min-height: 2.75rem; cursor: pointer;
-    font-family: var(--fuente-ui); font-size: .82rem; font-weight: 600; color: var(--pergamino-50);
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
-    border-radius: 999px; padding: 0 1.1rem 0 .8rem; margin-bottom: 1.5rem; transition: background .2s ease;
-  }
+  .juego-exit-btn { margin-bottom: 1.5rem; } /* el resto lo da .btn-suave (botones.css) */
   .juego-exit-ico { display: inline-flex; color: var(--dorado-500); }
   .juego-exit-ico .ico { width: 1.1rem; height: 1.1rem; transform: scaleX(-1); }
-  @media (hover: hover) { .juego-exit-btn:hover { background: rgba(255,255,255,.16); } }
 
   /* ---- cupones para raspar ---- */
   .cupon-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
@@ -94,12 +82,8 @@
   }
   .cupon-scratch-canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; }
   .cupon-scratch-canvas.cleared { opacity: 0; pointer-events: none; transition: opacity .5s ease; }
-  .cupon-redeem-btn {
-    font-family: 'Inter', sans-serif; font-size: .7rem; font-weight: 600;
-    padding: .4rem .9rem; border-radius: 999px; border: none; cursor: pointer;
-    background: linear-gradient(to right, var(--dorado-500), var(--dorado-400)); color: var(--ciruela-900);
-  }
-  .cupon-redeem-btn[disabled] { opacity: .5; cursor: default; }
+  /* .cupon-card recorta (overflow:hidden) el contorno global: este va hacia adentro */
+  .cupon-scratch-canvas:focus-visible, .cupon-reveal:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: -4px; border-radius: 1.25rem; }
   .cupon-redeemed-tag { font-family: 'Inter', sans-serif; font-size: .65rem; color: rgba(var(--dorado-rgb), .75); }
 
   /* ---- memorama ---- */
@@ -115,7 +99,7 @@
     position: absolute; inset: 0; backface-visibility: hidden; border-radius: .7rem;
     display: flex; align-items: center; justify-content: center; overflow: hidden;
   }
-  .memorama-face-back { background: linear-gradient(135deg, rgba(126,34,206,.5), rgba(245,158,11,.3)); font-size: 1.4rem; }
+  .memorama-face-back { background: linear-gradient(135deg, rgba(126,34,206,.5), rgba(var(--ambar-rgb), .3)); font-size: 1.4rem; }
   .memorama-face-front { transform: rotateY(180deg); background: var(--pergamino-50); }
   .memorama-face-front picture { width: 100%; height: 100%; }
   .memorama-face-front img { width: 100%; height: 100%; object-fit: cover; }
@@ -154,7 +138,7 @@
   .constelacion-fecha.in { opacity: 1; transform: translateY(0); }
 
   /* decoración permanente en el cielo nocturno, una vez completada (ver
-     renderNightConstellation() al final del script principal) */
+     renderNightConstellation() en js/extras.js) */
   .night-constellation { position: absolute; width: 150px; height: 150px; opacity: .85; }
   @keyframes constellationTwinkle { 0%, 100% { opacity: .65; } 50% { opacity: 1; } }
   .night-constellation circle { animation: constellationTwinkle 3.6s ease-in-out infinite; }
@@ -187,6 +171,6 @@
     display: flex; align-items: center; justify-content: center;
   }
   .heart-hotspot:hover, .heart-hotspot:focus-visible { opacity: .9; transform: scale(1.25); }
-  .heart-hotspot.found { opacity: .55; cursor: default; }
+  .heart-hotspot.found { opacity: .55; cursor: default; pointer-events: none; }
   .heart-hotspot.found:hover { transform: none; }
 

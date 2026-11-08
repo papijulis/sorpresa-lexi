@@ -1,13 +1,15 @@
 /* ======================================================================
    LAS CARTAS DEL FINAL (2026-11-05: vuelta al pergamino, con un solo sobre)
-   Las tres cartas largas —la carta del Capítulo 1 (LETTER), "Para seguir
-   escribiendo" (CARTA_FINAL) y "Para Lexi" (CARTA_PARA_LEXI)— viven detrás de UN
-   solo sobre:
+   Las cartas largas —la carta del Capítulo 1 (LETTER), "Para seguir
+   escribiendo" (CARTA_FINAL), "Para Lexi" (CARTA_PARA_LEXI) y, si existe, la
+   cuarta (CARTA_CUARTA; mientras no tiene texto se muestra como papel en
+   blanco)— viven detrás de UN solo sobre:
      • Al bajar, el sobre (un cuadrito lila) crece con el scroll hasta ocupar la
        pantalla y en ese momento se vuelve un pop-up fijo (#carta-lector) con la
        carta en papel de pergamino, como la versión anterior: texto con scroll
        propio, tinta que aparece párrafo por párrafo y las flechas redondas con
-       "Carta N de 3" para cambiar entre las tres (←/→ y deslizar también).
+       "Carta N de M" (M = cuántas cartas hay) para cambiar entre ellas (←/→ y
+       deslizar también).
      • Al cerrar (✕, Esc o tocar fuera) el pop-up se encoge de nuevo hasta el
        sobre, que queda quieto al centro; la página se queda justo al final de la
        pista, así que para volver a abrirlo basta tocarlo o subir con el scroll
@@ -138,8 +140,14 @@
     lcTexto.classList.toggle('es-pendiente', !!c.pendiente);
     lcTexto.scrollTop = 0;
     lcN.textContent = 'Carta ' + (i + 1) + ' de ' + N;
+    var foco = document.activeElement;
     btnAnt.disabled = i === 0;
     btnSig.disabled = i === N - 1;
+    /* si se desactivó el botón que tenía el foco, el foco no debe salirse del diálogo */
+    if ((foco === btnSig && btnSig.disabled) || (foco === btnAnt && btnAnt.disabled)) {
+      var otro = foco === btnSig ? btnAnt : btnSig;
+      (otro.disabled ? lcCerrar : otro).focus({ preventScroll: true });
+    }
     var t = papel.querySelector('.carta-titulo'); if (t) t.textContent = c.titulo;
     var e = papel.querySelector('.carta-etiqueta'); if (e) e.textContent = 'Carta ' + (i + 1) + ' de ' + N;
   }
@@ -158,8 +166,14 @@
     return 'inset(' + (r.top - cr.top).toFixed(1) + 'px ' + (cr.right - r.right).toFixed(1) + 'px ' + (cr.bottom - r.bottom).toFixed(1) + 'px ' + (r.left - cr.left).toFixed(1) + 'px round ' + radio + 'px)';
   }
   function rectSobreCentrado() {
-    var w = window.innerWidth, h = window.innerHeight;
-    return { left: w / 2 - LADO / 2, right: w / 2 + LADO / 2, top: h / 2 - LADO / 2, bottom: h / 2 + LADO / 2 };
+    /* centro real de la escena (100svh): en iPhone innerHeight puede ser el viewport grande */
+    var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    var esc = host.querySelector('.carta-escena');
+    if (esc) {
+      var er = esc.getBoundingClientRect();
+      if (er.width > 0 && er.height > 0) { cx = er.left + er.width / 2; cy = er.top + er.height / 2; }
+    }
+    return { left: cx - LADO / 2, right: cx + LADO / 2, top: cy - LADO / 2, bottom: cy + LADO / 2 };
   }
 
   /* desde: 'scroll' (el marco ya ocupa la pantalla) o el rect del sobre (al tocarlo) */
@@ -232,13 +246,16 @@
   lcCerrar.addEventListener('click', cerrar);
   lector.addEventListener('pointerdown', function (e) { if (e.target === lector) cerrar(); });
   document.addEventListener('keydown', function (e) {
-    if (!abierto) return;
+    /* con el aviso (modal) encima, Esc/Tab son del modal, no del lector */
+    var modal = document.getElementById('app-modal');
+    if (!abierto || (modal && modal.classList.contains('open'))) return;
     if (e.key === 'Escape') { cerrar(); e.preventDefault(); }
     else if (e.key === 'ArrowRight' && document.activeElement !== lcTexto) { irCarta(1); e.preventDefault(); }
     else if (e.key === 'ArrowLeft' && document.activeElement !== lcTexto) { irCarta(-1); e.preventDefault(); }
     else if (e.key === 'Tab') {
       var f = Array.prototype.filter.call(caja.querySelectorAll('button, [tabindex="0"]'), function (x) { return !x.disabled; });
       var pos = f.indexOf(document.activeElement);
+      if (pos === -1) { if (f.length) f[e.shiftKey ? f.length - 1 : 0].focus(); e.preventDefault(); return; }
       if (e.shiftKey && pos <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
       else if (!e.shiftKey && pos === f.length - 1) { f[0].focus(); e.preventDefault(); }
     }
@@ -258,6 +275,11 @@
     abrir(sobre.getBoundingClientRect());
   });
 
+  /* mientras dura un salto programático (enlaces de la barra superior) la carta
+     no se abre sola al pasar por el centro de la pista; se libera tras ~12 cuadros quietos */
+  var autoPausa = false, framesQuieto = 0;
+  window.CartasFinal = { pausarAuto: function () { autoPausa = true; framesQuieto = 0; } };
+
   if (estatica) return;
 
   /* ---- la pista: el sobre crece con el scroll (simétrico respecto al centro) ---- */
@@ -269,6 +291,7 @@
     medidas.rec = Math.max(1, medidas.h - window.innerHeight);
     medidas.mw = marco.offsetWidth; medidas.mh = marco.offsetHeight;
     ultimoX = -1;
+    ultimoP = null;
   }
   var mt = 0;
   window.addEventListener('resize', function () { clearTimeout(mt); mt = setTimeout(medir, 160); });
@@ -278,6 +301,7 @@
 
   var emph = M.ease(.7, 0, .2, 1), lerp = M.lerp, clamp = M.clamp, suave = M.suave;
   var ultimoX = -1;
+  var ultimoP = null;
 
   function aplicar(x) {
     var mw = medidas.mw, mh = medidas.mh;
@@ -298,14 +322,20 @@
 
   function cuadro(E) {
     if (abierto || animando) return;
+    if (autoPausa) { if (E.dy === 0) { if (++framesQuieto > 12) autoPausa = false; } else framesQuieto = 0; }
     var p = clamp((E.y - medidas.top) / medidas.rec, 0, 1);
     var d = Math.min(p, 1 - p) * 2;                 // 0 en los extremos de la pista, 1 en el centro
     var x = clamp((d - .12) / .82, 0, 1);
+    /* un deslizamiento rápido puede saltarse la ventana del centro: también cuenta cruzarlo */
+    var cruzo = ultimoP !== null && ultimoP !== p && (ultimoP - .5) * (p - .5) <= 0;
+    ultimoP = p;
     if (x === ultimoX) return;
     var subiendo = x > ultimoX;
     ultimoX = x;
     aplicar(x);
-    if (x >= .985 && subiendo && performance.now() > bloqueoHasta) abrir(null);
+    var otraCapa = typeof canvasPauseReasons !== 'undefined' && canvasPauseReasons.size > 0;   // Buzón, Juegos, Infinito, visor…
+    if (autoPausa || otraCapa || performance.now() <= bloqueoHasta) return;
+    if ((x >= .985 && subiendo) || (cruzo && x > .85)) abrir(null);
   }
   medir();
   aplicar(0);

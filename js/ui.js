@@ -4,7 +4,8 @@
 const preloader = document.getElementById('preloader');
 const screenGate = document.getElementById('screen-gate');
 Promise.all([
-  document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(),
+  /* con red lenta una fuente colgada no debe esconder la entrada: a los 4 s se sigue (swap la aplica después) */
+  Promise.race([document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve(), new Promise((r) => setTimeout(r, 4000))]),
   new Promise((res) => setTimeout(res, 1300)),
 ]).then(() => {
   preloader.style.opacity = '0';
@@ -66,19 +67,31 @@ const lightboxImg = document.getElementById('lightbox-img');
 const lightboxCloseBtn = document.getElementById('lightbox-close');
 let lightboxTouchStartY = null, lightboxTouchStartX = null;
 let lbGrupo = null, lbIndice = 0; // grupo de fotos navegables [{src, alt}] y la actual
+let lbOrigen = null; // a donde vuelve el foco al cerrar
 const lightboxPrev = document.getElementById('lightbox-prev');
 const lightboxNext = document.getElementById('lightbox-next');
 const lightboxCount = document.getElementById('lightbox-count');
+lightbox.inert = true; // cerrado: su botón no se enfoca ni lo leen los lectores de pantalla
 
+/* el visor usa la misma .webp que ya mostró la tarjeta (pictureHTML); si no carga, el .jpeg */
+function ponerFotoLightbox(src) {
+  const webp = src.replace(/\.jpe?g$/i, '.webp');
+  if (webp === src) { lightboxImg.onerror = null; lightboxImg.src = src; return; }
+  lightboxImg.onerror = function () {
+    lightboxImg.onerror = null;
+    if (lightboxImg.getAttribute('src') === webp) lightboxImg.src = src;
+  };
+  lightboxImg.src = webp;
+}
 function pintarLightbox() {
   const f = lbGrupo ? lbGrupo[lbIndice] : null;
-  if (f) { lightboxImg.src = f.src; lightboxImg.alt = f.alt || ''; }
+  if (f) { ponerFotoLightbox(f.src); lightboxImg.alt = f.alt || ''; }
   const varias = !!lbGrupo;
   lightboxPrev.hidden = lightboxNext.hidden = lightboxCount.hidden = !varias;
   if (varias) {
     lightboxCount.textContent = (lbIndice + 1) + ' / ' + lbGrupo.length;
     const vecina = lbGrupo[(lbIndice + 1) % lbGrupo.length];
-    new Image().src = vecina.src; // la siguiente ya queda en caché
+    new Image().src = vecina.src.replace(/\.jpe?g$/i, '.webp'); // la siguiente ya queda en caché
   }
 }
 /* grupo (opcional): arreglo de { src, caption|alt } para navegar con flechas, teclas y deslizando */
@@ -89,11 +102,15 @@ function openLightbox(src, alt, grupo, indice) {
     pintarLightbox();
   } else {
     lbGrupo = null;
-    lightboxImg.src = src;
+    ponerFotoLightbox(src);
     lightboxImg.alt = alt || '';
     pintarLightbox();
   }
+  const yaAbierto = lightbox.classList.contains('open');
+  if (!yaAbierto) lbOrigen = document.activeElement;
+  lightbox.inert = false;
   lightbox.classList.add('open');
+  if (!yaAbierto) lightboxCloseBtn.focus({ preventScroll: true });
   canvasPauseReasons.add('lightbox');
   updateCanvasPauseState();
 }
@@ -105,10 +122,14 @@ function lightboxIr(d) {
   if (window.Sonidos) window.Sonidos.play('mes');
 }
 function closeLightbox() {
+  if (!lightbox.classList.contains('open')) return;
   lightbox.classList.remove('open');
+  lightbox.inert = true;
   lightboxImg.style.transform = '';
   canvasPauseReasons.delete('lightbox');
   updateCanvasPauseState();
+  if (lbOrigen && lbOrigen.focus && document.contains(lbOrigen)) lbOrigen.focus({ preventScroll: true });
+  lbOrigen = null;
 }
 lightboxCloseBtn.addEventListener('click', closeLightbox);
 lightboxPrev.addEventListener('click', () => lightboxIr(-1));
@@ -116,9 +137,16 @@ lightboxNext.addEventListener('click', () => lightboxIr(1));
 lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 document.addEventListener('keydown', (e) => {
   if (!lightbox.classList.contains('open')) return;
-  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'Escape') { closeLightbox(); e.preventDefault(); }
   else if (e.key === 'ArrowRight') lightboxIr(1);
   else if (e.key === 'ArrowLeft') lightboxIr(-1);
+  else if (e.key === 'Tab') {   // Tab no se sale del visor mientras está abierto
+    const f = Array.from(lightbox.querySelectorAll('button')).filter((x) => !x.hidden && !x.disabled && x.offsetParent !== null);
+    if (!f.length) return;
+    const i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
+    else if (!e.shiftKey && (i === f.length - 1 || i === -1)) { f[0].focus(); e.preventDefault(); }
+  }
 });
 lightbox.addEventListener('touchstart', (e) => { lightboxTouchStartY = e.touches[0].clientY; lightboxTouchStartX = e.touches[0].clientX; }, { passive: true });
 lightbox.addEventListener('touchmove', (e) => {
@@ -240,6 +268,7 @@ btnSi.addEventListener('click', () => {
   spawnSparkleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 90);
   screenGate.classList.add('screen-out');
   setTimeout(() => { screenGate.style.display = 'none'; }, 850);
+  screenSongs.removeAttribute('inert');
   screenSongs.classList.add('active');
 });
 

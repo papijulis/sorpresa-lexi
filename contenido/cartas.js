@@ -1,21 +1,19 @@
 /* El Buzón — cartas que se "sellan" hasta su fecha de apertura (o que
    están disponibles desde ya, para abrir "cuando" haga falta).
    Fecha de apertura: comparada contra la fecha de hoy en America/Mexico_City
-   (ver getTodayDateString() en index.html). Mientras no llegue esa fecha,
+   (ver getTodayDateString() en js/buzon-juegos.js). Mientras no llegue esa fecha,
    el sobre se ve sellado con cuenta regresiva.
    desbloqueaCon: "caceria" | "curame" — la carta no se abre por fecha sino
-   al completar ese juego (ver cartaIsOpenable() en index.html); "pista" es
+   al completar ese juego (ver cartaIsOpenable() en js/buzon-juegos.js); "pista" es
    lo que se lee en el sobre mientras está cerrado.
    Los textos marcados borrador:true se listan en REVISAR.md. */
 
-/* Segunda carta del pergamino final ("Leer una carta más") y también sobre
-   del Buzón. Texto de CARTA-FINAL.md; el cierre mezcla las tres variantes
+/* Segunda carta del sobre de "Las cartas del final" (js/cartas-final.js);
+   no está en el Buzón. Texto de CARTA-FINAL.md; el cierre mezcla las tres variantes
    opcionales (gracias por quedarte / lugar seguro, hogar, persona / hasta
    la luna). Sin emojis a propósito. */
 window.CARTA_FINAL = {
   titulo: "Para seguir escribiendo",
-  botonIda: "Leer una carta más",
-  botonVuelta: "Volver a la primera carta",
   texto: `Lexi:
 
 Cuando abriste esta página el 21 de septiembre, me dijiste que iba a ser tu lugar seguro cuando yo no estuviera. Por eso no quise que se quedara en la sorpresa de un solo día. Aquí van a vivir las cartas que todavía no te escribo, las razones que todavía me faltan y todo lo que se nos vaya ocurriendo.
@@ -38,8 +36,8 @@ Julio`,
 };
 
 
-/* Tercera carta del pergamino ("Leer una carta más" desde "Para seguir
-   escribiendo") y último sobre del Buzón. Texto literal, tal como lo
+/* Tercera carta del sobre de "Las cartas del final" (js/cartas-final.js);
+   no está en el Buzón. Texto literal, tal como lo
    escribió Julio: no se corrige ni se resume. */
 window.CARTA_PARA_LEXI = {
   titulo: "Para Lexi",

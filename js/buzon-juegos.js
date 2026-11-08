@@ -10,7 +10,11 @@ function mexicoCityDateString(date) {
 }
 const URL_FECHA_OVERRIDE = (() => {
   const raw = new URLSearchParams(location.search).get('fecha');
-  return raw && /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : null;
+  if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+  /* una fecha imposible (2026-13-01, 2026-02-30) se ignora en vez de romper la carga */
+  const [y, m, d] = raw.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1, d));
+  return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d ? raw : null;
 })();
 function getTodayDateString() {
   return URL_FECHA_OVERRIDE || mexicoCityDateString(new Date());
@@ -20,16 +24,18 @@ function daysBetween(dateStrA, dateStrB) {
   const b = new Date(dateStrB + 'T00:00:00');
   return Math.round((b - a) / 86400000);
 }
+/* en UTC: con la hora local, en zonas con horario de verano un día se repetía y otro se saltaba */
 function dayOfYear(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  const start = new Date(d.getFullYear(), 0, 1);
-  return Math.floor((d - start) / 86400000);
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(y, 0, 1)) / 86400000);
 }
 
 /* ======================================================================
    EL BUZÓN — sobres con fecha de apertura, mesiversarios, abre-cuando,
    cápsulas del tiempo
 ====================================================================== */
+/* si contenido/cartas.js no cargó o trae un error, el Buzón queda vacío pero el resto del archivo (Juegos, Cacería) sigue vivo */
+if (!Array.isArray(window.CARTAS)) window.CARTAS = [];
 const BUZON_STORAGE_KEY = 'jardin.buzon.v1';
 const TIPO_META = {
   mesiversario: { icon: 'i-luna', color: '#FFD700' },
@@ -145,6 +151,18 @@ function showCartaModal(carta, dir) {
   const prev = document.getElementById('carta-prev'), next = document.getElementById('carta-next');
   if (prev) prev.addEventListener('click', () => irCarta(-1));
   if (next) next.addEventListener('click', () => irCarta(1));
+  /* al cambiar de carta se rehace el cuerpo del modal: si el botón enfocado se destruyó, el foco
+     pasa al botón nuevo equivalente en vez de caer en <body> */
+  if (dir) {
+    const act = document.activeElement;
+    const panelCarta = document.getElementById('modal-panel');
+    if (!act || act === document.body || !document.contains(act) || (panelCarta && !panelCarta.contains(act))) {
+      const pref = document.getElementById(dir > 0 ? 'carta-next' : 'carta-prev');
+      const otro = document.getElementById(dir > 0 ? 'carta-prev' : 'carta-next');
+      const destino = (pref && !pref.disabled) ? pref : ((otro && !otro.disabled) ? otro : document.getElementById('modal-close'));
+      if (destino) destino.focus({ preventScroll: true });
+    }
+  }
 }
 /* de una carta a la vecina (solo entre las que ya se pueden abrir) */
 function irCarta(dir) {
@@ -365,6 +383,7 @@ function renderJuegosGrid() {
   JUEGOS_JUGABLES.forEach((juego) => {
     const card = document.createElement('div');
     card.className = 'juego-card tarjeta-flor glass rounded-3xl';
+    card.dataset.id = juego.id;
     card.innerHTML = `
       <span class="juego-card-emoji">${iconoHTML(juego.icono || juego.emoji, 'ico-xl')}</span>
       <p class="font-display text-lg text-parchment">${juego.titulo}</p>
@@ -399,8 +418,13 @@ function launchJuego(juego) {
   juegosIntro.classList.add('hidden');
   juegoStage.classList.remove('hidden');
   juego.start(juegoMount);
+  /* la tarjeta enfocada quedó escondida: el foco pasa a "Salir del juego" en vez de caer en <body> */
+  juegoExitBtn.focus({ preventScroll: true });
 }
-function exitJuego() {
+/* devolverFoco: verdadero al salir con el botón o con Esc (closeJuegosView llama sin argumentos
+   y devuelve el foco por su cuenta) */
+function exitJuego(devolverFoco) {
+  const idPrevio = activeJuego ? activeJuego.id : null;
   if (activeJuego) { activeJuego.stop(); activeJuego = null; }
   juegoStage.classList.add('hidden');
   viewJuegos.classList.remove('jugando');
@@ -408,8 +432,12 @@ function exitJuego() {
   juegosIntro.classList.remove('hidden');
   juegosGridEl.classList.remove('hidden');
   renderJuegosGrid();
+  if (devolverFoco && idPrevio && viewJuegos.classList.contains('open')) {
+    const card = Array.prototype.find.call(juegosGridEl.children, (c) => c.dataset.id === idPrevio);
+    if (card) card.focus({ preventScroll: true });
+  }
 }
-juegoExitBtn.addEventListener('click', exitJuego);
+juegoExitBtn.addEventListener('click', exitJuego); // el listener recibe el evento => devolverFoco es verdadero
 
 function openJuegosView(origen) {
   if (!viewJuegos.classList.contains('open')) juegosOrigen = document.activeElement;
@@ -436,6 +464,34 @@ function closeJuegosView() {
 }
 juegosToggleBtn.addEventListener('click', openJuegosView);
 juegosCloseBtn.addEventListener('click', closeJuegosView);
+
+/* Esc cierra el Buzón / sale del juego o cierra los Juegos; Tab no se sale de la vista abierta.
+   Cede a cualquier capa que esté encima (modal, visor de fotos, Rueda, Flor, Infinito, lector de cartas). */
+function capaEncimaDeVista() {
+  const abierta = (id) => { const el = document.getElementById(id); return !!(el && el.classList.contains('open')); };
+  const visible = (id) => { const el = document.getElementById(id); return !!(el && !el.hidden); };
+  return abierta('app-modal') || abierta('lightbox') || abierta('view-infinito') ||
+    visible('rueda') || visible('flor-especial') ||
+    document.documentElement.classList.contains('carta-abierta');
+}
+document.addEventListener('keydown', (e) => {
+  if (e.defaultPrevented || e.isComposing) return;
+  if (e.key !== 'Escape' && e.key !== 'Tab') return;
+  const vista = viewJuegos.classList.contains('open') ? viewJuegos : (viewBuzon.classList.contains('open') ? viewBuzon : null);
+  if (!vista || capaEncimaDeVista()) return;
+  if (e.key === 'Escape') {
+    if (vista === viewJuegos) { if (activeJuego) exitJuego(true); else closeJuegosView(); }
+    else closeBuzonView();
+    e.preventDefault();
+    return;
+  }
+  const f = Array.from(vista.querySelectorAll('button, [href], input, select, textarea, [tabindex]'))
+    .filter((x) => !x.disabled && x.tabIndex >= 0 && x.getClientRects().length > 0 && !x.closest('[inert]'));
+  if (!f.length) return;
+  const i = f.indexOf(document.activeElement);
+  if (e.shiftKey && i <= 0) { f[f.length - 1].focus(); e.preventDefault(); }
+  else if (!e.shiftKey && (i === f.length - 1 || i === -1)) { f[0].focus(); e.preventDefault(); }
+});
 
 function updateJuegosDot() {
   if (!window.JuegoCaceria || !juegosDot) return;

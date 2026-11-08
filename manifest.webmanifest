@@ -1,11 +1,10 @@
 {
-  "name": "Para Lexi 💛",
+  "name": "Para Lexi",
   "short_name": "Lexi",
   "description": "Nuestro Jardín — un pequeño mundo hecho de flores amarillas, atardeceres y todo lo que siento por ti.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#090112",
   "theme_color": "#18062B",
   "lang": "es-MX",

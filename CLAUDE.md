@@ -225,7 +225,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 
 ## Partes del recorrido (rediseño, bloque 3)
 
-- El recorrido va en **cinco partes** (`<div class="capitulo" id="cap-N" data-capitulo="N" data-nombre="…">` en `index.html`): I Cómo empezó (contador, mesiversario, calendario) · II Lo que guardo de ti (nota de voz, frasco) · III Lo que hemos vivido (fotos favoritas, polaroids, línea del tiempo) · IV Nuestra música (banda sonora) · V Lo que sigue (pergamino de cartas). Se dice **"Parte"**, no "Capítulo": "Capítulo 1" ya es el nombre de la sorpresa del 21 de septiembre.
+- El recorrido va en **cinco partes** (`<div class="capitulo" id="cap-N" data-capitulo="N">` en `index.html`): I Cómo empezó (contador, mesiversario, calendario) · II Lo que guardo de ti (nota de voz, frasco) · III Lo que hemos vivido (fotos favoritas, polaroids, línea del tiempo) · IV Nuestra música (banda sonora) · V Lo que sigue (pergamino de cartas). Se dice **"Parte"**, no "Capítulo": "Capítulo 1" ya es el nombre de la sorpresa del 21 de septiembre.
 - Cada parte abre con un **portal a pantalla completa** (`.cap-portal`, `data-escena="pasada"`: el número romano gigante en contorno y el texto se mueven con `--p`), y entre partes crece un **puente** (`.cap-puente`, `data-escena="trazo"`: un tallo que se dibuja y un lirio que florece). Estilos en `assets/css/capitulos.css`.
 - `js/capitulos.js`: un `IntersectionObserver` con banda de cero alto en el centro decide la parte actual → `body[data-capitulo]` (tiñe `#bg-capitulo` con `--cap-rgb`/`--cap-a`, registrados con `@property`), resalta la entrada del índice de partes (dentro de "Caminos del jardín", `.cap-indice-item`) y muestra 3.4 s el letrero `#cap-indicador`. Si agregas una sección nueva, ponla dentro de la parte que le toque, no suelta; si agregas una parte, suma su portal, su puente y un tinte `body[data-capitulo="N"]`.
 - Los títulos y subtítulos de las partes son rótulos míos: están listados en `REVISAR.md`.
@@ -278,6 +278,17 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
 - Línea del tiempo: termina en `.tl-pausa` (lirio cerrado + `PAUSA.cierre` + un segundo círculo de la rueda; `Rueda.abrir(boton)` acepta el botón de origen). Lirios del mes topados en `PAUSA.flores` (5). Cupones: se raspan, no se canjean.
 - Cartas del final: 4 (la cuarta es `CARTA_CUARTA` en cartas.js; con `texto` vacío muestra `pendiente`).
 - Más sereno: `SERENO` en motor-canvas.js (pétalos 60 % y más lentos, máx. 2 mariposas, destellos al 45 %), sin mariposas extra de primavera, ritmo de la música al 45 % y sin bokeh por golpe, flujo de luz más lento, brillos/latidos CSS más lentos.
+
+## Auditoría completa (2026-11-08)
+
+- Revisión línea por línea de todo el proyecto: 182 hallazgos, 172 confirmados por verificación doble y corregidos (rama `pulido-total`). Lo esencial que NO hay que reintroducir:
+  - **Cacería**: lee su progreso en `init()` (cuando `jardinStorage` ya existe), no al cargar el archivo; antes cada recarga borraba los corazones encontrados.
+  - **`jardinStorage`** (nucleo.js): la memoria es una capa encima de `localStorage`; un fallo de escritura ya no deja de leer lo guardado.
+  - **Canvas principal**: `loop()` programa el siguiente cuadro primero y atrapa errores (`loopFallo`), así un error no congela el fondo; `ctx2d()` tolera un `getContext` nulo.
+  - **Contador**: setInterval de 250 ms que solo pinta al cambiar el segundo (no salta ni repite); con el reloj del dispositivo antes del 28/05/2026 muestra ceros.
+  - **sw.js**: precache que conserva la copia anterior si un archivo falla; network-first entrega la copia guardada ante 404/5xx o red colgada (4 s la página, 12 s los demás); la página se guarda sin query; `activate` solo borra cachés `jardin-*`; `assets/vendor/` cache-first.
+  - **Accesibilidad**: tarjetas de canción con teclado (`hacerClicable`), `inert` inicial en `#main-content`, `#dock` y `#screen-songs` (los quita el JS en el momento justo), Buzón/Juegos con Esc y foco atrapado, visor de fotos como diálogo, `#toast` con `role=status`.
+  - `tools/check-assets.js` ahora también revisa scripts, hojas de estilo, `url()` de CSS, manifest y `sw.js`.
 
 ## Sistema de botones (2026-11-05)
 
@@ -337,7 +348,7 @@ Un solo motivo maestro en todo el sitio: **el lirio de 6 pétalos con trazo cont
   (`goToLetter()`; "Leer…" se oculta en la última, "Volver…" en la primera): la tinta se desvanece y se
   vuelve a revelar párrafo por párrafo, `aria-live="polite"`, instantáneo con
   `prefers-reduced-motion`. La vela del deseo (`#letter-wish-block`) es solo de
-  la primera carta. `CARTA_FINAL` también es un sobre abierto del Buzón; "Para Lexi" **no** está en el Buzón (solo es la tercera carta del pergamino).
+  la primera carta. Ni `CARTA_FINAL` ni "Para Lexi" están en el Buzón: solo viven en el sobre de "Las cartas del final".
 - **Contador infinito:** `diffFromStart()` calcula siempre ahora − 28/05/2026 en hora de Ciudad de México (Intl, no la zona del dispositivo) a partir de `Date`, nunca sumando 1 por tic; sin fecha de fin ni `clearInterval`; se actualiza al instante en `visibilitychange`/`pageshow`/`focus`. Debajo va la dedicatoria "Me dijiste que el día que este contador se detenga…". `START_DATE` es el instante fijo `2026-05-28T00:00:00-06:00`.
 - **Popup "Infinito"** (`#view-infinito` en index.html + `assets/css/infinito.css` + `js/infinito.js`; ya no existe `infinito.html`): se abre desde el ∞ junto al contador (`#clock-infinity-link`) como una vista más (`.app-view`, iris desde el ∞, `window.Infinito.abrir()/cerrar()`, razón `'infinito'` en `canvasPauseReasons`) — por decisión de Julio, para que no se reinicie el Jardín al volver. Idea tomada de ritvikbhatia/LoveProject (texto tipo código que se escribe solo + corazón de flores + contador), en JS plano con la paleta del sitio: flores de pétalos bezier con composición `lighter` sobre canvas (dpr ≤ 2, 1.5 en teléfono), **el corazón de "te amo" en 20 idiomas justo en el centro del corazón de flores** (`#inf-lang`, mismo centro H/2, escala `K*0.82`, vía `buildHeartLangWords(w, h, {cx, cy, scale})`), texto en monoespaciado del sistema (única excepción tipográfica, solo para el "código"), contador con la misma regla de siempre. Nada corre con el popup cerrado; reduced-motion dibuja todo de una vez.
 - La sección "Lo que nos falta vivir" se eliminó por decisión de Julio (no volver a agregarla).

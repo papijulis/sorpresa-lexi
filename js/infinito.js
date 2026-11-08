@@ -20,6 +20,7 @@
   window.heartProgress = 0;
   var pico = 1;
   var abierto = false, iniciado = false, necesitaRehacer = false;
+  var cieloMedido;   // cielo con el que se midieron (y colorearon) las palabras
 
   function rand(a, b) { return Math.random() * (b - a) + a; }
   function randInt(a, b) { return Math.floor(rand(a, b + 1)); }
@@ -60,7 +61,7 @@
     for (var i = 0; i < count; i++) {
       petals.push({
         sa: rand(0.1, 3), sb: rand(0.1, 3), start: start + i * step, angle: step,
-        grow: rand(0.1, 1) * K, r: 1, done: false,
+        grow: rand(0.1, 1) * K, r: 1,
       });
     }
     return { x: x, y: y, R: radius, color: pickColor(), petals: petals };
@@ -84,7 +85,7 @@
       ctx.strokeStyle = b.color;
       for (var k = 0; k < b.petals.length; k++) {
         var p = b.petals[k];
-        if (p.r <= b.R) { p.r += p.grow; drawPetal(p); allDone = false; } else { p.done = true; }
+        if (p.r <= b.R) { p.r += p.grow; drawPetal(p); allDone = false; }
       }
       ctx.restore();
       if (allDone) blooms.splice(i, 1);
@@ -92,8 +93,8 @@
     return blooms.length === 0;
   }
 
-  /* curva paramétrica clásica del corazón (la misma de Constelación y del
-     corazón de idiomas del Jardín) */
+  /* curva paramétrica clásica del corazón (la misma de Constelación y de
+     corazon-palabras.js) */
   function heartPoint(t) {
     var x = 16 * Math.pow(Math.sin(t), 3);
     var y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t));
@@ -107,9 +108,8 @@
   var running = false;
 
   function sizeCanvas() {
-    var rect = box.getBoundingClientRect();
     dpr = Math.min(window.devicePixelRatio || 1, window.innerWidth < 640 ? 1.5 : 2);
-    W = Math.max(1, rect.width); H = Math.max(1, rect.height);
+    W = Math.max(1, box.clientWidth); H = Math.max(1, box.clientHeight);   // tamaño de layout: sin el latido ni la escala del iris
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = 'lighter';
@@ -140,7 +140,7 @@
     if (heartDone) { pico = Math.max(pico, blooms.length); return blooms.length ? 0.92 + 0.08 * (1 - blooms.length / pico) : 1; }
     return Math.max(0, Math.min(1, (angle - Math.PI) / (Math.PI * 2))) * 0.92;
   }
-  function medirPalabras() { if (palabras) palabras.medir(W, H, K, dpr); }
+  function medirPalabras() { cieloMedido = document.documentElement.dataset.cielo; if (palabras) palabras.medir(W, H, K, dpr); }
 
   function showMessage() { messageEl.classList.add('shown'); }
 
@@ -265,7 +265,12 @@
     elH.textContent = pad(h); elM.textContent = pad(m); elS.textContent = pad(s);
   }
   tick();
-  setInterval(function () { if (abierto && !document.hidden) tick(); }, 1000);
+  var ultimoSegInf = -1;
+  setInterval(function () {
+    if (!abierto || document.hidden) return;
+    var s = Math.floor(Date.now() / 1000);
+    if (s !== ultimoSegInf) { ultimoSegInf = s; tick(); }
+  }, 250);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tick(); });
   window.addEventListener('pageshow', tick);
   window.addEventListener('focus', tick);
@@ -341,7 +346,7 @@
       restart();
       if (REDUCED) finishTyping(); else setTimeout(typeNext, 900);
     } else {
-      if (necesitaRehacer) restart();
+      if (necesitaRehacer || cieloMedido !== document.documentElement.dataset.cielo) restart();
       else if (!REDUCED) {
         running = true;
         start();
@@ -385,4 +390,5 @@
      popup no dé un tirón en teléfonos lentos (el popup cerrado igual tiene su tamaño de layout) */
   var precalcular = function () { if (!iniciado && box.offsetWidth) { sizeCanvas(); medirPalabras(); } };
   if ('requestIdleCallback' in window) window.addEventListener('load', function () { requestIdleCallback(precalcular, { timeout: 8000 }); });
+  else window.addEventListener('load', function () { setTimeout(function () { if (!document.hidden) precalcular(); }, 5000); });   /* Safari/iOS no tiene requestIdleCallback; 5 s para quedar fuera de la medición de fps de los primeros 3 s */
 })();

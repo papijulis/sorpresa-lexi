@@ -1,9 +1,10 @@
 /* Cupones para raspar — capa de canvas que se "rasca" con el dedo o el
-   mouse hasta revelar el cupón. Usa helpers globales de index.html:
+   mouse hasta revelar el cupón. Usa helpers globales de los scripts principales
+   (nucleo.js, ui.js…):
    jardinStorage, showToast y window.CUPONES / window.NOTA_CUPON. Todo lo
    que toca esos globales vive dentro
    de funciones, nunca en el nivel superior del archivo, para no importar
-   si este script carga antes que el inline principal. */
+   aunque este script cargue antes que ellos. */
 window.JuegoCupones = (function () {
   const STORAGE_KEY = 'jardin.cupones.v1';
   let state = null;
@@ -75,36 +76,77 @@ window.JuegoCupones = (function () {
       return count / (cols * rows);
     }
 
+    function revelar(porTeclado) {
+      if (cleared) return;
+      cleared = true;
+      if (window.Acierto) window.Acierto('exito');
+      canvas.classList.add('cleared');
+      canvas.tabIndex = -1;
+      canvas.setAttribute('aria-hidden', 'true');
+      resizeObserver.disconnect();
+      onCleared(porTeclado === true);
+    }
+
     let dragging = false;
     let frameQueued = false;
+    let ultimaRevision = 0;
+    let pendiente = false;   // hubo raspado desde la última revisión
+    /* leer el lienzo completo cuesta: se revisa a lo más cada 120 ms mientras
+       se raspa, y una vez más al soltar */
+    function revisar() {
+      if (cleared || !pendiente) return;
+      ultimaRevision = performance.now();
+      pendiente = false;
+      if (clearedFraction() > 0.55) revelar(false);
+    }
     function handleMove(clientX, clientY) {
       scratchAt(clientX, clientY);
+      pendiente = true;
       if (frameQueued) return;
       frameQueued = true;
       requestAnimationFrame(() => {
         frameQueued = false;
-        if (!cleared && clearedFraction() > 0.55) {
-          cleared = true;
-          if (window.Acierto) window.Acierto('exito');
-          canvas.classList.add('cleared');
-          resizeObserver.disconnect();
-          onCleared();
-        }
+        if (performance.now() - ultimaRevision < 120) return;
+        revisar();
       });
     }
-    function onPointerDown(e) { dragging = true; handleMove(e.clientX, e.clientY); }
-    function onPointerMove(e) { if (dragging) handleMove(e.clientX, e.clientY); }
-    function onPointerUp() { dragging = false; }
+    function onPointerDown(e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;   // solo el botón principal raspa
+      dragging = true;
+      handleMove(e.clientX, e.clientY);
+    }
+    function onPointerMove(e) {
+      if (!dragging) return;
+      // soltó el mouse fuera de la ventana o perdió el foco: deja de raspar
+      if (e.pointerType === 'mouse' && !(e.buttons & 1)) { dragging = false; revisar(); return; }
+      handleMove(e.clientX, e.clientY);
+    }
+    // pointerup se escucha en window por cada tarjeta: solo revisa la que se estaba raspando
+    function onPointerUp() {
+      if (!dragging) return;
+      dragging = false;
+      revisar();
+    }
+    // teclado / switch: Enter o Espacio revela el cupón
+    function onKeyDown(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      revelar(true);
+    }
 
     canvas.addEventListener('pointerdown', onPointerDown);
     canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('keydown', onKeyDown);
     window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerUp);
 
     return function cleanup() {
       resizeObserver.disconnect();
       canvas.removeEventListener('pointerdown', onPointerDown);
       canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
     };
   }
 
@@ -155,10 +197,19 @@ window.JuegoCupones = (function () {
     } else {
       const canvas = document.createElement('canvas');
       canvas.className = 'cupon-scratch-canvas';
+      canvas.tabIndex = 0;
+      canvas.setAttribute('role', 'button');
+      canvas.setAttribute('aria-label', 'Raspar el cupón ' + cupon.titulo);
       card.appendChild(canvas);
-      const cleanup = setupScratch(canvas, () => {
+      const cleanup = setupScratch(canvas, (porTeclado) => {
         if (!state.revelados.includes(cupon.id)) { state.revelados.push(cupon.id); saveState(); }
         addRedeemUI(reveal, cupon);
+        if (porTeclado) {
+          // el lienzo se quita en 550 ms: el foco pasa al botón "Acepto" (o al cupón, en pausa)
+          const destino = reveal.querySelector('button:not([disabled])') || reveal;
+          if (destino === reveal) reveal.tabIndex = -1;
+          try { destino.focus({ preventScroll: true }); } catch (e) { destino.focus(); }
+        }
         setTimeout(() => canvas.remove(), 550);
       });
       cleanupFns.push(cleanup);
@@ -187,8 +238,11 @@ window.JuegoCupones = (function () {
     descripcion: 'Raspa cada tarjeta y descubre tu premio.',
     progressLabel() {
       const s = loadState();
-      const total = (window.CUPONES || []).length;
-      return `${s.revelados.length} de ${total} raspados`;
+      const cupones = window.CUPONES || [];
+      // solo cuenta ids que siguen existiendo (si Julio quita o renombra un cupón)
+      const ids = new Set(cupones.map((c) => c && c.id));
+      const n = s.revelados.filter((id) => ids.has(id)).length;
+      return `${n} de ${cupones.length} raspados`;
     },
     start,
     stop,

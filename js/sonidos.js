@@ -122,7 +122,10 @@
            pantalla bloqueada en iPhone) currentTime no avanza: las notas que se programaban se
            apilaban en el mismo instante y sonaban TODAS de golpe al reanudar, una tras otra
            sin parar. Ahora, si no está corriendo, solo se reanuda y ese sonido se descarta. */
-        if (b.ac.state !== 'running') { b.ac.resume(); return; }
+        if (b.ac.state !== 'running') {
+          try { var r = b.ac.resume(); if (r && r.catch) r.catch(function () {}); } catch (e2) { /* nada */ }
+          return;
+        }
         ultimo[nombre] = ahora;
         recientes.push(ahora);
         VOCES[nombre](b, arg);

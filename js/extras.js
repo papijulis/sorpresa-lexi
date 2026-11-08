@@ -51,19 +51,28 @@ function spawnHeartRain() {
 }
 let teAmoBuffer = '';
 let iLoveYouBuffer = '';
+/* Infinito no se abre detrás de otro pop-up (quedaría tapado con el foco en un ✕ invisible) */
+function capaEncimaDeInfinito() {
+  const oculto = (id) => { const el = document.getElementById(id); return !el || el.hidden; };
+  const abierta = (id) => { const el = document.getElementById(id); return !!(el && el.classList.contains('open')); };
+  return !oculto('rueda') || !oculto('flor-especial') || abierta('app-modal') || abierta('lightbox') ||
+    document.documentElement.classList.contains('carta-abierta');
+}
 window.addEventListener('keydown', (e) => {
-  if (e.key.length !== 1) return;
+  if (typeof e.key !== 'string' || e.key.length !== 1) return;   // keydown sintéticos (autocompletado) pueden venir sin key
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  if (document.body.classList.contains('locked')) return;          // pantalla de entrada
   teAmoBuffer = (teAmoBuffer + e.key.toLowerCase()).slice(-6);
   if (teAmoBuffer.includes('te amo')) {
     teAmoBuffer = '';
     spawnHeartRain();
     showToast('Yo también te amo {i-corazon-lleno}');
-    if (window.Infinito) window.Infinito.abrir();
+    if (window.Infinito && !capaEncimaDeInfinito()) window.Infinito.abrir();
   }
   iLoveYouBuffer = (iLoveYouBuffer + e.key.toLowerCase()).slice(-11);
   if (iLoveYouBuffer.includes('i love you')) {
     iLoveYouBuffer = '';
-    if (window.Infinito) window.Infinito.abrir();
+    if (window.Infinito && !capaEncimaDeInfinito()) window.Infinito.abrir();
   }
 });
 
@@ -78,7 +87,8 @@ function applySeason() {
   } else {
     SEASON_PALETTE = null; // resto del año: paleta dorada/lavanda de siempre
   }
-  if (month >= 3 && month <= 5 && !window.EN_PAUSA) BUTTERFLY_CAP = 7; // primavera: más mariposas (en pausa, no)
+  /* primavera: más mariposas (en pausa, no; con modo ligero / movimiento reducido se queda el tope de motor-canvas) */
+  if (month >= 3 && month <= 5 && !window.EN_PAUSA && !LIGHT_MODE) BUTTERFLY_CAP = window.innerWidth < 640 ? 4 : 7;
 }
 applySeason();
 
@@ -86,6 +96,12 @@ applySeason();
    Construye las estrellas una sola vez; qué cielo se muestra (día /
    atardecer / noche) lo decide setCielo() en js/navegacion.js. */
 let cieloNocturnoListo = false;
+/* antes de la luna si vive dentro de la capa; si no (la luna puede salir como hermana de la capa),
+   al final — insertBefore con un nodo que no es hijo lanzaría NotFoundError */
+function meterEnCielo(nightLayer, nodo, moonEl) {
+  if (moonEl && moonEl.parentNode === nightLayer) nightLayer.insertBefore(nodo, moonEl);
+  else nightLayer.appendChild(nodo);
+}
 function applyNightMode() {
   const nightLayer = document.getElementById('bg-layer-night');
   const moonEl = document.getElementById('night-moon');
@@ -93,7 +109,7 @@ function applyNightMode() {
     cieloNocturnoListo = true;
     const via = document.createElement('div');
     via.className = 'night-via';
-    nightLayer.insertBefore(via, moonEl);
+    meterEnCielo(nightLayer, via, moonEl);
     const total = LIGHT_MODE ? 40 : (vw < 640 ? 64 : 110);
     for (let i = 0; i < total; i++) {
       const star = document.createElement('div');
@@ -106,12 +122,12 @@ function applyNightMode() {
       star.style.top = rand(0, 74) + '%';
       star.style.animationDuration = rand(2.4, 5.4).toFixed(2) + 's';
       star.style.animationDelay = rand(0, 3).toFixed(2) + 's';
-      nightLayer.insertBefore(star, moonEl);
+      meterEnCielo(nightLayer, star, moonEl);
     }
     const fugaz = document.createElement('div');
     fugaz.className = 'night-fugaz';
     fugaz.setAttribute('aria-hidden', 'true');
-    nightLayer.insertBefore(fugaz, moonEl);
+    meterEnCielo(nightLayer, fugaz, moonEl);
   }
   const vieja = nightLayer.querySelector('.night-constellation');
   if (vieja) vieja.remove();
@@ -123,7 +139,8 @@ function applyNightMode() {
    reimplementar la curva del corazón aquí. */
 function renderNightConstellation(nightLayer, moonEl) {
   if (!window.JuegoConstelacion || !window.JuegoConstelacion.isCompleted()) return;
-  const pts = window.JuegoConstelacion.getHeartPoints(38);
+  /* scale multiplica las unidades de la curva (x ±16, y ≈ -11.7..17): 2.3 cabe en el viewBox de ±42 */
+  const pts = window.JuegoConstelacion.getHeartPoints(2.3);
   const svgNS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(svgNS, 'svg');
   svg.setAttribute('viewBox', '-42 -42 84 84');
@@ -148,32 +165,69 @@ function renderNightConstellation(nightLayer, moonEl) {
     svg.appendChild(c);
   });
 
-  nightLayer.insertBefore(svg, moonEl);
+  meterEnCielo(nightLayer, svg, moonEl);
 }
-document.getElementById('night-moon').addEventListener('click', () => {
+function abrirSecretoLuna() {
   if (!document.body.classList.contains('night-mode') || document.body.classList.contains('sunset-mode')) return;
-  const rect = document.getElementById('night-moon').getBoundingClientRect();
+  const moon = document.getElementById('night-moon');
+  if (!moon) return;
+  const rect = moon.getBoundingClientRect();
   spawnSparkleBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 30, true);
   openModal({ icon: 'i-luna', title: 'Un secreto de la luna', body: window.MOON_SECRET_TEXT || '' });
+}
+document.getElementById('night-moon').addEventListener('click', abrirSecretoLuna);
+/* <main> (z 10) tapa la luna para el mouse y el dedo: un clic en una zona
+   "vacía" del contenido que cae sobre la luna también la abre. */
+document.addEventListener('click', (e) => {
+  if (e.defaultPrevented || e.button !== 0) return;
+  const body = document.body;
+  if (!body.classList.contains('night-mode') || body.classList.contains('sunset-mode')) return;
+  if (document.documentElement.classList.contains('carta-abierta')) return;
+  const mainEl = document.getElementById('main-content');
+  if (!mainEl || mainEl.classList.contains('hidden-content')) return;
+  const t = e.target;
+  if (!(t instanceof Element) || !mainEl.contains(t)) return;   // no closest('main'): #view-infinito tiene su propio <main>
+  if (t.closest('button, a[href], [role="button"], [tabindex], canvas, input, textarea, select, label, summary, [contenteditable]')) return;
+  const sel = window.getSelection ? window.getSelection() : null;
+  if (sel && String(sel).length) return;
+  const moon = document.getElementById('night-moon');
+  if (!moon) return;
+  const r = moon.getBoundingClientRect();
+  if (!r.width || !r.height) return;
+  if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) abrirSecretoLuna();
 });
 
 /* ---- saludo dinámico + frase del día (entrada suave, una vez por visita) ---- */
-function renderSaludoYFrase() {
+/* devuelve el elemento de la frase si la pintó (para el fundido de la primera vez) */
+function pintarSaludo() {
   const hour = mexicoCityHour();
   const saludo = hour < 12 ? 'Buenos días' : (hour < 19 ? 'Buenas tardes' : 'Buenas noches');
   const totalDias = Math.max(0, Math.floor((new Date() - START_DATE) / 86400000));
   const saludoEl = document.getElementById('saludo-dinamico');
-  if (saludoEl) saludoEl.textContent = `${saludo}, Lexi. Hoy son ${totalDias} días desde que empezamos a hablar.`;
+  const texto = `${saludo}, Lexi. Hoy son ${totalDias} días desde que empezamos a hablar.`;
+  if (saludoEl && saludoEl.textContent !== texto) saludoEl.textContent = texto;
 
   const banco = window.FRASES;
   const fraseEl = document.getElementById('frase-del-dia');
   if (fraseEl && banco && banco.length) {
     const frase = banco[dayOfYear(getTodayDateString()) % banco.length];
-    fraseEl.textContent = `"${frase.texto}"`;
-    setTimeout(() => fraseEl.classList.add('in'), 1000);
+    if (frase && frase.texto) {
+      const fraseTxt = `"${frase.texto}"`;
+      if (fraseEl.textContent !== fraseTxt) fraseEl.textContent = fraseTxt;
+      return fraseEl;
+    }
   }
+  return null;
+}
+function renderSaludoYFrase() {
+  const fraseEl = pintarSaludo();
+  if (fraseEl) setTimeout(() => fraseEl.classList.add('in'), 1000);
 }
 renderSaludoYFrase();
+/* si la pestaña o la PWA se reanuda otro día, el saludo, los días y la frase se ponen al corriente (sin repetir el fundido) */
+function repintarSaludo() { try { pintarSaludo(); } catch (e) {} }
+document.addEventListener('visibilitychange', () => { if (!document.hidden) repintarSaludo(); });
+window.addEventListener('pageshow', repintarSaludo);
 
 /* ---- Ritual 11:11 en vivo: si está en el sitio a las 11:11 (am o pm, hora
    de Ciudad de México) aparece la invitación a pedir un deseo, una sola
@@ -183,12 +237,26 @@ function mexicoCityHourMinute() {
   const get = (type) => Number((parts.find((p) => p.type === type) || {}).value);
   return { h: get('hour') % 24, m: get('minute') };
 }
-function check1111(h, m, force) {
+function hayAlgoAbierto1111() {
+  const modal = document.getElementById('app-modal');
+  if (modal && modal.classList.contains('open')) return true;
+  if (typeof activeJuego !== 'undefined' && activeJuego) return true;
+  if (document.querySelector('.app-view.open, #lightbox.open')) return true;
+  const rueda = document.getElementById('rueda');
+  if (rueda && !rueda.hidden) return true;
+  const flor = document.getElementById('flor-especial');
+  if (flor && !flor.hidden) return true;
+  return document.documentElement.classList.contains('carta-abierta');
+}
+function check1111(h, m) {
   if (m !== 11 || (h !== 11 && h !== 23)) return false;
   const mainEl = document.getElementById('main-content');
-  if (!force && mainEl && mainEl.classList.contains('hidden-content')) return false;
+  if (mainEl && mainEl.classList.contains('hidden-content')) return false;
   const key = `jardin.1111.${getTodayDateString()}-${h}`;
-  if (!force && jardinStorage.get(key)) return false;
+  if (jardinStorage.get(key)) return false;
+  /* algo abierto (carta, juego, rueda, flor, lector, foto): no tapar; sin marcar la clave,
+     el intervalo de 5 s vuelve a intentar dentro del mismo minuto */
+  if (hayAlgoAbierto1111()) return false;
   jardinStorage.set(key, '1');
   spawnSparkleBurst(window.innerWidth / 2, window.innerHeight / 2, 80, true);
   openModal({ icon: 'brillo', title: '11:11', body: window.RITUAL_1111_TEXT || 'Son las 11:11. Pide un deseo.' });
@@ -255,7 +323,8 @@ function renderTimeline() {
 
   /* recuerdos agrupados por mes (cronológico); el último mes arranca abierto */
   const grupos = [];
-  (window.MEMORIES || []).slice().sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).forEach((m) => {
+  /* un recuerdo sin fecha válida (edición a mano) se omite en vez de tumbar el resto del archivo */
+  (window.MEMORIES || []).filter((m) => m && typeof m.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(m.date)).sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0)).forEach((m) => {
     const key = m.date.slice(0, 7);
     let g = grupos[grupos.length - 1];
     if (!g || g.key !== key) { g = { key, anio: key.slice(0, 4), mes: Number(key.slice(5, 7)) - 1, items: [] }; grupos.push(g); }
@@ -267,17 +336,18 @@ function renderTimeline() {
     const mes = document.createElement('section');
     mes.className = 'tl-mes' + (gi === grupos.length - 1 ? ' abierto' : '');
     const panelId = 'tl-panel-' + g.key;
+    const btnId = 'tl-btn-' + g.key;
     const n = g.items.length;
     mes.innerHTML = `
       <h3 class="tl-mes-h">
-        <button type="button" class="tl-mes-btn" aria-expanded="${gi === grupos.length - 1}" aria-controls="${panelId}">
+        <button type="button" class="tl-mes-btn" id="${btnId}" aria-expanded="${gi === grupos.length - 1}" aria-controls="${panelId}">
           <span class="timeline-dot-col">${ico('lirio-mini', 'timeline-flor tl-flor-mes')}</span>
           <span class="tl-mes-nom">${MESES[g.mes]} <small>${g.anio}</small></span>
           <span class="tl-mes-cuenta">${n} ${n === 1 ? 'recuerdo' : 'recuerdos'}</span>
           <span class="tl-mes-mas" aria-hidden="true"></span>
         </button>
       </h3>
-      <div class="tl-panel" id="${panelId}" role="region"><div class="tl-panel-in"></div></div>`;
+      <div class="tl-panel" id="${panelId}" role="region" aria-labelledby="${btnId}"><div class="tl-panel-in"></div></div>`;
     const inner = mes.querySelector('.tl-panel-in');
     g.items.forEach((m) => {
       const el = document.createElement('div');
@@ -340,7 +410,6 @@ function renderTimeline() {
   actualizarBotonTodo();
 
   /* ---- la enredadera: un tallo que se dibuja con el scroll, con hojas y zarcillos ---- */
-  const NS = 'http://www.w3.org/2000/svg';
   let vineFill = null, decos = [], tlTop = 0, tlHeight = 0, tops = [], lastBuiltH = -1;
   function buildVine(h) {
     lastBuiltH = h;
@@ -373,10 +442,13 @@ function renderTimeline() {
     tops = litTargets.map((el) => el.getBoundingClientRect().top + y);
     const h = Math.max(40, Math.round(tlHeight));
     if (Math.abs(h - lastBuiltH) > 1) buildVine(h);
-    update();
+    update(y, window.innerHeight);
   }
-  function update() {
-    const markerY = window.scrollY + window.innerHeight * 0.75;
+  function update(y, vh) {
+    const E = window.Motor && Motor.estado;
+    if (y == null) y = E ? E.y : window.scrollY;
+    if (vh == null) vh = E ? E.vh : window.innerHeight;
+    const markerY = y + vh * 0.75;
     const filled = clamp(markerY - tlTop, 0, tlHeight);
     if (vineFill) vineFill.style.strokeDashoffset = String(1 - (tlHeight ? filled / tlHeight : 0));
     for (let i = 0; i < decos.length; i++) {
@@ -389,13 +461,23 @@ function renderTimeline() {
     }
   }
   let tlUltimoY = -1;
-  Motor.suscribir((E) => { if (E.y !== tlUltimoY) { tlUltimoY = E.y; update(); } });   // único lector de scroll: motor.js
+  Motor.suscribir((E) => { if (E.y !== tlUltimoY) { tlUltimoY = E.y; update(E.y, E.vh); } });   // único lector de scroll: motor.js
   window.addEventListener('resize', measure);
   window.addEventListener('load', measure);
-  /* al plegar/desplegar un mes cambia el alto: se vuelve a medir (un solo cuadro por cambio) */
+  /* al plegar/desplegar cambia el alto: durante la transición solo se ajusta el alto (barato);
+     la medición completa y la enredadera se rehacen UNA vez cuando el alto deja de cambiar.
+     No depende de transitionend: funciona con reduced-motion (transition:none), cancelaciones,
+     fuentes o fotos que cambian el alto. */
   if ('ResizeObserver' in window) {
-    let pendiente = false;
-    new ResizeObserver(() => { if (!pendiente) { pendiente = true; requestAnimationFrame(() => { pendiente = false; measure(); }); } }).observe(wrap);
+    let pendiente = false, tFinal = 0;
+    new ResizeObserver(() => {
+      if (!pendiente) {
+        pendiente = true;
+        requestAnimationFrame(() => { pendiente = false; tlHeight = wrap.getBoundingClientRect().height; update(); });
+      }
+      clearTimeout(tFinal);
+      tFinal = setTimeout(measure, 120);
+    }).observe(wrap);
   }
   setTimeout(measure, 1500);
   measure();
@@ -492,9 +574,13 @@ function renderBandaSonora() {
   function ir(i) {
     const n = ((i % N) + N) % N;
     if (n === foco) return;
+    /* si el foco estaba en un disco, pasa al nuevo disco central (se mira ANTES de layout(),
+       que puede esconder el disco enfocado y soltar el foco a <body>) */
+    const teniaFoco = discoEls.indexOf(document.activeElement) !== -1;
     foco = n;
     if (window.Sonidos) window.Sonidos.play('mes');
     layout();
+    if (teniaFoco && discoEls[foco]) discoEls[foco].focus({ preventScroll: true });
   }
   function reproducir() {
     if (currentSongIndex === foco) {
@@ -511,16 +597,18 @@ function renderBandaSonora() {
   el('cd-next').addEventListener('click', () => ir(foco + 1));
   el('cd-play').addEventListener('click', reproducir);
 
-  /* deslizar para cambiar de disco */
+  /* deslizar para cambiar de disco (solo táctil/lápiz: con mouse, arrastrar y soltar sobre un disco
+     lo cambiaba y el click lo regresaba en el mismo gesto) */
   const escenario = host.querySelector('.cd-escenario');
   let x0 = null;
-  escenario.addEventListener('pointerdown', (e) => { x0 = e.clientX; });
+  escenario.addEventListener('pointerdown', (e) => { x0 = e.pointerType === 'mouse' ? null : e.clientX; });
   escenario.addEventListener('pointerup', (e) => {
     if (x0 === null) return;
     const dx = e.clientX - x0; x0 = null;
     if (Math.abs(dx) > 40) ir(foco + (dx < 0 ? 1 : -1));
   });
   escenario.addEventListener('pointercancel', () => { x0 = null; });
+  escenario.addEventListener('pointerleave', () => { x0 = null; });
   escenario.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight') { ir(foco + 1); e.preventDefault(); }
     else if (e.key === 'ArrowLeft') { ir(foco - 1); e.preventDefault(); }
@@ -541,6 +629,7 @@ renderBandaSonora();
 /* ---- service worker (Fase 5) — registra sw.js si el navegador lo soporta ---- */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    /* Firefox con almacenamiento bloqueado lanza SecurityError al leer navigator.serviceWorker */
+    try { navigator.serviceWorker.register('./sw.js').catch(() => {}); } catch (e) {}
   });
 }

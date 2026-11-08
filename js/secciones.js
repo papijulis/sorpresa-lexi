@@ -17,6 +17,8 @@ function mexicoWallMs(date) {
 }
 function diffFromStart(now) {
   const wallNow = mexicoWallMs(now);
+  /* reloj del dispositivo antes del 28/05/2026: ceros (no días falsos contados desde un 28 anterior) */
+  if (wallNow < Date.UTC(2026, 4, 28)) return { months: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
   const n = new Date(wallNow);
   let months = (n.getUTCFullYear() - 2026) * 12 + (n.getUTCMonth() - 4);
   let anchor = Date.UTC(2026, 4 + months, 28);
@@ -37,7 +39,14 @@ function tickClock() {
   document.getElementById('clock-seconds').textContent = d.seconds;
 }
 tickClock();
-setInterval(() => { if (!document.hidden) tickClock(); }, 1000);
+/* se revisa 4 veces por segundo y solo se pinta al cambiar el segundo del reloj: así no salta ni repite
+   segundos por el desfase del timer (sigue siendo setInterval: una excepción no corta la cadena) */
+let ultimoSegReloj = -1;
+setInterval(() => {
+  if (document.hidden) return;
+  const s = Math.floor(Date.now() / 1000);
+  if (s !== ultimoSegReloj) { ultimoSegReloj = s; tickClock(); }
+}, 250);
 /* al volver a la pestaña (o a la PWA) se actualiza al instante */
 document.addEventListener('visibilitychange', () => { if (!document.hidden) tickClock(); });
 window.addEventListener('pageshow', tickClock);
@@ -118,22 +127,32 @@ function formatTime(sec) {
 }
 voiceAudio.addEventListener('loadedmetadata', () => { voiceDuration.textContent = formatTime(voiceAudio.duration); });
 voiceAudio.addEventListener('timeupdate', () => { voiceCurrent.textContent = formatTime(voiceAudio.currentTime); });
-voiceAudio.addEventListener('error', () => { voiceFallbackNote.classList.remove('hidden'); });
-voiceAudio.addEventListener('ended', () => {
-  voicePlayIcon.innerHTML = ico('i-play');
-  if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.remove('playing'));
+/* el botón y las barras siguen el estado real del audio (también si falla o se pausa desde el sistema) */
+function pintarVoz() {
+  const suena = !voiceAudio.paused && !voiceAudio.error;
+  voicePlayIcon.innerHTML = ico(suena ? 'i-pausa' : 'i-play');
+  voicePlayBtn.setAttribute('aria-label', suena ? 'Pausar nota de voz' : 'Reproducir nota de voz');
+  if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.toggle('playing', suena));
+}
+['play', 'pause', 'ended'].forEach((ev) => voiceAudio.addEventListener(ev, pintarVoz));
+voiceAudio.addEventListener('playing', () => voiceFallbackNote.classList.add('hidden'));   // si al reintentar sí suena, se quita el aviso
+voiceAudio.addEventListener('error', () => {
+  voiceFallbackNote.classList.remove('hidden');
+  if (!voiceAudio.paused) voiceAudio.pause();
+  pintarVoz();
 });
 voicePlayBtn.addEventListener('click', () => {
   if (voiceAudio.paused) {
     pauseBgAudioForVoiceNote();
     setupAnalysers();
-    voiceAudio.play().catch(() => { voiceFallbackNote.classList.remove('hidden'); });
-    voicePlayIcon.innerHTML = ico('i-pausa');
-    if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.add('playing'));
+    reanudarAudioCtx();
+    voiceAudio.play().catch((e) => {
+      if (!e || e.name !== 'AbortError') voiceFallbackNote.classList.remove('hidden');
+      if (!voiceAudio.paused) voiceAudio.pause();
+      pintarVoz();
+    });
   } else {
     voiceAudio.pause();
-    voicePlayIcon.innerHTML = ico('i-play');
-    if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.remove('playing'));
   }
 });
 
@@ -231,7 +250,7 @@ function updateJarVisuals() {
   jarBtn.innerHTML = iconizar(jarState.pointer >= JAR_TOTAL
     ? (jarState.secretUnlocked ? 'Ya las encontré todas {i-corazon-lleno}' : 'Encontré las 100... espera la sorpresa')
     : 'Tomar una razón de por qué eres mi todo');
-  jarSecretBtn.classList.toggle('hidden', !jarState.secretUnlocked);
+  jarSecretBtn.classList.toggle('hidden', !jarState.secretUnlocked || secretIndex === -1);
 }
 updateJarVisuals();
 
@@ -267,6 +286,7 @@ function milestoneBodyHTML(hito) {
     return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:var(--pergamino-50);">${p.texto}</p>`;
   }
   if (p.tipo === 'final') {
+    if (secretIndex === -1) return frase;
     return frase + `<p class="font-hand text-lg mt-4 whitespace-pre-line" style="color:var(--lavanda-200);">${REASONS[secretIndex].texto}</p>`;
   }
   return '';
@@ -287,6 +307,7 @@ function triggerMilestone(hito) {
 }
 
 function openSecretReason() {
+  if (secretIndex === -1) return;
   openModal({ icon: 'brillo', title: 'La Razón 101', body: REASONS[secretIndex].texto });
 }
 jarSecretBtn.addEventListener('click', openSecretReason);
@@ -298,8 +319,15 @@ jarBtn.addEventListener('click', () => {
   jarEl.classList.add('shake-anim');
 
   if (jarState.pointer >= JAR_TOTAL) {
-    if (jarState.secretUnlocked) openSecretReason();
-    else showToast('Tu sorpresa final ya casi está lista...');
+    if (secretIndex === -1) { showToast('Ya las encontraste todas'); return; }
+    /* autorreparo: si se recargó en los 280 ms antes del hito final (o el hito nunca coincidió), se desbloquea aquí */
+    if (!jarState.secretUnlocked) {
+      jarState.secretUnlocked = true;
+      saveJarState();
+      updateJarVisuals();
+      spawnGoldRain();
+    }
+    openSecretReason();
     return;
   }
 
@@ -308,6 +336,7 @@ jarBtn.addEventListener('click', () => {
 
   const hito = window.HITOS.find((h) => h.en === jarState.pointer && !jarState.milestones.includes(h.en));
   if (hito) jarState.milestones.push(hito.en);
+  if (hito && hito.premio.tipo === 'final') jarState.secretUnlocked = true; // se guarda junto con el hito
   saveJarState();
   updateJarVisuals();
 
@@ -342,13 +371,20 @@ function renderPolaroidGrid(gridEl, photos) {
       <p class="font-hand text-center text-base mt-3" style="color:#3B2A1A;">${p.caption}</p>
     `;
     if (isDesktopPointer) {
+      /* medir una vez al entrar (caja sin la inclinación inline) y compensar el scroll cacheado por Motor */
+      let r = null, ry = 0;
+      const scrollY = () => (window.Motor && Motor.estado) ? Motor.estado.y : (window.scrollY || 0);
+      const medir = () => { r = card.getBoundingClientRect(); ry = scrollY(); };
+      card.addEventListener('mouseenter', medir);
       card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const px = (e.clientX - rect.left) / rect.width - 0.5;
-        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        if (!r) medir();
+        if (!r.width || !r.height) return;
+        const top = r.top - (scrollY() - ry);
+        const px = clamp((e.clientX - r.left) / r.width - 0.5, -0.5, 0.5);
+        const py = clamp((e.clientY - top) / r.height - 0.5, -0.5, 0.5);
         card.style.transform = `rotate(${rotateBase.toFixed(1)}deg) rotateX(${(-py * 16).toFixed(2)}deg) rotateY(${(px * 16).toFixed(2)}deg) translateY(-6px) scale(1.06)`;
       });
-      card.addEventListener('mouseleave', () => { card.style.transform = ''; });
+      card.addEventListener('mouseleave', () => { r = null; card.style.transform = ''; });
     }
     card.style.cursor = 'pointer';
     hacerClicable(card, () => {
@@ -373,9 +409,6 @@ renderPolaroidGrid(document.getElementById('polaroid-grid'), POLAROIDS);
    LAS CARTAS DEL FINAL — viven en js/cartas-final.js (scrub por scroll). La vela
    del deseo ya no depende de ninguna carta: ver "11:11 WISH RITUAL" abajo.
 ====================================================================== */
-function prefersReducedMotion() {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
 
 /* ======================================================================
    HERO TITLE — letter-by-letter reveal (fires once journey unlocks)

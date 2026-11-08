@@ -241,16 +241,8 @@
       </div>
       <label for="carta-texto">Texto de la carta</label>
       <textarea id="carta-texto" rows="6" placeholder="Escribe aquí la carta..."></textarea>
-      <div class="row">
-        <div>
-          <label for="carta-foto">Foto (opcional, ruta exacta)</label>
-          <input id="carta-foto" type="text" placeholder="./assets/img/girasoles.jpeg">
-        </div>
-        <div>
-          <label for="carta-audio">Audio (opcional, ruta exacta)</label>
-          <input id="carta-audio" type="text" placeholder="./assets/audio/Lover.mp3">
-        </div>
-      </div>
+      <label for="carta-foto">Foto (opcional, ruta exacta)</label>
+      <input id="carta-foto" type="text" placeholder="./assets/img/girasoles.jpeg">
       <label for="carta-cancion">Canción dedicada (opcional, título exacto de canciones.js)</label>
       <input id="carta-cancion" type="text" placeholder="Lover">
       <div class="checkbox-row">
@@ -299,7 +291,7 @@
           <input id="recuerdo-fecha" type="date">
         </div>
         <div>
-          <label for="recuerdo-display">Texto de la fecha a mostrar</label>
+          <label for="recuerdo-display">Texto de la fecha a mostrar (vacío = se calcula de la fecha)</label>
           <input id="recuerdo-display" type="text" placeholder="Domingo 28 de junio">
         </div>
       </div>
@@ -324,27 +316,17 @@
   <section class="panel" id="panel-foto">
     <div class="card">
       <h2>Nueva foto (contenido/fotos.js)</h2>
-      <p class="hint" style="margin-top:-.25rem;">Coloca primero el archivo en <code>assets/img/</code> (nombre exacto, minúsculas y guiones) antes de pegar el bloque.</p>
-      <div class="row">
-        <div>
-          <label for="foto-album">Álbum</label>
-          <input id="foto-album" type="text" placeholder="Flores">
-        </div>
-        <div>
-          <label for="foto-fecha">Fecha (opcional)</label>
-          <input id="foto-fecha" type="date">
-        </div>
-      </div>
+      <p class="hint" style="margin-top:-.25rem;">Coloca primero el archivo en <code>assets/img/</code> (nombre exacto, minúsculas y guiones) antes de pegar el bloque. Pon el original en <code>assets/img/originales/</code>, corre <code>python3 tools/optimize-images.py</code> (genera .jpeg + .webp), agrega sus medidas a <code>IMG_DIMENSIONS</code> en <code>js/nucleo.js</code> y corre <code>node tools/check-assets.js</code> antes de publicar.</p>
       <label for="foto-src">Ruta exacta del archivo</label>
       <input id="foto-src" type="text" placeholder="./assets/img/ramo-feito-ella.jpeg">
-      <label for="foto-pie">Pie de foto</label>
-      <input id="foto-pie" type="text" placeholder="Un domingo cualquiera 💛">
+      <label for="foto-pie">Pie de foto (caption)</label>
+      <input id="foto-pie" type="text" placeholder="Un domingo cualquiera">
       <div class="actions">
         <button class="primary" onclick="buildFoto()">Generar bloque</button>
         <button class="ghost" onclick="copyOutput('out-foto')">Copiar</button>
       </div>
       <div class="output-wrap">
-        <h3>Pega esto dentro del array de fotos en contenido/fotos.js</h3>
+        <h3>Pega esto dentro de POLAROIDS (flores) o FAVORITE_PHOTOS en contenido/fotos.js</h3>
         <pre id="out-foto">// completa el formulario y pulsa "Generar bloque"</pre>
       </div>
     </div>
@@ -360,8 +342,31 @@
           <input id="cupon-id" type="text" placeholder="cita-sorpresa">
         </div>
         <div>
-          <label for="cupon-emoji">Emoji</label>
-          <input id="cupon-emoji" type="text" placeholder="🎁" maxlength="4">
+          <label for="cupon-icono">Ícono (del sprite)</label>
+          <select id="cupon-icono">
+            <option value="i-corazon">i-corazon</option>
+            <option value="i-corazon-lleno">i-corazon-lleno</option>
+            <option value="i-estrella">i-estrella</option>
+            <option value="i-regalo">i-regalo</option>
+            <option value="i-abrazo">i-abrazo</option>
+            <option value="i-beso">i-beso</option>
+            <option value="i-sobre-corazon">i-sobre-corazon</option>
+            <option value="i-atardecer">i-atardecer</option>
+            <option value="i-luna">i-luna</option>
+            <option value="i-sol">i-sol</option>
+            <option value="i-mariposa">i-mariposa</option>
+            <option value="i-tv">i-tv</option>
+            <option value="i-claqueta">i-claqueta</option>
+            <option value="i-cubiertos">i-cubiertos</option>
+            <option value="i-tazon">i-tazon</option>
+            <option value="i-carro">i-carro</option>
+            <option value="i-casa">i-casa</option>
+            <option value="i-dado">i-dado</option>
+            <option value="i-huella">i-huella</option>
+            <option value="i-nota">i-nota</option>
+            <option value="i-vela">i-vela</option>
+            <option value="lirio-linea">lirio-linea</option>
+          </select>
         </div>
       </div>
       <label for="cupon-titulo">Título</label>
@@ -371,6 +376,10 @@
       <div class="checkbox-row">
         <input id="cupon-canjeable" type="checkbox" checked>
         <label for="cupon-canjeable" style="margin:0; text-transform:none; font-size:.85rem;">Canjeable (muestra botón "Canjear")</label>
+      </div>
+      <div class="checkbox-row">
+        <input id="cupon-borrador" type="checkbox" checked>
+        <label for="cupon-borrador" style="margin:0; text-transform:none; font-size:.85rem;">Marcar como borrador</label>
       </div>
       <div class="actions">
         <button class="primary" onclick="buildCupon()">Generar bloque</button>
@@ -441,9 +450,19 @@ function buildCarta() {
   const sello = document.getElementById('carta-sello').value;
   const texto = document.getElementById('carta-texto').value.trim();
   const foto = document.getElementById('carta-foto').value.trim();
-  const audio = document.getElementById('carta-audio').value.trim();
   const cancion = document.getElementById('carta-cancion').value.trim();
   const borrador = document.getElementById('carta-borrador').checked;
+  const out = document.getElementById('out-carta');
+  if (!id || !/^[a-z0-9-]+$/.test(id)) {
+    out.textContent = '// Falta el ID (solo minúsculas, números y guiones, p. ej. mes-7)';
+    showToast('Falta el ID (minúsculas, números y guiones)');
+    return;
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(apertura)) {
+    out.textContent = '// Falta la fecha de apertura';
+    showToast('Falta la fecha de apertura');
+    return;
+  }
 
   let block = '{\n';
   block += `  id: ${JSON.stringify(id)},\n`;
@@ -453,11 +472,10 @@ function buildCarta() {
   block += `  sello: ${JSON.stringify(sello)},\n`;
   block += `  texto: ${jsStringLiteral(texto)},\n`;
   if (foto) block += `  foto: ${JSON.stringify(foto)},\n`;
-  if (audio) block += `  audio: ${JSON.stringify(audio)},\n`;
   if (cancion) block += `  cancion: ${JSON.stringify(cancion)},\n`;
   block += `  borrador: ${borrador}\n`;
   block += '},';
-  document.getElementById('out-carta').textContent = block;
+  out.textContent = block;
 }
 
 function buildRazon() {
@@ -469,7 +487,12 @@ function buildRazon() {
 
 function buildRecuerdo() {
   const fecha = document.getElementById('recuerdo-fecha').value;
-  const display = document.getElementById('recuerdo-display').value.trim();
+  let display = document.getElementById('recuerdo-display').value.trim();
+  if (!display && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    // si se deja vacío, el día de la semana sale de la fecha (así no se equivoca)
+    const s = new Date(fecha + 'T12:00').toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
+    display = s.charAt(0).toUpperCase() + s.slice(1);
+  }
   const texto = document.getElementById('recuerdo-texto').value.trim();
   const special = document.getElementById('recuerdo-special').checked;
   let block = `{ date: ${JSON.stringify(fecha)}, display: ${JSON.stringify(display)}`;
@@ -479,16 +502,9 @@ function buildRecuerdo() {
 }
 
 function buildFoto() {
-  const album = document.getElementById('foto-album').value.trim();
   const src = document.getElementById('foto-src').value.trim();
-  const pie = document.getElementById('foto-pie').value.trim();
-  const fecha = document.getElementById('foto-fecha').value;
-  let block = '{\n';
-  block += `  album: ${JSON.stringify(album)},\n`;
-  block += `  src: ${JSON.stringify(src)},\n`;
-  block += `  pie: ${JSON.stringify(pie)}`;
-  if (fecha) block += `,\n  fecha: ${JSON.stringify(fecha)}`;
-  block += '\n},';
+  const caption = document.getElementById('foto-pie').value.trim();
+  const block = `{ src: ${JSON.stringify(src)}, caption: ${JSON.stringify(caption)} },`;
   document.getElementById('out-foto').textContent = block;
 }
 
@@ -496,14 +512,16 @@ function buildCupon() {
   const id = document.getElementById('cupon-id').value.trim();
   const titulo = document.getElementById('cupon-titulo').value.trim();
   const descripcion = document.getElementById('cupon-descripcion').value.trim();
-  const emoji = document.getElementById('cupon-emoji').value.trim();
+  const icono = document.getElementById('cupon-icono').value || 'i-corazon';
   const canjeable = document.getElementById('cupon-canjeable').checked;
+  const borrador = document.getElementById('cupon-borrador').checked;
   let block = '{\n';
   block += `  id: ${JSON.stringify(id)},\n`;
   block += `  titulo: ${JSON.stringify(titulo)},\n`;
   block += `  descripcion: ${jsStringLiteral(descripcion)},\n`;
-  block += `  emoji: ${JSON.stringify(emoji)},\n`;
-  block += `  canjeable: ${canjeable}\n`;
+  block += `  icono: ${JSON.stringify(icono)},\n`;
+  block += `  canjeable: ${canjeable},\n`;
+  block += `  borrador: ${borrador}\n`;
   block += '},';
   document.getElementById('out-cupon').textContent = block;
 }

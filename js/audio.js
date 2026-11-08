@@ -3,18 +3,34 @@
 ====================================================================== */
 const bgAudio = new Audio();
 bgAudio.loop = true;
-bgAudio.crossOrigin = 'anonymous';
+/* Con file:// las peticiones CORS al esquema file: fallan y el audio no sonaría: ahí se pide sin CORS
+   (y sin Web Audio, porque un audio sin CORS saldría en silencio por el analizador). */
+const SIN_CORS = location.protocol === 'file:';
+if (!SIN_CORS) bgAudio.crossOrigin = 'anonymous';
 const voiceAudio = document.getElementById('voice-audio');
+if (SIN_CORS && voiceAudio) {
+  voiceAudio.removeAttribute('crossorigin');
+  if (voiceAudio.error) voiceAudio.load();
+}
 
 let audioCtx = null;
 let bgAnalyser = null, bgDataArr = null;
 let voiceAnalyser = null, voiceDataArr = null;
 let useRealEq = false;
 let analysersSetupDone = false;
+/* reanuda el contexto si quedó suspendido o interrumpido (Safari tras dormir, otra app tomó el audio…);
+   sin gesto, resume() se rechaza: se ignora en silencio */
+function reanudarAudioCtx() {
+  if (!audioCtx || audioCtx.state === 'running' || audioCtx.state === 'closed') return;
+  try {
+    const r = audioCtx.resume && audioCtx.resume();
+    if (r && typeof r.catch === 'function') r.catch(() => {});
+  } catch (e) { /* sin gesto o contexto no disponible: no pasa nada */ }
+}
 
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  reanudarAudioCtx();
   return audioCtx;
 }
 /* En iPhone/iPad, pasar el <audio> por Web Audio (createMediaElementSource) hace que la música
@@ -24,7 +40,7 @@ const ES_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (/macintosh/i.te
 function setupAnalysers() {
   if (analysersSetupDone) return;
   analysersSetupDone = true;
-  if (ES_IOS) { useRealEq = false; return; }
+  if (ES_IOS || SIN_CORS) { useRealEq = false; return; }
   try {
     const ac = getAudioCtx();
     const bgSource = ac.createMediaElementSource(bgAudio);
@@ -126,10 +142,11 @@ SONGS.forEach((song, idx) => {
     <div class="flex items-end gap-[3px] h-6 eq-wrap"></div>
   `;
   buildBars(card.querySelector('.eq-wrap'), 5);
-  card.addEventListener('click', () => {
+  hacerClicable(card, () => {
+    if (!screenSongs.classList.contains('active')) return; // aún en "¿Me amas?" o ya elegida (evita doble llamada / Enter repetido)
     card.classList.add('selected');
     chooseSong(idx);
-  });
+  }, 'Elegir canción: ' + song.title + ', de ' + song.artist);
   songSelectCards.appendChild(card);
 });
 
@@ -138,9 +155,13 @@ function updateMiniPlayerIcon() {
   miniVinyl.classList.toggle('spinning', !bgAudio.paused);
   if (!useRealEq) miniEqBars.forEach((b) => b.classList.toggle('playing', !bgAudio.paused));
 }
+/* el dock se entera también de pausas/arranques por fuera (controles del sistema, audífonos, play() rechazado) */
+['play', 'pause'].forEach((ev) => bgAudio.addEventListener(ev, updateMiniPlayerIcon));
 function playCurrentSong() {
   setupAnalysers();
-  bgAudio.play().catch(() => {});
+  reanudarAudioCtx();
+  if (voiceAudio && !voiceAudio.paused) voiceAudio.pause(); // nunca música y nota de voz a la vez
+  bgAudio.play().catch(updateMiniPlayerIcon);
   updateMiniPlayerIcon();
 }
 function chooseSong(idx) {
@@ -155,11 +176,15 @@ function chooseSong(idx) {
 
   document.body.classList.remove('locked');
   screenSongs.classList.remove('active');
+  screenSongs.setAttribute('inert', '');
   screenSongs.classList.add('screen-out');
   setTimeout(() => {
     screenSongs.style.display = 'none';
     mainContent.classList.remove('hidden-content');
-    document.getElementById('dock').classList.add('visible');
+    mainContent.removeAttribute('inert');
+    const dockEl = document.getElementById('dock');
+    dockEl.removeAttribute('inert');
+    dockEl.classList.add('visible');
     updateScrollProgress();
     revealHeroTitle();
     setTimeout(() => document.getElementById('hero-panel').classList.add('shown'), 4500);

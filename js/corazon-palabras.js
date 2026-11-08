@@ -42,7 +42,7 @@
     var S = document.createElement('canvas'), sctx = S.getContext('2d');
     var REDUCIDO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     var W = 0, H = 0, dpr = 1, palabras = [], paleta = [];
-    var mostradas = 0, entrando = [], destellos = [], corriendo = false, raf = 0, ultimoDestello = 0, ultimoP = -1;
+    var mostradas = 0, entrando = [], destellos = [], corriendo = false, raf = 0, ultimoDestello = 0;
 
     function colorEn(prof) {   // prof 0 = borde, 1 = centro
       var n = paleta.length - 1, x = Math.min(.999, Math.max(0, prof)) * n, i = Math.floor(x);
@@ -155,11 +155,11 @@
       c.fillText(p.t, p.x, p.y);
     }
     function reiniciar() {
-      mostradas = 0; entrando = []; destellos = []; ultimoP = -1;
+      mostradas = 0; entrando = []; destellos = [];
       sctx.clearRect(0, 0, W, H); ctx.clearRect(0, 0, W, H);
       if (REDUCIDO) { palabras.forEach(function (p) { dibujar(sctx, p, p.alfa); }); mostradas = palabras.length; pintarUnaVez(); }
     }
-    function pintarUnaVez() { ctx.clearRect(0, 0, W, H); ctx.globalAlpha = 1; ctx.drawImage(S, 0, 0, W, H); }
+    function pintarUnaVez() { if (!W || !H) return; ctx.clearRect(0, 0, W, H); ctx.globalAlpha = 1; ctx.drawImage(S, 0, 0, W, H); }
 
     function cuadro(t) {
       raf = 0;
@@ -172,7 +172,6 @@
       }
       if (REDUCIDO) { objetivo = palabras.length; for (; mostradas < objetivo; mostradas++) dibujar(sctx, palabras[mostradas], palabras[mostradas].alfa); }
       else for (; mostradas < objetivo; mostradas++) entrando.push({ p: palabras[mostradas], t0: t });
-      ultimoP = p;
 
       ctx.clearRect(0, 0, W, H);
       ctx.globalAlpha = 1; ctx.drawImage(S, 0, 0, W, H);
@@ -203,6 +202,7 @@
       }
     }
     function iniciar() {
+      if (REDUCIDO) { pintarUnaVez(); return; }   // reiniciar() ya dibujó todo: sin bucle con movimiento reducido
       if (corriendo) return;
       corriendo = true;
       if (!raf) raf = requestAnimationFrame(cuadro);
@@ -212,7 +212,7 @@
     document.addEventListener('visibilitychange', vis);
     function destruir() { detener(); document.removeEventListener('visibilitychange', vis); palabras = []; entrando = []; destellos = []; ctx.clearRect(0, 0, W, H); }
 
-    return { medir: medir, iniciar: iniciar, detener: detener, reiniciar: reiniciar, toque: toque, destruir: destruir, total: function () { return palabras.length; } };
+    return { medir: medir, iniciar: iniciar, detener: detener, toque: toque, destruir: destruir };
   }
   window.CorazonPalabras = { crear: crear };
 })();

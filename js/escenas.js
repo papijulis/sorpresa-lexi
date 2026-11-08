@@ -5,9 +5,9 @@
    • [data-escena="pasada"] --p = cuánto ha cruzado el elemento por la pantalla
      (0 entra por abajo, 1 sale por arriba): base para las escenas del rediseño.
    • [data-en-vista] / .mov-* → agrega la clase .en-vista una sola vez.
-   Solo mide los elementos que están en pantalla (IntersectionObserver) y
-   actualiza con un requestAnimationFrame por desplazamiento. Con
-   prefers-reduced-motion deja todo en su estado final (--p = 1).
+   Solo mide los elementos que están en pantalla (IntersectionObserver) y se
+   pinta desde el bucle de motor.js (Motor.suscribir), sin rAF ni listener de
+   scroll propios. Con prefers-reduced-motion deja todo en su estado final (--p = 1).
 ====================================================================== */
 (function () {
   'use strict';
@@ -54,7 +54,7 @@
       return;
     }
     if (el.hasAttribute('data-escena')) ioEscenas.observe(el);
-    if (el.hasAttribute('data-en-vista') || /\bmov-/.test(el.className)) ioVista.observe(el);
+    if (el.hasAttribute('data-en-vista') || /\bmov-/.test(el.getAttribute('class') || '')) ioVista.observe(el);   // getAttribute: en <svg> className no es texto
   }
 
   /* inserta el divisor ornamental bajo cada título de sección y en los

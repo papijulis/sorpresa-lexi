@@ -10,7 +10,7 @@
   'use strict';
   var CLICABLE = 'button, [role="button"], a[href], .camino, .tl-mes-btn, .juego-card, .buzon-envelope, .cupon-card, .song-select-card, .polaroid';
   /* estos ya hacen su propio sonido (abrir vista, cambiar cielo…): solo llevan pétalos */
-  var CON_SONIDO_PROPIO = '#buzon-toggle, #juegos-toggle, #sunset-toggle, #camino-buzon, #camino-juegos, #clock-infinity-link, #camino-efectos, .tl-mes-btn, [data-cielo], .app-view-close, #modal-close';
+  var CON_SONIDO_PROPIO = '#buzon-toggle, #juegos-toggle, #sunset-toggle, #camino-buzon, #camino-juegos, #clock-infinity-link, #camino-efectos, .tl-mes-btn, [data-cielo], .app-view-close, #modal-close, #jar-btn, .lightbox-nav, .cd-prev, .cd-next, .cd-num, .carta-nav-btn, #letter-back, #letter-switch';
   var ultimoAire = 0;
 
   function colores() {
@@ -32,7 +32,7 @@
       return;
     }
     /* al aire: solo en el Jardín (no en vistas, juegos ni popups) y sin saturar */
-    if (t.closest('.app-view, .modal-backdrop, .lightbox, canvas, #screen-gate, #screen-songs, input, textarea')) return;
+    if (t.closest('.app-view, .modal-backdrop, .lightbox, .rueda, .flor-esp, .carta-lector, canvas, #screen-gate, #screen-songs, input, textarea')) return;
     var ahora = performance.now();
     if (ahora - ultimoAire < 350) return;
     ultimoAire = ahora;

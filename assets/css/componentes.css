@@ -1,7 +1,3 @@
-  /* ---- reveal on scroll ---- */
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .9s ease, transform .9s cubic-bezier(.2,.8,.2,1); }
-  .reveal.in-view { opacity: 1; transform: translateY(0); }
-
   /* pictureHTML() pone width/height reales como atributos (anti-CLS); sin
      height:auto esos atributos fijan el alto en px y deforman o inflan
      cualquier foto cuyo ancho se limita por CSS. */
@@ -21,28 +17,14 @@
   .polaroid.reveal.in-view { transform: rotate(var(--rot, 0deg)); }
   .polaroid:focus-visible { outline: 2px solid var(--dorado-500); outline-offset: 4px; }
   .polaroid:hover { will-change: transform; }
-  .polaroid img, .polaroid .img-fallback { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: linear-gradient(135deg,var(--pergamino-100),#F59E0B33); }
+  .polaroid img, .polaroid .img-fallback { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; background: linear-gradient(135deg,var(--pergamino-100),rgba(var(--ambar-rgb), .2)); }
 
   /* ---- tinta (cartas del final) ---- */
   .ink-hidden { opacity: 0; filter: blur(3px); transition: opacity .9s ease, filter .9s ease; }
   .ink-in { opacity: 1; filter: blur(0); }
-  /* botones modernos de la interfaz: icono redondo y píldora suave */
-  .btn-icono {
-    display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;
-    color: var(--pergamino-50); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); transition: background .2s ease, transform .2s var(--ease-rebote);
-  }
-  .btn-icono .ico { width: 1.2rem; height: 1.2rem; }
+  /* botones de la interfaz: el estilo vive en botones.css; aquí solo lo propio */
   .btn-icono-prev .ico { transform: scaleX(-1); }
-  @media (hover: hover) { .btn-icono:hover { background: rgba(255,255,255,.16); } }
-  .btn-suave {
-    display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 2.75rem; padding: 0 1.3rem; border-radius: var(--radio-pill); cursor: pointer;
-    font-family: var(--fuente-ui); font-size: .85rem; font-weight: 600; color: var(--pergamino-50);
-    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); transition: background .2s ease, border-color .2s ease, transform .2s var(--ease-rebote);
-  }
-  .btn-suave .ico { width: 1.1rem; height: 1.1rem; color: var(--dorado-500); }
-  .btn-suave-oro { color: var(--dorado-500); border-color: rgba(var(--dorado-rgb), .35); background: rgba(var(--dorado-rgb), .08); }
   .btn-suave.hidden, .btn-icono.hidden { display: none; }
-  @media (hover: hover) { .btn-suave:hover { background: rgba(255,255,255,.14); border-color: rgba(var(--dorado-rgb), .45); } }
 
   /* ---- hero shimmer ---- */
   @keyframes shimmerText { 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
@@ -116,7 +98,7 @@
 
   /* ---- vinyl ---- */
   .vinyl-disc {
-    width: 30px; height: 30px; border-radius: 50%; shrink: 0;
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
     background: repeating-radial-gradient(circle at center, #0c0c10 0 2px, #1a1a22 2px 4px);
     box-shadow: inset 0 0 0 6px #7E22CE, inset 0 0 0 7px #000;
     animation: spinVinyl 2.6s linear infinite; animation-play-state: paused;
@@ -126,8 +108,9 @@
 
   /* ---- modal ---- */
   .modal-backdrop {
-    position: fixed; inset: 0; z-index: 80;
-    background: rgba(var(--abismo-rgb), 0.78); backdrop-filter: blur(6px);
+    /* +1: por encima del lector de cartas, la rueda y la flor (también --z-modal y agregados después al body) */
+    position: fixed; inset: 0; z-index: calc(var(--z-modal) + 1);
+    background: rgba(var(--abismo-rgb), 0.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
     opacity: 0; pointer-events: none; transition: opacity 0.35s ease; padding: 1.25rem;
   }
@@ -137,35 +120,22 @@
     max-height: 85vh; overflow-y: auto;
   }
   .modal-backdrop.open .modal-panel { transform: scale(1) translateY(0); }
-  #modal-close {
-    width: 2.5rem; height: 2.5rem; padding: 0; border-radius: 999px; cursor: pointer;
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50);
-    display: flex; align-items: center; justify-content: center; transition: background .25s ease, transform .2s var(--ease-rebote);
-  }
-  #modal-close .ico, .app-view-close .ico, .lightbox-close .ico { width: 1.1rem; height: 1.1rem; }
-  @media (hover: hover) { #modal-close:hover { background: rgba(255,255,255,0.16); } }
+  /* deslizar entre cartas: sin esto el navegador toma el gesto horizontal y manda pointercancel */
+  #modal-panel[data-nav="carta"] { touch-action: pan-y pinch-zoom; }
 
   /* ---- navegación entre cartas del Buzón (bloque 9) ---- */
   .carta-anim { animation: cartaEntra .45s var(--ease-flor) both; }
   @keyframes cartaEntra { from { opacity: 0; transform: translateX(calc(var(--dir, 0) * 36px)); } to { opacity: 1; transform: none; } }
   .carta-nav { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.1); }
-  .carta-nav-btn {
-    display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; padding: 0; border-radius: 50%; cursor: pointer;
-    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); color: var(--pergamino-50); transition: background .2s ease, transform .2s var(--ease-rebote);
-  }
-  .carta-nav-btn:disabled { opacity: .3; cursor: default; }
   .carta-nav-prev .ico { transform: scaleX(-1); }
   .carta-nav-n { font-family: var(--fuente-ui); font-size: .78rem; color: rgba(var(--pergamino-rgb), .6); min-width: 5rem; text-align: center; }
-  @media (hover: hover) { .carta-nav-btn:not(:disabled):hover { background: rgba(255,255,255,.16); } }
 
   /* ---- screens ---- */
   #preloader {
-    position: fixed; inset: 0; z-index: 100; background: var(--ciruela-950);
+    position: fixed; inset: 0; z-index: var(--z-precarga); background: var(--ciruela-950);
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
     transition: opacity .7s ease;
   }
-  @keyframes heartbeat { 0%,100%{transform:scale(1);} 15%{transform:scale(1.28);} 30%{transform:scale(1);} 45%{transform:scale(1.18);} 60%{transform:scale(1);} }
-  .heartbeat { animation: heartbeat 1.15s ease-in-out infinite; }
 
   #screen-gate, #screen-songs {
     position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
@@ -173,7 +143,7 @@
   }
   #screen-gate.pre-hidden { opacity: 0; }
   #screen-gate.screen-out, #screen-songs.screen-out { opacity: 0; transform: scale(1.08); filter: blur(10px); pointer-events: none; }
-  #screen-songs { z-index: 65; opacity: 0; pointer-events: none; transform: scale(0.94); filter: blur(6px); }
+  #screen-songs { z-index: var(--z-pantalla); opacity: 0; pointer-events: none; transform: scale(0.94); filter: blur(6px); }
   #screen-songs.active { opacity: 1; pointer-events: auto; transform: scale(1); filter: blur(0); }
   .song-select-card.selected .vinyl-mini { animation: spinVinyl 1.1s linear infinite; }
   #btn-no { transition: left 0.32s cubic-bezier(.3,.7,.3,1.4), top 0.32s cubic-bezier(.3,.7,.3,1.4), transform 0.28s cubic-bezier(.3,.7,.3,1.4), opacity 0.4s ease; }

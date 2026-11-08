@@ -10,13 +10,16 @@
      stale-while-revalidate, y en la primera visita tras una actualización
      se veía el index.html nuevo con contenido viejo; ahora siempre llega
      lo más reciente y, sin red, se sirve la copia guardada.
-   - Fotos/audio/juegos: cache-first bajo demanda (se guardan la primera
-     vez que se piden, no se precargan todas de entrada — mantiene la
-     primera visita ligera). assets/img/originales/ NUNCA se cachea.
+   - Fotos, íconos y demás estáticos: cache-first bajo demanda (se guardan
+     la primera vez que se piden, no se precargan todas de entrada —
+     mantiene la primera visita ligera). Los juegos (js/juegos/*.js) son
+     parte del shell (network-first); cualquier otro .js/.css/.html va
+     network-first en la caché runtime. assets/vendor/ (Three.js) es
+     cache-first. assets/img/originales/ NUNCA se cachea.
    - Sube CACHE_VERSION cuando cambies qué se precachea; las versiones
      viejas se borran solas en "activate". */
 
-const CACHE_VERSION = 'v33';
+const CACHE_VERSION = 'v34';
 const SHELL_CACHE = `jardin-shell-${CACHE_VERSION}`;
 const CONTENIDO_CACHE = `jardin-contenido-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `jardin-runtime-${CACHE_VERSION}`;
@@ -100,10 +103,20 @@ const CONTENIDO_URLS = [
 /* Precache tolerante: cada archivo por separado. Con addAll (todo o nada) un solo 404 o un
    corte de red dejaba la versión nueva sin instalar y a Lexi con la vieja para siempre.
    Three.js (≈ 700 KB) NO se precachea: solo lo usa "una flor especial" y se guarda la
-   primera vez que se abre (network-first del runtime). */
+   primera vez que se abre (cache-first del runtime). */
 async function precachear(nombre, urls) {
   const cache = await caches.open(nombre);
-  await Promise.allSettled(urls.map((u) => fetch(u, { cache: 'reload' }).then((r) => (r.ok ? cache.put(u, r) : null))));
+  await Promise.allSettled(urls.map(async (u) => {
+    try {
+      const r = await fetch(u, { cache: 'reload' });
+      if (r && r.ok) { await cache.put(u, r); return; }
+    } catch (e) {}
+    /* no se pudo bajar: conservar la copia de una versión anterior antes de que "activate" la borre */
+    try {
+      const viejo = await caches.match(u);
+      if (viejo) await cache.put(u, viejo);
+    } catch (e) {}
+  }));
 }
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -119,7 +132,8 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
       const names = await caches.keys();
-      await Promise.all(names.filter((n) => !ALL_CACHES.includes(n)).map((n) => caches.delete(n)));
+      // solo las cachés propias (jardin-*): el origen papijulis.github.io lo comparten otros proyectos
+      await Promise.all(names.filter((n) => n.startsWith('jardin-') && !ALL_CACHES.includes(n)).map((n) => caches.delete(n)));
       self.clients.claim();
     })()
   );
@@ -132,23 +146,37 @@ function isOriginalesRequest(url) {
   return url.pathname.includes('/assets/img/originales/');
 }
 
-/* network-first con tiempo límite: con señal débil, si hay copia guardada se usa a los 4 s en
-   vez de esperar indefinidamente; la respuesta de red, si llega después, igual actualiza la caché */
+/* network-first con tiempo límite: con señal débil, si hay copia guardada se usa a los 4 s (la
+   página) o 12 s (los demás archivos) en vez de esperar indefinidamente, o si la red responde con
+   error (404/5xx, p. ej. durante un despliegue); la respuesta de red, si llega después, igual
+   actualiza la caché */
 async function networkFirst(request, cacheName) {
   const cache = await caches.open(cacheName);
-  const red = fetch(request).then((response) => {
-    if (response && response.ok) cache.put(request, response.clone());
+  const esNav = request.mode === 'navigate';
+  // La página se guarda sin la query (?fbclid, ?utm_, ?fecha): una sola copia, y sin conexión
+  // también abre con parámetros en la URL
+  let clave = request;
+  if (esNav) { const u = new URL(request.url); u.search = ''; u.hash = ''; clave = u.href; }
+  // Archivos (no la página): no-cache = siempre revalida con el servidor (con ETag cuesta un 304)
+  // en vez de usar la caché HTTP de 10 min de GitHub Pages, que mezclaba index.html nuevo con
+  // js/*.js viejos
+  const red = (esNav ? fetch(request) : fetch(request, { cache: 'no-cache' })).then((response) => {
+    if (response && response.ok && !response.redirected) cache.put(clave, response.clone()).catch(() => {});
     return response;
   });
   red.catch(() => {});   // si gana el reloj y luego falla la red, no es un error sin atender
-  const cached = await cache.match(request);
+  const esInicio = esNav && new URL(request.url).pathname.endsWith('/');
+  const cached = (await cache.match(clave)) || (esInicio ? await cache.match('./index.html') : undefined);
   if (!cached) return red;
+  // nunca esperar para siempre: con una red colgada un <script> bloqueante dejaría la página en blanco
+  const limite = esNav ? 4000 : 12000;
   let reloj;
-  const tiempo = new Promise((res) => { reloj = setTimeout(() => res(cached), 4000); });
+  const tiempo = new Promise((res) => { reloj = setTimeout(() => res(cached), limite); });
   try {
     const r = await Promise.race([red, tiempo]);
     clearTimeout(reloj);
-    return r || cached;
+    if (r && (r.ok || r.type === 'opaqueredirect')) return r;
+    return cached; // 404/5xx de la red: mejor la copia buena
   } catch (e) {
     clearTimeout(reloj);
     return cached;
@@ -191,11 +219,16 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(isFont ? cacheFirst(req, SHELL_CACHE) : networkFirst(req, SHELL_CACHE));
     return;
   }
+  // Three.js r160 y OrbitControls (versión fija, ~700 KB): cache-first; se renuevan solo al subir CACHE_VERSION
+  if (url.pathname.includes('/assets/vendor/')) {
+    event.respondWith(cacheFirst(req, RUNTIME_CACHE));
+    return;
+  }
   if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.html')) {
     event.respondWith(networkFirst(req, RUNTIME_CACHE));
     return;
   }
-  // Todo lo demás (fotos, audio, iconos, juegos extra): cache-first bajo
-  // demanda, se va guardando conforme se usa.
+  // Todo lo demás (fotos, iconos y otros estáticos que no son JS/CSS/HTML):
+  // cache-first bajo demanda, se va guardando conforme se usa.
   event.respondWith(cacheFirst(req, RUNTIME_CACHE));
 });

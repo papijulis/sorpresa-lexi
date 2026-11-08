@@ -6,13 +6,7 @@
    plegados cabe en una pantalla y media.
 ====================================================================== */
 .tl-controles { display: flex; justify-content: center; margin: -.6rem 0 1.4rem; }
-.tl-todo {
-  min-height: 2.75rem; padding: 0 1.1rem; border-radius: var(--radio-pill); cursor: pointer;
-  font-family: var(--fuente-ui); font-size: .8rem; font-weight: 600; color: var(--dorado-500);
-  background: rgba(var(--dorado-rgb), .08); border: 1px solid rgba(var(--dorado-rgb), .3);
-  transition: background var(--dur-rapida) ease;
-}
-@media (hover: hover) { .tl-todo:hover { background: rgba(var(--dorado-rgb), .16); } }
+/* el botón "Abrir/Cerrar todos los meses" (.tl-todo) lo estilan .btn-suave/.btn-suave-oro (botones.css) */
 
 /* ---- la enredadera ---- */
 .tl-vine { position: absolute; left: 0; top: 0; width: 40px; overflow: visible; pointer-events: none; z-index: 0; }
