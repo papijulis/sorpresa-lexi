@@ -28,7 +28,7 @@ window.MEMORIES = [
   { date: "2026-08-15", display: "Sábado 15 de agosto", text: "El día que me di cuenta que Taylor Swift estaba por encima de Kanye west en mis artistas escuchados jaja." },
   { date: "2026-08-18", display: "Martes 18 de agosto", text: "El día que volví a la uni, pero está en esta lista porque ese día fue muy especial: el día que yo te hice el ramo de flores todo feo jajaja y ese día tomamos la foto que ahora es mi fondo de chat contigo." },
   { date: "2026-08-19", display: "Miércoles 19 de agosto", text: "La segunda cita en Colomos, día perfecto e increíble." },
-  { date: "2026-08-29", display: "Viernes 29 de agosto", text: "El día que salimos a chapu, fuimos a strana y luego fuimos a dormir juntitos, día increíble.", borrador: true },
+  { date: "2026-08-29", display: "Sábado 29 de agosto", text: "El día que salimos a chapu, fuimos a strana y luego fuimos a dormir juntitos, día increíble.", borrador: true },
   { date: "2026-09-09", display: "Miércoles 9 de septiembre", text: "El día que finalmente conocí a tu mamá, de los días más increíbles que hemos tenido a pesar de que estaba taaaan nervioso.", borrador: true },
   { date: "2026-09-11", display: "Viernes 11 de septiembre", text: "El concierto de Taylor, el día que lloré de felicidad viéndote.", borrador: true },
   { date: "2026-09-13", display: "Domingo 13 de septiembre", text: "Curiosamente el día es un 13, como si fuera Taylor dándonos una señal. Desde ese día, cada noche y cada día que hemos pasado juntos han sido de los mejores de mi vida.", borrador: true },

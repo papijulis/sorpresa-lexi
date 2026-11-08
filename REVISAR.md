@@ -21,12 +21,6 @@ Todos son borrador míos salvo donde se indica; edítalos ahí mismo.
 - **Parte V**: "Lo que quedó escrito" · "cartas que se quedan guardadas".
 - **Cuarta carta** (`contenido/cartas.js` → `CARTA_CUARTA`): título "La cuarta carta" y "Todavía la estoy escribiendo." mientras `texto` esté vacío. Cuando la termines, pega el texto ahí.
 
-## De la auditoría (2026-11-08)
-
-- **Recuerdo del 29 de agosto** (`recuerdos.js`): dice "Viernes 29 de agosto", pero el 29/08/2026 fue sábado. ¿Es "Sábado 29 de agosto" o la fecha era el viernes 28? No lo cambié.
-- **Aviso nuevo de la nota de voz** (rótulo de interfaz, mío): "No se pudo cargar la nota de voz. Revisa tu conexión e inténtalo de nuevo."
-- **Nombre de la app instalada** (`manifest.webmanifest`): pasó de "Para Lexi 💛" a "Para Lexi" (regla de no emojis).
-
 ## Calendario (`contenido/recuerdos.js`)
 
 Entradas reescritas en versión positiva y sin nombres de terceros:

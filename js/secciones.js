@@ -116,7 +116,6 @@ const voicePlayIcon = document.getElementById('voice-play-icon');
 const voiceCurrent = document.getElementById('voice-current');
 const voiceDuration = document.getElementById('voice-duration');
 const voiceWave = document.getElementById('voice-wave');
-const voiceFallbackNote = document.getElementById('voice-fallback-note');
 const voiceWaveBars = buildBars(voiceWave, 22);
 
 function formatTime(sec) {
@@ -135,9 +134,7 @@ function pintarVoz() {
   if (!useRealEq) voiceWaveBars.forEach((b) => b.classList.toggle('playing', suena));
 }
 ['play', 'pause', 'ended'].forEach((ev) => voiceAudio.addEventListener(ev, pintarVoz));
-voiceAudio.addEventListener('playing', () => voiceFallbackNote.classList.add('hidden'));   // si al reintentar sí suena, se quita el aviso
 voiceAudio.addEventListener('error', () => {
-  voiceFallbackNote.classList.remove('hidden');
   if (!voiceAudio.paused) voiceAudio.pause();
   pintarVoz();
 });
@@ -147,7 +144,6 @@ voicePlayBtn.addEventListener('click', () => {
     setupAnalysers();
     reanudarAudioCtx();
     voiceAudio.play().catch((e) => {
-      if (!e || e.name !== 'AbortError') voiceFallbackNote.classList.remove('hidden');
       if (!voiceAudio.paused) voiceAudio.pause();
       pintarVoz();
     });
